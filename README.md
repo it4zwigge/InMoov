@@ -1,3 +1,5 @@
+<img src="http://h2590701.stratoserver.net/wp-content/uploads/2016/10/IMG_8484.jpg">
+
 # InMoov
 
 InMoov ist eine UWP-App zum Steuern unseres [InMoov](http://www.inmoov.fr)-Roboters.

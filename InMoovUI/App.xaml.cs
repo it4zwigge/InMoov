@@ -23,7 +23,10 @@ namespace InMoov
     using Microsoft.ApplicationInsights.Channel;
     using Microsoft.Maker.RemoteWiring;
     using Microsoft.Maker.Serial;
+    using System.Diagnostics;
     using Views;
+    using Windows.Media.SpeechRecognition;
+    using Windows.Storage;
     using Windows.UI;
     using Windows.UI.ViewManagement;
     /// <summary>
@@ -66,8 +69,55 @@ namespace InMoov
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            //NEU
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // App-Initialisierung nicht wiederholen, wenn das Fenster bereits Inhalte enthält.
+            // Nur sicherstellen, dass das Fenster aktiv ist.
+            if (rootFrame == null)
+            {
+                // Frame erstellen, der als Navigationskontext fungiert und zum Parameter der ersten Seite navigieren
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    //TODO: Zustand von zuvor angehaltener Anwendung laden
+                }
+
+                // Den Frame im aktuellen Fenster platzieren
+                Window.Current.Content = rootFrame;
+
+                try
+                {
+                    // Install the main VCD. Since there's no simple way to test that the VCD has been imported, or that it's your most recent
+                    // version, it's not unreasonable to do this upon app load.
+                    StorageFile vcdStorageFile = await Package.Current.InstalledLocation.GetFileAsync(@"CortanaCommands.xml");
+                    Debug.WriteLine(vcdStorageFile.Path);
+                    await Windows.ApplicationModel.VoiceCommands.VoiceCommandDefinitionManager.InstallCommandDefinitionsFromStorageFileAsync(vcdStorageFile);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Installing Voice Commands Failed: " + ex.ToString());
+                }
+            }
+
+            if (e.PrelaunchActivated == false)
+            {
+                if (rootFrame.Content == null)
+                {
+                    // Wenn der Navigationsstapel nicht wiederhergestellt wird, zur ersten Seite navigieren
+                    // und die neue Seite konfigurieren, indem die erforderlichen Informationen als Navigationsparameter
+                    // übergeben werden
+                    rootFrame.Navigate(typeof(AppShell), e.Arguments);
+                }
+                // Sicherstellen, dass das aktuelle Fenster aktiv ist
+                Window.Current.Activate();
+            }
+            //[ENDE]
 
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -155,6 +205,19 @@ namespace InMoov
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        //NEU
+        /// <summary>
+        /// Returns the semantic interpretation of a speech result. Returns null if there is no interpretation for
+        /// that key.
+        /// </summary>
+        /// <param name="interpretationKey">The interpretation key.</param>
+        /// <param name="speechRecognitionResult">The result to get an interpretation from.</param>
+        /// <returns></returns>
+        private string SemanticInterpretation(string interpretationKey, SpeechRecognitionResult speechRecognitionResult)
+        {
+            return speechRecognitionResult.SemanticInterpretation.Properties[interpretationKey].FirstOrDefault();
         }
     }
 }

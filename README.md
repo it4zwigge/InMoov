@@ -26,3 +26,12 @@ Die Kinect dient als zentraler Sensor des Projekts. Die ca. 30 Servomotoren werd
 - Sprachsteuerung bzw. ausgabe (Microsoft Cortana)
 - Interaktion über hinterlegte Datenbankinformationen
 - ...
+
+## Ausblick
+
+_Im Moment befindet sich eine zweite Version unseres Roboters, mit folgenden Features in Arbeit:_
+
+- Mecanum-Fahrwerk mit Federung
+- verbesserte Materialauswahl
+- verbessertes Farbdesign
+- erhöhte Stabilität und Sicherheit

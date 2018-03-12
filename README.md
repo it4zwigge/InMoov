@@ -1,4 +1,4 @@
-<img src="http://h2590701.stratoserver.net/wp-content/uploads/2016/10/IMG_8484.jpg">
+<img src="http://h2590701.stratoserver.net/wp-content/uploads/2017/09/inmoov-github-header.png">
 
 # InMoov
 

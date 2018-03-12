@@ -1,4 +1,4 @@
-<img src="http://h2590701.stratoserver.net/wp-content/uploads/2017/09/inmoov-github-header.png">
+ <img src="http://h2590701.stratoserver.net/wp-content/uploads/2017/09/inmoov-github-header.png">
 
 # InMoov
 
@@ -12,13 +12,17 @@ Der humanoide Roboter mit [Mecanum](https://de.wikipedia.org/wiki/Mecanum-Rad)-F
 >
 > [https://sagwas.net/2017/12/roboter-zum-selbermachen]
 
-## Hardware
+## Hardware (Auszug)
 
 - [Microsoft Kinect v2](https://en.wikipedia.org/wiki/Kinect#Kinect_for_Windows_v2_(2014))
 - [LattePanda](www.lattepanda.com/)
 - 2x Arduino Mega
 
-## Software
+Die Kinect dient als zentraler Sensor des Projekts. Die ca. 30 Servomotoren werden über die beiden Arduino Mega angesteuert. Die Verbindung der InMoov-App zu den Servomotoren erfolgt mit Hilfe der [Microsoft.Maker](https://github.com/ms-iot/remote-wiring)-Bibliotheken.
 
-- [Microsoft.Maker](https://github.com/ms-iot/remote-wiring)
-- 
+## Geplanter Funktionsumfang
+
+- Gesichtserkennung (Microsoft Cognitive Services)
+- Sprachein- bzw. ausgabe
+- Interaktion über hinterlegte Datenbankinformationen
+- ...

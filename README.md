@@ -14,11 +14,11 @@ Der humanoide Roboter mit [Mecanum](https://de.wikipedia.org/wiki/Mecanum-Rad)-F
 
 ## Hardware
 
-- Microsoft Kinect v2
-- LattePanda
+- [Microsoft Kinect v2](https://en.wikipedia.org/wiki/Kinect#Kinect_for_Windows_v2_(2014))
+- [LattePanda](www.lattepanda.com/)
 - 2x Arduino Mega
 
 ## Software
 
-- Microsoft.Maker
+- [Microsoft.Maker](https://github.com/ms-iot/remote-wiring)
 - 

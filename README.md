@@ -1,3 +1,3 @@
 # InMoov
 
-Ist eine UWP-App für unseren [InMoov](http://www.inmoov.fr/)-Roboter.
+Ist eine UWP-App zum steuern unseres [InMoov](http://www.inmoov.fr/)-Roboters.

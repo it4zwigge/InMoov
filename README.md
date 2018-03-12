@@ -8,6 +8,7 @@ InMoov ist eine [UWP](https://de.wikipedia.org/wiki/Universal_Windows_Platform)-
 
 Der humanoide Roboter mit [Mecanum](https://de.wikipedia.org/wiki/Mecanum-Rad)-Fahrgestell wurde 2016 am [Volkswagen Bildungsintitut](http://vw-bi.de) in Zwickau fertiggestellt. Der Roboter soll, nach seiner programmiertechnischen Fertigstellung, zur sozialen Interaktion im Institutsfojer dienen. Gleichzeitig dient er als Lernträger bei der Ausbildung unserer Fachinformatiker für Anwendungsentwicklung (FIAN).
 
-> mehr dazu [hier](http://h2590701.stratoserver.net/?p=8)
+> [http://h2590701.stratoserver.net/?p=8]
+> [https://sagwas.net/2017/12/roboter-zum-selbermachen]
 
 ## Hardware

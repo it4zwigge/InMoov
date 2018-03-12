@@ -13,3 +13,12 @@ Der humanoide Roboter mit [Mecanum](https://de.wikipedia.org/wiki/Mecanum-Rad)-F
 > [https://sagwas.net/2017/12/roboter-zum-selbermachen]
 
 ## Hardware
+
+- Microsoft Kinect v2
+- LattePanda
+- 2x Arduino Mega
+
+## Software
+
+- Microsoft.Maker
+- 

@@ -1,4 +1,4 @@
- () <img src="http://h2590701.stratoserver.net/wp-content/uploads/2017/09/inmoov-github-header.png">
+<img src="http://h2590701.stratoserver.net/wp-content/uploads/2017/09/inmoov-github-header.png">
 
 # InMoov
 
@@ -22,7 +22,7 @@ Die Kinect dient als zentraler Sensor des Projekts. Die ca. 30 Servomotoren werd
 
 ## Geplanter Funktionsumfang
 
-- Gesichtserkennung (Microsoft Cognitive Services)
+- Gesichtserkennung ([Microsoft Cognitive Services](https://azure.microsoft.com/de-de/services/cognitive-services/))
 - Sprachsteuerung bzw. ausgabe (Microsoft Cortana)
 - Interaktion über hinterlegte Datenbankinformationen
 - ...

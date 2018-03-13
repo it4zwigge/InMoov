@@ -108,6 +108,21 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SkeletonPage.xaml.cs">
+      <DependentUpon>SkeletonPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FacesPage.xaml.cs">
+      <DependentUpon>FacesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SpeechPage.xaml.cs">
+      <DependentUpon>SpeechPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LedRingPage.xaml.cs">
+      <DependentUpon>LedRingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DrivePage.xaml.cs">
+      <DependentUpon>DrivePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ConnectPage.xaml.cs">
       <DependentUpon>ConnectPage.xaml</DependentUpon>
     </Compile>
@@ -166,6 +181,26 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\BasicSubPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SkeletonPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\FacesPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SpeechPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\LedRingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\DrivePage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -32,28 +32,40 @@ namespace InMoov
             {
                 new NavMenuItem()
                 {
-                    Symbol = Symbol.Edit,
-                    Label = "Connect Page",
+                    Symbol = Symbol.PreviewLink,
+                    Label = "Arduinos",
                     DestPage = typeof(ConnectPage)
                 },
                 new NavMenuItem()
                 {
-                    Symbol = Symbol.Contact,
-                    Label = "Basic Page",
-                    DestPage = typeof(BasicPage)
+                    Symbol = Symbol.Play,
+                    Label = "Fahrwerk",
+                    DestPage = typeof(DrivePage)
                 },
                 new NavMenuItem()
                 {
-                    Symbol = Symbol.Edit,
-                    Label = "CommandBar Page",
-                    DestPage = typeof(CommandBarPage)
+                    Symbol = Symbol.Rotate,
+                    Label = "Ledring",
+                    DestPage = typeof(LedRingPage)
                 },
                 new NavMenuItem()
                 {
-                    Symbol = Symbol.Favorite,
-                    Label = "Drill In Page",
-                    DestPage = typeof(DrillInPage)
+                    Symbol = Symbol.Microphone,
+                    Label = "Sprache",
+                    DestPage = typeof(SpeechPage)
                 },
+                new NavMenuItem()
+                {
+                    Symbol = Symbol.WebCam,
+                    Label = "Gesichtserkennung",
+                    DestPage = typeof(FacesPage)
+                },
+                new NavMenuItem()
+                {
+                    Symbol = Symbol.People,
+                    Label = "Skelettierung",
+                    DestPage = typeof(SkeletonPage)
+                }
             });
 
         public static AppShell Current = null;

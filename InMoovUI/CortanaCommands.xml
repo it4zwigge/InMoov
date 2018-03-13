@@ -6,19 +6,19 @@
 
     <Command Name="arms">
       <Example>Hebe den rechten Arm</Example>
-      <ListenFor RequireAppName="BeforePhrase">Hebe den {direction} Arm</ListenFor>
-      <Feedback>Bist du dir sicher das ich den {direction} Arm heben soll?</Feedback>
+      <ListenFor RequireAppName="BeforePhrase">Hebe den {handside} Arm</ListenFor>
+      <Feedback>Bist du dir sicher das ich den {handside} Arm heben soll?</Feedback>
       <VoiceCommandService Target="FHEMAppVoiceCommandService"/>
     </Command>
 
-    <Command Name="arms_without_specification">
+    <Command Name="arms_without_handside">
       <Example>Hebe den Arm</Example>
       <ListenFor RequireAppName="BeforeOrAfterPhrase">Hebe den {bodypart}</ListenFor>
-      <Feedback>BliBlaBlub {bodypart}</Feedback>
+      <Feedback>Welchen {bodypart} soll ich heben, den rechten oder den linken?</Feedback>
       <VoiceCommandService Target="FHEMAppVoiceCommandService"/>
     </Command>    
 
-    <PhraseList Label="direction">
+    <PhraseList Label="handside">
       <Item> linken </Item>
       <Item> rechten </Item>
     </PhraseList>

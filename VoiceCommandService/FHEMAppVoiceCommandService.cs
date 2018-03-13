@@ -36,21 +36,20 @@ namespace FHEMApp.VoiceCommands
                     VoiceCommand voiceCommand = await voiceServiceConnection.GetVoiceCommandAsync();
 
                     //textSpoken = voiceCommand.SpeechRecognitionResult.Text;
-                    
+
                     switch (voiceCommand.CommandName)
                     {
                         case "arms":
-                            var destination = voiceCommand.Properties["direction"][0];
-                            await Speech_contains_destination(destination);
+                            var handside = voiceCommand.Properties["handside"][0];
+                            await SpeechContainsHandside(handside);
                             break;
-                        case "arms_without_specification":
-                            var part = voiceCommand.Properties["bodypart"][0];
-                            await Speech_not_contains_direction(part);
+                        case "arms_without_handside":
+                            var bodypart = voiceCommand.Properties["bodypart"][0];
+                            await DisambiguateHandsides(bodypart);
                             break;
-
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     var test = ex.Message;
                 }
@@ -58,84 +57,44 @@ namespace FHEMApp.VoiceCommands
         }
 
         /// <summary>
-        /// Methode welche uns einen Arm vorschlägt welcher bestätigt oder abgelehnt werden kann, wenn abgelehnt dann wird anderer Arm vorgeschlagen
+        /// 
         /// </summary>
-        /// <param name="bodypart">beinhaltet "arm"</param>
         /// <returns></returns>
-        private async Task Speech_not_contains_direction(string bodypart)
+        private async Task<string> DisambiguateHandsides(string bodypart)
         {
-            //Cortana fragt welcher Arm gehoben werden soll? Sie schlägt uns einen vor.
+            string[] handsides = new string[] { "rechter", "linker" };
             var userPrompt = new VoiceCommandUserMessage();
-            userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Welchen {bodypart} soll ich heben? Ich schlage den linken vor.";
 
-            //Nach zu langer Wartezeit wird noch einmal nachgefragt.
+            userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Welchen {bodypart} soll ich heben? {handsides[0]} oder {handsides[1]} {bodypart}?";
             var userReprompt = new VoiceCommandUserMessage();
-            userReprompt.DisplayMessage = userReprompt.SpokenMessage = $"Hallo! Welchen {bodypart} soll ich nun heben, wie gesagt mein Vorschlag wäre der linke.";
 
-            //Antwort wird erwartet und überprüft
-            var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt);
-            var voiceCommandConfirmation = await voiceServiceConnection.RequestConfirmationAsync(response);
-            Debug.WriteLine(voiceCommandConfirmation.Confirmed.ToString());
+            userReprompt.DisplayMessage = userReprompt.SpokenMessage = $"Könntest Du dich für einen {bodypart} entscheiden.";
+            var destinationContentTiles = new List<VoiceCommandContentTile>();
 
-
-            if (voiceCommandConfirmation != null)
+            foreach (string sides in handsides)
             {
-                //Prüfen wie die Antwort auf die Frage ist.
-                if (voiceCommandConfirmation.Confirmed == true)
-                {
-                    //Linker Arm ist bestätigt worden
+                var destinationTile = new VoiceCommandContentTile();
+                
+                destinationTile.AppContext = $"{sides}";
+                destinationTile.Title = $"{sides} {bodypart}";
+                //destinationTile.TextLine1 = $"{sides} Description";
 
-                    var userMessage = new VoiceCommandUserMessage();
-                    userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, ich hebe den linken {bodypart}.";
-                    response = VoiceCommandResponse.CreateResponse(userMessage);
-                    await voiceServiceConnection.ReportSuccessAsync(response);
-/*
-                             +++ TODO +++ 
-                      Befehl für Servos ergänzen    
-                Servos ansteuern und Bewegung ausführen
-*/
-
-                }
-                else
-                {
-                    //Es soll der Rechte Arm gewählt werden
-                    var new_userPrompt = new VoiceCommandUserMessage();
-                    new_userPrompt.DisplayMessage = new_userPrompt.SpokenMessage = $"Soll ich dann den rechten {bodypart} heben?";
-
-                    //Nachfrage wenn zu lange gezögert
-                    var new_userReprompt = new VoiceCommandUserMessage();
-                    new_userReprompt.DisplayMessage = new_userReprompt.SpokenMessage = $"Hallo! Soll ich nun den rechten {bodypart} heben?.";
-
-                    var new_response = VoiceCommandResponse.CreateResponseForPrompt(new_userPrompt, new_userReprompt);
-
-                    var new_voiceCommandConfirmation = await voiceServiceConnection.RequestConfirmationAsync(new_response);
-                    Debug.WriteLine(new_voiceCommandConfirmation.Confirmed.ToString());
-                    if (new_voiceCommandConfirmation != null)
-                    {
-                        if (new_voiceCommandConfirmation.Confirmed == true)
-                        {
-                            //Rechter Arm wird bestätigt
-                            var new_userMessage = new VoiceCommandUserMessage();
-                            new_userMessage.DisplayMessage = new_userMessage.SpokenMessage = $"Alles klar, ich hebe den rechten {bodypart}.";
-                            new_response = VoiceCommandResponse.CreateResponse(new_userMessage);
-                            await voiceServiceConnection.ReportSuccessAsync(new_response);
-                        }
-                        else
-                        {
-                            //Abbruch weil nicht erfordert.
-                            Debug.WriteLine(007);
-                            var decline_userMessage = new VoiceCommandUserMessage();
-                            decline_userMessage.DisplayMessage = decline_userMessage.SpokenMessage = "Gut dann lasse ich´s halt.";
-
-                            new_response = VoiceCommandResponse.CreateResponse(decline_userMessage);
-                            await voiceServiceConnection.ReportSuccessAsync(new_response);
-                        }
-                    }
-                }
+                destinationContentTiles.Add(destinationTile);
             }
+            var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt, destinationContentTiles);
+
+            var voiceCommandDisambiguationResult = await voiceServiceConnection.RequestDisambiguationAsync(response);
+            if (voiceCommandDisambiguationResult != null)
+            {
+                var userMessage = new VoiceCommandUserMessage();
+                userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, {voiceCommandDisambiguationResult.SelectedItem.AppContext} {bodypart} wird gehoben.";
+                response = VoiceCommandResponse.CreateResponse(userMessage);
+                await voiceServiceConnection.ReportSuccessAsync(response);
+            }
+            return String.Empty;
         }
 
-        private async Task Speech_contains_destination(string destination)
+        private async Task SpeechContainsHandside(string destination)
         {
             var userPrompt = new VoiceCommandUserMessage();
             userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Sind Sie sicher das ich den {destination} Arm heben soll?";
@@ -147,13 +106,10 @@ namespace FHEMApp.VoiceCommands
             var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt);
 
             var voiceCommandConfirmation = await voiceServiceConnection.RequestConfirmationAsync(response);
-            Debug.WriteLine(voiceCommandConfirmation.Confirmed.ToString());
             if (voiceCommandConfirmation != null)
             {
                 if (voiceCommandConfirmation.Confirmed == true)
                 {
-                    //await ShowProgressScreen($"Was willst Du?");
-
                     var userMessage = new VoiceCommandUserMessage();
                     userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, ich hebe den {destination} Arm.";
                     response = VoiceCommandResponse.CreateResponse(userMessage);
@@ -165,7 +121,6 @@ namespace FHEMApp.VoiceCommands
                 {
                     var userMessage = new VoiceCommandUserMessage();
                     userMessage.DisplayMessage = userMessage.SpokenMessage = "Na dann eben nicht!";
-
                     response = VoiceCommandResponse.CreateResponse(userMessage);
                     await voiceServiceConnection.ReportSuccessAsync(response);
                 }

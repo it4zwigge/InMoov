@@ -1,6 +1,7 @@
 ﻿using Communication;
 using Microsoft.Maker.RemoteWiring;
 using Microsoft.Maker.Serial;
+using Microsoft.Maker.Firmata;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using InMoov;
+using System.Diagnostics;
 
 namespace InMoov.Views
 {
@@ -32,10 +35,10 @@ namespace InMoov.Views
         DateTime timePageNavigatedTo;
         CancellationTokenSource cancelTokenSource;
 
-        //string identifiers used to recognize drop-down selections
-        private const string BLUETOOTH = "Bluetooth";
-        private const string USB = "USB";
-        private const string NETWORK = "Network";
+        const string Computer = "";       // Hier den Namen des Computers eintragen
+        const string ComL = "COM4";       // COM Port für Leonardo [ Fahrwerk ]
+        const string ComA = "COM3";       // COM Port für Mega A   [ Rechts ]
+        const string ComB = "COM9";       // COM Port für Mega B   [ Links ]
 
         public ConnectPage()
         {
@@ -98,81 +101,29 @@ namespace InMoov.Views
                 var selectedConnection = ConnectionList.SelectedItem as Connection;
                 device = selectedConnection.Source as DeviceInformation;
             }
-            else if ((ConnectionMethodComboBox.SelectedItem as string) != NETWORK)
-            {
-                //if they haven't selected an item, but have chosen "usb" or "bluetooth", we can't proceed
-                ConnectMessage.Text = "You must select an item to proceed.";
-                SetUiEnabled(true);
-                return;
-            }
 
             //determine the selected baud rate
-            uint baudRate = Convert.ToUInt32((BaudRateComboBox.SelectedItem as string));
+            //uint baudRate = Convert.ToUInt32((BaudRateComboBox.SelectedItem as string));
 
             //connection properties dictionary, used only for telemetry data
             var properties = new Dictionary<string, string>();
 
             //use the selected device to create our communication object
-            switch (ConnectionMethodComboBox.SelectedItem as string)
-            {
-                default:
-                case BLUETOOTH:
+            
+            //send telemetry about this connection attempt
+            properties.Add("Device_Name", device.Name);
+            properties.Add("Device_ID", device.Id);
+            properties.Add("Device_Kind", device.Kind.ToString());
+            App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
 
-                    //send telemetry about this connection attempt
-                    properties.Add("Device_Name", device.Name);
-                    properties.Add("Device_ID", device.Id);
-                    properties.Add("Device_Kind", device.Kind.ToString());
-                    App.Telemetry.TrackEvent("Bluetooth_Connection_Attempt", properties);
-                    App.Connection = new BluetoothSerial(device);
-                    break;
-
-                case USB:
-
-                    //send telemetry about this connection attempt
-                    properties.Add("Device_Name", device.Name);
-                    properties.Add("Device_ID", device.Id);
-                    properties.Add("Device_Kind", device.Kind.ToString());
-                    App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
-
-                    App.Connection = new UsbSerial(device);
-                    break;
-
-                case NETWORK:
-                    string host = NetworkHostNameTextBox.Text;
-                    string port = NetworkPortTextBox.Text;
-                    ushort portnum = 0;
-
-                    if (host == null || port == null)
-                    {
-                        ConnectMessage.Text = "You must enter host and IP.";
-                        return;
-                    }
-
-                    try
-                    {
-                        portnum = Convert.ToUInt16(port);
-                    }
-                    catch (FormatException)
-                    {
-                        ConnectMessage.Text = "You have entered an invalid port number.";
-                        return;
-                    }
-
-                    //send telemetry about this connection attempt
-                    properties.Add("host", host);
-                    properties.Add("port", portnum.ToString());
-                    App.Telemetry.TrackEvent("Network_Connection_Attempt", properties);
-
-                    App.Connection = new NetworkSerial(new Windows.Networking.HostName(host), portnum);
-                    break;
-            }
+            App.Connection = new UsbSerial(device);
 
             App.Arduino = new RemoteDevice(App.Connection);
             App.Arduino.DeviceReady += OnDeviceReady;
             App.Arduino.DeviceConnectionFailed += OnDeviceConnectionFailed;
 
             connectionAttemptStartedTime = DateTime.UtcNow;
-            App.Connection.begin(baudRate, SerialConfig.SERIAL_8N1);
+            App.Connection.begin(57600, SerialConfig.SERIAL_8N1);
 
             //start a timer for connection timeout
             timeout = new DispatcherTimer();
@@ -183,53 +134,28 @@ namespace InMoov.Views
 
         private void RefreshDeviceList()
         {
+            Dictionary<string, UsbSerial> devices = new Dictionary<string, UsbSerial>();
+            Connections connections = new Connections();
             //invoke the listAvailableDevicesAsync method of the correct Serial class. Since it is Async, we will wrap it in a Task and add a llambda to execute when finished
             Task<DeviceInformationCollection> task = null;
-            if (ConnectionMethodComboBox.SelectedItem == null)
-            {
-                ConnectMessage.Text = "Select a connection method to continue.";
-                return;
-            }
+            //if (ConnectionMethodComboBox.SelectedItem == null)
+            //{
+            //    ConnectMessage.Text = "Select a connection method to continue.";
+            //    return;
+            //}
 
-            switch (ConnectionMethodComboBox.SelectedItem as String)
-            {
-                default:
-                case BLUETOOTH:
-                    ConnectionList.Visibility = Visibility.Visible;
-                    NetworkConnectionGrid.Visibility = Visibility.Collapsed;
-                    BaudRateStack.Visibility = Visibility.Visible;
+            
+            ConnectionList.Visibility = Visibility.Visible;
+            NetworkConnectionGrid.Visibility = Visibility.Collapsed;
+            BaudRateStack.Visibility = Visibility.Visible;
 
-                    //create a cancellation token which can be used to cancel a task
-                    cancelTokenSource = new CancellationTokenSource();
-                    cancelTokenSource.Token.Register(() => OnConnectionCancelled());
+            //create a cancellation token which can be used to cancel a task
+            cancelTokenSource = new CancellationTokenSource();
+            cancelTokenSource.Token.Register(() => OnConnectionCancelled());
 
-                    task = BluetoothSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
-                    break;
+            task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
+            
 
-                case USB:
-                    ConnectionList.Visibility = Visibility.Visible;
-                    NetworkConnectionGrid.Visibility = Visibility.Collapsed;
-                    BaudRateStack.Visibility = Visibility.Visible;
-
-                    //create a cancellation token which can be used to cancel a task
-                    cancelTokenSource = new CancellationTokenSource();
-                    cancelTokenSource.Token.Register(() => OnConnectionCancelled());
-
-                    task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
-                    break;
-
-                case NETWORK:
-                    ConnectionList.Visibility = Visibility.Collapsed;
-                    NetworkConnectionGrid.Visibility = Visibility.Visible;
-                    BaudRateStack.Visibility = Visibility.Collapsed;
-
-                    ConnectMessage.Text = "Enter a host and port to connect";
-                    task = null;
-                    break;
-            }
-
-
-            //the task, if created, is enumerating the devices available from the selected connection method. We will display the results to the UI so that they can be selected.
             if (task != null)
             {
                 //store the returned DeviceInformation items when the task completes
@@ -238,27 +164,32 @@ namespace InMoov.Views
                     //store the result and populate the device list on the UI thread
                     var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
-                        Connections connections = new Connections();
-
                         var result = listTask.Result;
                         if (result == null || result.Count == 0)
                         {
-                            ConnectMessage.Text = "No items found.";
+                            Debug.WriteLine("[Info] Keine Geräte Gefunden!");
                         }
                         else
                         {
+                            Debug.WriteLine("[Info] Geräte Gefunden: " + result.Count.ToString());
                             foreach (DeviceInformation device in result)
                             {
-                                connections.Add(new Connection(device.Name, device));
+                                if (device.Name != Computer)
+                                {                           
+                                    connections.Add(new Connection(device.Name, device));
+                                    devices.Add(device.Name,new UsbSerial(device));
+                                }
                             }
-                            ConnectMessage.Text = "Select an item and press \"Connect\" to connect.";
+                            ConnectMessage.Text = "Wählen sie einen Arduino aus und.";
+                            Task.Delay(100).Wait();
+                            ConnectionList.ItemsSource = connections; // anzeige der Geräte als Liste
+                            Task.Delay(100).Wait();
                         }
-
-                        ConnectionList.ItemsSource = connections;
                     }));
                 });
             }
         }
+
 
         /// <summary>
         /// This function is invoked if a cancellation is invoked for any reason on the connection task
@@ -312,13 +243,15 @@ namespace InMoov.Views
             var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
             {
                 timeout.Stop();
-
+      
                 //telemetry
                 App.Telemetry.TrackRequest("Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
                 App.Telemetry.TrackMetric("Connection_Page_Time_Spent_In_Seconds", (DateTime.UtcNow - timePageNavigatedTo).TotalSeconds);
 
                 //this.Frame.Navigate(typeof(MainPage));
             }));
+            //ConnectMessage.Text = "Arduino: " + App.Arduino.ToString() + "wurde erfolgreich verbunden!";
+            //Debug.WriteLine("Arduino: " + App.Arduino.ToString() + "wurde erfolgreich verbunden!");
         }
 
         private void Connection_TimeOut(object sender, object e)

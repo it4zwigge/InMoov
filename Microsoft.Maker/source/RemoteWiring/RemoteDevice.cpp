@@ -544,7 +544,7 @@ RemoteDevice::onConnectionReady(
     {
         const int MAX_ATTEMPTS = 30;
 		const int MAX_DELAY_LOOP = 5;
-		const int INIT_DELAY_MS = 10;
+		const int INIT_DELAY_MS = 200;
         int attempts = 0;
 		int delay_loop = 0;
 		int delay_ms = INIT_DELAY_MS;

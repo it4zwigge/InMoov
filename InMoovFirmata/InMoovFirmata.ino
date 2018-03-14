@@ -27,6 +27,11 @@
 #include <Wire.h>
 #include <Firmata.h>
 
+/*==============================================================================
+ * INMOOV LIBRARIES
+ *============================================================================*/
+#include <Sabertooth.h>
+
 #define I2C_WRITE                   B00000000
 #define I2C_READ                    B00001000
 #define I2C_READ_CONTINUOUSLY       B00010000
@@ -42,6 +47,10 @@
 // the minimum interval for sampling analog input
 #define MINIMUM_SAMPLING_INTERVAL   1
 
+/*==============================================================================
+ * INMOOV DEFINES
+ *============================================================================*/
+#define SABERTOOTH_MOTOR 0x40
 
 /*==============================================================================
  * GLOBAL VARIABLES
@@ -693,6 +702,13 @@ void sysexCallback(byte command, byte argc, byte *argv)
       serialFeature.handleSysex(command, argc, argv);
 #endif
       break;
+
+   /*==============================================================================
+    * IMOOV CASES
+    *============================================================================*/
+    case SABERTOOTH_MOTOR:
+      ST.Motor(1, 127);
+      break;
   }
 }
 
@@ -752,6 +768,12 @@ void systemResetCallback()
   isResetting = false;
 }
 
+/*==============================================================================
+ * INMOOV OBJECTS
+ *============================================================================*/
+
+Sabertooth ST(128);
+
 void setup()
 {
   Firmata.setFirmwareVersion(FIRMATA_FIRMWARE_MAJOR_VERSION, FIRMATA_FIRMWARE_MINOR_VERSION);
@@ -776,6 +798,12 @@ void setup()
     ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
   }
 
+ /*==============================================================================
+  * INMOOV
+  *============================================================================*/
+  SabertoothTXPinSerial.begin(9600); // 9600 is the default baud rate for Sabertooth packet serial.
+ 
+  
   systemResetCallback();  // reset to default config
 }
 

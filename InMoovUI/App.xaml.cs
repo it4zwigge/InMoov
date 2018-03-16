@@ -21,6 +21,7 @@ using Microsoft.ApplicationInsights;
 namespace InMoov
 {
     using Microsoft.ApplicationInsights.Channel;
+    using Microsoft.Maker.Firmata;
     using Microsoft.Maker.RemoteWiring;
     using Microsoft.Maker.Serial;
     using System.Diagnostics;
@@ -50,6 +51,12 @@ namespace InMoov
         {
             get;
             private set;
+        }
+
+        public static UwpFirmata firmata
+        {
+            get;
+            set;
         }
 
         /// <summary>

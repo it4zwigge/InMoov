@@ -67,7 +67,7 @@ namespace InMoov.Views
             byte[] message = new byte[2];
             message[0] = (byte)(pin);
             message[1] = (byte)(count);
-            App.firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
+            App.Firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
         }
 
         public void SetPixelColor(byte index, byte r, byte g, byte b)
@@ -77,7 +77,7 @@ namespace InMoov.Views
             message[1] = (byte)(r);
             message[2] = (byte)(g);
             message[3] = (byte)(b);
-            App.firmata.sendSysex(NEOPIXEL, message.AsBuffer());
+            App.Firmata.sendSysex(NEOPIXEL, message.AsBuffer());
         }
 
         public void STMotor (byte motor, byte speed, byte rampe)
@@ -86,7 +86,7 @@ namespace InMoov.Views
             message[0] = (byte)(motor);
             message[1] = (byte)(speed);
             message[2] = (byte)(rampe);
-            App.firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
+            App.Firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
         }
     }
 }

@@ -30,7 +30,7 @@
 /*==============================================================================
  * INMOOV LIBRARIES
  *============================================================================*/
-//#include <Sabertooth.h>
+#include <Sabertooth.h>
 
 #define I2C_WRITE                   B00000000
 #define I2C_READ                    B00001000
@@ -708,7 +708,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
     *============================================================================*/
     case SABERTOOTH_MOTOR:
       digitalWrite(13, HIGH);
-      //ST.Motor(1, 127);
+      ST.Motor(1, 127);
       break;
   }
 }
@@ -773,7 +773,7 @@ void systemResetCallback()
  * INMOOV OBJECTS
  *============================================================================*/
 
-//Sabertooth ST(128);
+Sabertooth ST(128);
 
 void setup()
 {
@@ -802,9 +802,9 @@ void setup()
  /*==============================================================================
   * INMOOV
   *============================================================================*/
-  //SabertoothTXPinSerial.begin(9600); // 9600 is the default baud rate for Sabertooth packet serial.
+  SabertoothTXPinSerial.begin(9600); // 9600 is the default baud rate for Sabertooth packet serial.
  
-  
+
   systemResetCallback();  // reset to default config
 }
 

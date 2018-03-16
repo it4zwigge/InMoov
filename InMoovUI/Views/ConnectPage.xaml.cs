@@ -35,18 +35,20 @@ namespace InMoov.Views
         DateTime timePageNavigatedTo;
         CancellationTokenSource cancelTokenSource;
 
-        const string Computer = "";       // Hier den Namen des Computers eintragen
-        const string ComL = "COM4";       // COM Port für Leonardo [ Fahrwerk ]
-        const string ComA = "COM3";       // COM Port für Mega A   [ Rechts ]
-        const string ComB = "COM9";       // COM Port für Mega B   [ Links ]
-
         public ConnectPage()
         {
             this.InitializeComponent();
+
             this.Loaded += ConnectPage_Loaded;
-            RefreshDeviceList();
+            App.Telemetry.TrackEvent("ConnectPage_Launched");
         }
 
+        #region UI events
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ConnectPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -63,6 +65,25 @@ namespace InMoov.Views
                 topbar.Visibility = Visibility.Visible;
                 //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            // Telemetry
+            App.Telemetry.TrackPageView("Connection_Page");
+            timePageNavigatedTo = DateTime.UtcNow;
+
+            if (ConnectionList.ItemsSource == null)
+            {
+                ConnectMessage.Text = "Select an item to connect to.";
+                RefreshDeviceList();
             }
         }
 
@@ -103,60 +124,51 @@ namespace InMoov.Views
                 device = selectedConnection.Source as DeviceInformation;
             }
 
-            //determine the selected baud rate
-            //uint baudRate = Convert.ToUInt32((BaudRateComboBox.SelectedItem as string));
-
-            //connection properties dictionary, used only for telemetry data
-            var properties = new Dictionary<string, string>();
-
-            //use the selected device to create our communication object
-            
-            //send telemetry about this connection attempt
-            properties.Add("Device_Name", device.Name);
-            properties.Add("Device_ID", device.Id);
-            properties.Add("Device_Kind", device.Kind.ToString());
+            // Connection properties dictionary, used only for telemetry data
+            var properties = new Dictionary<string, string>
+            {
+                { "Device_Name", device.Name },
+                { "Device_ID", device.Id },
+                { "Device_Kind", device.Kind.ToString() }
+            };
             App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
 
-            /*******************************************************************************************/
+            App.Connection = new UsbSerial(device);
 
-            App.Connection = new UsbSerial(device);//usb
-            App.firmata = new UwpFirmata();
-            App.Arduino = new RemoteDevice(App.firmata);
-            App.firmata.begin(App.Connection);
-            App.Connection.begin(57600, SerialConfig.SERIAL_8N1);
-
+            App.Arduino = new RemoteDevice(App.Connection);
             App.Arduino.DeviceReady += OnDeviceReady;
             App.Arduino.DeviceConnectionFailed += OnDeviceConnectionFailed;
 
-            App.firmata.FirmataConnectionReady += Firmata_FirmataConnectionReady;
+            App.Firmata = new UwpFirmata();
+            App.Firmata.begin(App.Connection);
+            App.Firmata.FirmataConnectionReady += Firmata_FirmataConnectionReady;
 
             connectionAttemptStartedTime = DateTime.UtcNow;
+            App.Connection.begin(57600, SerialConfig.SERIAL_8N1);
 
             //start a timer for connection timeout
-            timeout = new DispatcherTimer();
-            timeout.Interval = new TimeSpan(0, 0, 30);
+            timeout = new DispatcherTimer
+            {
+                Interval = new TimeSpan(0, 0, 30)
+            };
             timeout.Tick += Connection_TimeOut;
             timeout.Start();
         }
-
-        /*************************
-         *        Events
-         ************************/
+        #endregion UI events
 
         private void OnDeviceReady()
         {
-            //var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
-            //{
-            //    timeout.Stop();
+            var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
+            {
+                timeout.Stop();
 
-            //    //telemetry
-            //    App.Telemetry.TrackRequest("Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
-            //    App.Telemetry.TrackMetric("Connection_Page_Time_Spent_In_Seconds", (DateTime.UtcNow - timePageNavigatedTo).TotalSeconds);
+                // Telemetry
+                App.Telemetry.TrackRequest("Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
+                App.Telemetry.TrackMetric("Connection_Page_Time_Spent_In_Seconds", (DateTime.UtcNow - timePageNavigatedTo).TotalSeconds);
 
-            //    //this.Frame.Navigate(typeof(MainPage));
-            //}));
-            //ConnectMessage.Text = "Arduino: " + App.Arduino.ToString() + "wurde erfolgreich verbunden!";
-            Debug.WriteLine("Arduino: wurde erfolgreich verbunden!");
+                ConnectMessage.Text = "Arduino wurde erfolgreich verbunden!";
+                //this.Frame.Navigate(typeof(MainPage));
+            }));
         }
 
         private void Firmata_FirmataConnectionReady()
@@ -164,23 +176,17 @@ namespace InMoov.Views
             Debug.WriteLine("Firmata: wurde erfolgreich verbunden!");
         }
 
-        /*************************
-         *        Methoden
-         ************************/
-
+        #region Helper
+        /// <summary>
+        /// 
+        /// </summary>
         private void RefreshDeviceList()
         {
             Dictionary<string, UsbSerial> devices = new Dictionary<string, UsbSerial>();
-            Connections connections = new Connections();
+
             //invoke the listAvailableDevicesAsync method of the correct Serial class. Since it is Async, we will wrap it in a Task and add a llambda to execute when finished
             Task<DeviceInformationCollection> task = null;
-            //if (ConnectionMethodComboBox.SelectedItem == null)
-            //{
-            //    ConnectMessage.Text = "Select a connection method to continue.";
-            //    return;
-            //}
 
-            
             ConnectionList.Visibility = Visibility.Visible;
             NetworkConnectionGrid.Visibility = Visibility.Collapsed;
             BaudRateStack.Visibility = Visibility.Visible;
@@ -190,7 +196,6 @@ namespace InMoov.Views
             cancelTokenSource.Token.Register(() => OnConnectionCancelled());
 
             task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
-            
 
             if (task != null)
             {
@@ -200,32 +205,39 @@ namespace InMoov.Views
                     //store the result and populate the device list on the UI thread
                     var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
+                        Connections connections = new Connections();
+
                         var result = listTask.Result;
                         if (result == null || result.Count == 0)
                         {
-                            Debug.WriteLine("[Info] Keine Geräte Gefunden!");
+                            ConnectMessage.Text = "[Info] Keine Geräte Gefunden!";
                         }
                         else
                         {
-                            Debug.WriteLine("[Info] Geräte Gefunden: " + result.Count.ToString());
                             foreach (DeviceInformation device in result)
                             {
-                                if (device.Name != Computer)
-                                {                           
-                                    connections.Add(new Connection(device.Name, device));
-                                    devices.Add(device.Name,new UsbSerial(device));
-                                }
+                                connections.Add(new Connection(device.Name, device));
+                                //devices.Add(device.Name, new UsbSerial(device));
                             }
-                            ConnectMessage.Text = "Wählen sie einen Arduino aus und.";
-                            Task.Delay(100).Wait();
-                            ConnectionList.ItemsSource = connections; // anzeige der Geräte als Liste
-                            Task.Delay(100).Wait();
+                            ConnectMessage.Text = "Wählen sie einen Arduino aus.";
+
+                            ConnectionList.ItemsSource = connections;  // Anzeige der Geräte als Liste
                         }
                     }));
                 });
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="enabled"></param>
+        private void SetUiEnabled(bool enabled)
+        {
+            RefreshButton.IsEnabled = enabled;
+            ConnectButton.IsEnabled = enabled;
+            CancelButton.IsEnabled = !enabled;
+        }
 
         /// <summary>
         /// This function is invoked if a cancellation is invoked for any reason on the connection task
@@ -252,13 +264,7 @@ namespace InMoov.Views
 
             SetUiEnabled(true);
         }
-
-        private void SetUiEnabled(bool enabled)
-        {
-            RefreshButton.IsEnabled = enabled;
-            ConnectButton.IsEnabled = enabled;
-            CancelButton.IsEnabled = !enabled;
-        }
+        #endregion Helper
 
         private void OnDeviceConnectionFailed(string message)
         {

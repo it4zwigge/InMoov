@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Maker.Firmata;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,6 +47,14 @@ namespace InMoov.Views
                 //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            UwpFirmata firmata = new UwpFirmata();
+            byte ECHO_QUERY = 0x40;
+            firmata.sendSysex(ECHO_QUERY, new byte[] { 66, 67 }.AsBuffer());
+            firmata.flush();
         }
     }
 }

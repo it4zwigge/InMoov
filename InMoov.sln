@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceCommandService", "Voic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InMoovFirmata", "InMoovFirmata", "{7432D974-7198-45B7-801F-C0238C7A45C5}"
 	ProjectSection(SolutionItems) = preProject
-		ArduinoFirmata\InMoovFirmata.ino = ArduinoFirmata\InMoovFirmata.ino
+		InMoovFirmata\InMoovFirmata.ino = InMoovFirmata\InMoovFirmata.ino
 	EndProjectSection
 EndProject
 Global

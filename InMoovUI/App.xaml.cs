@@ -16,11 +16,10 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.ApplicationInsights;
 
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=402347&clcid=0x409
-
 namespace InMoov
 {
     using Microsoft.ApplicationInsights.Channel;
+    using Microsoft.Maker.Firmata;
     using Microsoft.Maker.RemoteWiring;
     using Microsoft.Maker.Serial;
     using System.Diagnostics;
@@ -35,6 +34,12 @@ namespace InMoov
     sealed partial class App : Application
     {
         public static IStream Connection
+        {
+            get;
+            set;
+        }
+
+        public static UwpFirmata Firmata
         {
             get;
             set;
@@ -207,7 +212,6 @@ namespace InMoov
             deferral.Complete();
         }
 
-        //NEU
         /// <summary>
         /// Returns the semantic interpretation of a speech result. Returns null if there is no interpretation for
         /// that key.

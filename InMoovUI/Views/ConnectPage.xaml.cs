@@ -44,6 +44,7 @@ namespace InMoov.Views
         {
             this.InitializeComponent();
             this.Loaded += ConnectPage_Loaded;
+            RefreshDeviceList();
         }
 
         private void ConnectPage_Loaded(object sender, RoutedEventArgs e)
@@ -116,14 +117,20 @@ namespace InMoov.Views
             properties.Add("Device_Kind", device.Kind.ToString());
             App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
 
-            App.Connection = new UsbSerial(device);
+            /*******************************************************************************************/
 
-            App.Arduino = new RemoteDevice(App.Connection);
+            App.Connection = new UsbSerial(device);//usb
+            App.firmata = new UwpFirmata();
+            App.Arduino = new RemoteDevice(App.firmata);
+            App.firmata.begin(App.Connection);
+            App.Connection.begin(57600, SerialConfig.SERIAL_8N1);
+
             App.Arduino.DeviceReady += OnDeviceReady;
             App.Arduino.DeviceConnectionFailed += OnDeviceConnectionFailed;
 
+            App.firmata.FirmataConnectionReady += Firmata_FirmataConnectionReady;
+
             connectionAttemptStartedTime = DateTime.UtcNow;
-            App.Connection.begin(57600, SerialConfig.SERIAL_8N1);
 
             //start a timer for connection timeout
             timeout = new DispatcherTimer();
@@ -131,6 +138,35 @@ namespace InMoov.Views
             timeout.Tick += Connection_TimeOut;
             timeout.Start();
         }
+
+        /*************************
+         *        Events
+         ************************/
+
+        private void OnDeviceReady()
+        {
+            //var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
+            //{
+            //    timeout.Stop();
+
+            //    //telemetry
+            //    App.Telemetry.TrackRequest("Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
+            //    App.Telemetry.TrackMetric("Connection_Page_Time_Spent_In_Seconds", (DateTime.UtcNow - timePageNavigatedTo).TotalSeconds);
+
+            //    //this.Frame.Navigate(typeof(MainPage));
+            //}));
+            //ConnectMessage.Text = "Arduino: " + App.Arduino.ToString() + "wurde erfolgreich verbunden!";
+            Debug.WriteLine("Arduino: wurde erfolgreich verbunden!");
+        }
+
+        private void Firmata_FirmataConnectionReady()
+        {
+            Debug.WriteLine("Firmata: wurde erfolgreich verbunden!");
+        }
+
+        /*************************
+         *        Methoden
+         ************************/
 
         private void RefreshDeviceList()
         {
@@ -236,22 +272,6 @@ namespace InMoov.Views
                 ConnectMessage.Text = "Connection attempt failed: " + message;
                 SetUiEnabled(true);
             }));
-        }
-
-        private void OnDeviceReady()
-        {
-            var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
-            {
-                timeout.Stop();
-      
-                //telemetry
-                App.Telemetry.TrackRequest("Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
-                App.Telemetry.TrackMetric("Connection_Page_Time_Spent_In_Seconds", (DateTime.UtcNow - timePageNavigatedTo).TotalSeconds);
-
-                //this.Frame.Navigate(typeof(MainPage));
-            }));
-            //ConnectMessage.Text = "Arduino: " + App.Arduino.ToString() + "wurde erfolgreich verbunden!";
-            //Debug.WriteLine("Arduino: " + App.Arduino.ToString() + "wurde erfolgreich verbunden!");
         }
 
         private void Connection_TimeOut(object sender, object e)

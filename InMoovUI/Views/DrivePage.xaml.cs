@@ -1,5 +1,4 @@
-﻿using Microsoft.Maker.Firmata;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,11 +8,14 @@ using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Microsoft.Maker.Firmata;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -24,6 +26,9 @@ namespace InMoov.Views
     /// </summary>
     public sealed partial class DrivePage : Page
     {
+        byte NEOPIXEL = 0x72;
+        byte NEOPIXEL_REGISTER  = 0x74;
+        byte SABERTOOTH_MOTOR = 0x42;
         public DrivePage()
         {
             this.InitializeComponent();
@@ -51,10 +56,37 @@ namespace InMoov.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            UwpFirmata firmata = new UwpFirmata();
-            byte ECHO_QUERY = 0x40;
-            firmata.sendSysex(ECHO_QUERY, new byte[] { 66, 67 }.AsBuffer());
-            firmata.flush();
+            STMotor(1, 2, 2);
+            //NeoPixelRegister(9, 16);
+            //Task.Delay(1000).Wait();
+            //SetPixelColor(1, 255, 0, 0);
+        }
+
+        public void NeoPixelRegister(byte pin, byte count)
+        {
+            byte[] message = new byte[2];
+            message[0] = (byte)(pin);
+            message[1] = (byte)(count);
+            App.firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
+        }
+
+        public void SetPixelColor(byte index, byte r, byte g, byte b)
+        {
+            byte[] message = new byte[4];
+            message[0] = (byte)(index);
+            message[1] = (byte)(r);
+            message[2] = (byte)(g);
+            message[3] = (byte)(b);
+            App.firmata.sendSysex(NEOPIXEL, message.AsBuffer());
+        }
+
+        public void STMotor (byte motor, byte speed, byte rampe)
+        {
+            byte[] message = new byte[3];
+            message[0] = (byte)(motor);
+            message[1] = (byte)(speed);
+            message[2] = (byte)(rampe);
+            App.firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
         }
     }
 }

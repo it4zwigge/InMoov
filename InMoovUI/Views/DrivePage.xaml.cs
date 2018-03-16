@@ -26,9 +26,6 @@ namespace InMoov.Views
     /// </summary>
     public sealed partial class DrivePage : Page
     {
-        byte NEOPIXEL = 0x72;
-        byte NEOPIXEL_REGISTER  = 0x74;
-        byte SABERTOOTH_MOTOR = 0x42;
         public DrivePage()
         {
             this.InitializeComponent();
@@ -56,37 +53,10 @@ namespace InMoov.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            STMotor(1, 2, 2);
+            App.STMotor(1, 2, 2);
             //NeoPixelRegister(9, 16);
             //Task.Delay(1000).Wait();
             //SetPixelColor(1, 255, 0, 0);
-        }
-
-        public void NeoPixelRegister(byte pin, byte count)
-        {
-            byte[] message = new byte[2];
-            message[0] = (byte)(pin);
-            message[1] = (byte)(count);
-            App.Firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
-        }
-
-        public void SetPixelColor(byte index, byte r, byte g, byte b)
-        {
-            byte[] message = new byte[4];
-            message[0] = (byte)(index);
-            message[1] = (byte)(r);
-            message[2] = (byte)(g);
-            message[3] = (byte)(b);
-            App.Firmata.sendSysex(NEOPIXEL, message.AsBuffer());
-        }
-
-        public void STMotor (byte motor, byte speed, byte rampe)
-        {
-            byte[] message = new byte[3];
-            message[0] = (byte)(motor);
-            message[1] = (byte)(speed);
-            message[2] = (byte)(rampe);
-            App.Firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
         }
     }
 }

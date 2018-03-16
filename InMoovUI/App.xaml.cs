@@ -33,6 +33,10 @@ namespace InMoov
     /// </summary>
     sealed partial class App : Application
     {
+        static byte NEOPIXEL = 0x72;
+        static byte NEOPIXEL_REGISTER = 0x74;
+        static byte SABERTOOTH_MOTOR = 0x42;
+
         public static IStream Connection
         {
             get;
@@ -55,6 +59,33 @@ namespace InMoov
         {
             get;
             private set;
+        }
+
+        public static void NeoPixelRegister(byte pin, byte count)
+        {
+            byte[] message = new byte[2];
+            message[0] = (byte)(pin);
+            message[1] = (byte)(count);
+            App.Firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
+        }
+
+        public static void SetPixelColor(byte index, byte r, byte g, byte b)
+        {
+            byte[] message = new byte[4];
+            message[0] = (byte)(index);
+            message[1] = (byte)(r);
+            message[2] = (byte)(g);
+            message[3] = (byte)(b);
+            App.Firmata.sendSysex(NEOPIXEL, message.AsBuffer());
+        }
+
+        public static void STMotor(byte motor, byte speed, byte rampe)
+        {
+            byte[] message = new byte[3];
+            message[0] = (byte)(motor);
+            message[1] = (byte)(speed);
+            message[2] = (byte)(rampe);
+            App.Firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
         }
 
         /// <summary>

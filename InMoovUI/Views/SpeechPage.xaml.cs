@@ -354,6 +354,7 @@ namespace InMoov.Views
         /// </summary>
         /// <param name="sender">Button that triggered this event</param>
         /// <param name="e">State information about the routed event</param>
+        FacesPage fp = new FacesPage();
         private async void RecognizeWithUIListConstraint_Click(object sender, RoutedEventArgs e)
         {
             heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
@@ -389,11 +390,15 @@ namespace InMoov.Views
                     else if (tag == "GesichtStart")
                     {
                         Frame.Navigate(typeof(FacesPage));
+
+                        fp.FaceDetect_on();
+                        string name = fp.nameface_voice;
                         heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
                         resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
                     }
                     else if (tag == "GesichtStop")
                     {
+                        fp.FaceDetect_off();
                         heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
                         resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
                     }

@@ -96,13 +96,17 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="AudioCapturePermissions.cs" />
+    <Compile Include="CognitiveServices\FaceAPI.cs" />
+    <Compile Include="CognitiveServices\PhotoFace.cs" />
     <Compile Include="Communication\Connection.cs" />
     <Compile Include="Communication\Connections.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="Controls\PageHeader.xaml.cs">
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Keys.cs" />
     <Compile Include="NavMenuItem.cs" />
+    <Compile Include="Scenario1_TrackInWebcam.xaml.cs" />
     <Compile Include="SystemInformationHelpers.cs" />
     <Compile Include="Triggers\IsTenFootTrigger.cs" />
     <Compile Include="Views\BasicPage.xaml.cs">

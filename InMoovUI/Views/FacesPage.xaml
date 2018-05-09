@@ -64,7 +64,10 @@
         </ctl:PageHeader>-->
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Gesichtserkennung"/>
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Text="Gesichtserkennung" Margin="618,83,0,0"/>
+            <Button x:Name="Button_ON" Content="ON" HorizontalAlignment="Left" Margin="366,190,0,0" VerticalAlignment="Top" Click="Button_ON_Click"/>
+            <Button x:Name="Button_OFF" Content="OFF" HorizontalAlignment="Left" Margin="476,190,0,0" VerticalAlignment="Top" Click="Button_OFF_Click"/>
+            <TextBlock x:Name="FaceName_TextBlock" HorizontalAlignment="Left" Margin="366,292,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

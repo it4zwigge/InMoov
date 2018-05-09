@@ -2,7 +2,10 @@
   "dependencies": {
     "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
     "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
-    "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
+    "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
+    "Microsoft.ProjectOxford.Common": "2.1.1",
+    "Microsoft.ProjectOxford.Face": "1.4.0",
+    "Microsoft.ProjectOxford.Vision": "1.0.393"
   },
   "frameworks": {
     "uap10.0.16299": {}

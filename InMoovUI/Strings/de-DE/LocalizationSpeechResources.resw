@@ -224,9 +224,6 @@ green circle</value>
     <value>Try "blue background, red border, green circle".</value>
     <comment>UIOptions for SRGS one-shot sample</comment>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value>Hallo</value>
-  </data>
   <data name="WebSearchUIOptionsExampleText" xml:space="preserve">
     <value>Z. B. "Wetter in London"</value>
   </data>

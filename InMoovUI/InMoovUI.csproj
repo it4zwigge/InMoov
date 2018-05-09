@@ -88,11 +88,14 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="project.json" />
+    <PRIResource Include="Strings\de-DE\LocalizationTTSResources.resw" />
+    <PRIResource Include="Strings\de-DE\LocalizationSpeechResources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AudioCapturePermissions.cs" />
     <Compile Include="Communication\Connection.cs" />
     <Compile Include="Communication\Connections.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
@@ -150,9 +153,6 @@
     <Content Include="Assets\splash-sdk.png" />
     <Content Include="Assets\squaretile-sdk.png" />
     <Content Include="Assets\StoreLogo.scale-100.png" />
-    <Content Include="CortanaCommands.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -233,10 +233,6 @@
     <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.Serial\Microsoft.Maker.Serial.vcxproj">
       <Project>{8376216c-282a-4927-b9ef-c2d545fe0bca}</Project>
       <Name>Microsoft.Maker.Serial</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VoiceCommandService\VoiceCommandService.csproj">
-      <Project>{83a67c20-b56c-4c6f-b7ea-c7a71efff42e}</Project>
-      <Name>VoiceCommandService</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

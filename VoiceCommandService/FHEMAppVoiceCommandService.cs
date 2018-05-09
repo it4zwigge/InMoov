@@ -41,11 +41,11 @@ namespace FHEMApp.VoiceCommands
                     {
                         case "arms":
                             var handside = voiceCommand.Properties["handside"][0];
-                            await SpeechContainsHandside(handside);
+                            await ServoControlFunction(handside, "Arm");
                             break;
                         case "arms_without_handside":
                             var bodypart = voiceCommand.Properties["bodypart"][0];
-                            await DisambiguateHandsides(bodypart);
+                            await ServoControlFunction("", bodypart);
                             break;
                     }
                 }
@@ -60,71 +60,81 @@ namespace FHEMApp.VoiceCommands
         /// 
         /// </summary>
         /// <returns></returns>
-        private async Task<string> DisambiguateHandsides(string bodypart)
+        private async Task<string> ServoControlFunction(string handside, string bodypart)
         {
-            string[] handsides = new string[] { "rechter", "linker" };
-            var userPrompt = new VoiceCommandUserMessage();
-
-            userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Welchen {bodypart} soll ich heben? {handsides[0]} oder {handsides[1]} {bodypart}?";
-            var userReprompt = new VoiceCommandUserMessage();
-
-            userReprompt.DisplayMessage = userReprompt.SpokenMessage = $"Könntest Du dich für einen {bodypart} entscheiden.";
-            var destinationContentTiles = new List<VoiceCommandContentTile>();
-
-            foreach (string sides in handsides)
+            if(handside != null)
             {
-                var destinationTile = new VoiceCommandContentTile();
-                
-                destinationTile.AppContext = $"{sides}";
-                destinationTile.Title = $"{sides} {bodypart}";
-                //destinationTile.TextLine1 = $"{sides} Description";
+                var userPrompt = new VoiceCommandUserMessage();
+                userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Sind Sie sicher das ich den {handside} {bodypart} heben soll?";
 
-                destinationContentTiles.Add(destinationTile);
+                // Wird noch nicht angezeigt...
+                var userReprompt = new VoiceCommandUserMessage();
+                userReprompt.DisplayMessage = userReprompt.SpokenMessage = $"Hallo, soll ich nun den {handside} {bodypart} heben, oder nicht?";
+
+                var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt);
+
+                var voiceCommandConfirmation = await voiceServiceConnection.RequestConfirmationAsync(response);
+                if (voiceCommandConfirmation != null)
+                {
+                    if (voiceCommandConfirmation.Confirmed == true)
+                    {
+                        var userMessage = new VoiceCommandUserMessage();
+                        userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, ich hebe den {handside} {bodypart}.";
+                        response = VoiceCommandResponse.CreateResponse(userMessage);
+                        await voiceServiceConnection.ReportSuccessAsync(response);
+
+                        //Befehl Servos
+                    }
+                    else
+                    {
+                        var userMessage = new VoiceCommandUserMessage();
+                        userMessage.DisplayMessage = userMessage.SpokenMessage = "Na dann eben nicht!";
+                        response = VoiceCommandResponse.CreateResponse(userMessage);
+                        await voiceServiceConnection.ReportSuccessAsync(response);
+                    }
+                }
+                return String.Empty;
             }
-            var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt, destinationContentTiles);
-
-            var voiceCommandDisambiguationResult = await voiceServiceConnection.RequestDisambiguationAsync(response);
-            if (voiceCommandDisambiguationResult != null)
+            else
             {
-                var userMessage = new VoiceCommandUserMessage();
-                userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, {voiceCommandDisambiguationResult.SelectedItem.AppContext} {bodypart} wird gehoben.";
-                response = VoiceCommandResponse.CreateResponse(userMessage);
-                await voiceServiceConnection.ReportSuccessAsync(response);
-            }
-            return String.Empty;
-        }
+                //Initialisieren der handsides welche die Richtungen darstellen
+                string[] handsides = new string[] { "rechter", "linker" };
 
-        private async Task SpeechContainsHandside(string destination)
-        {
-            var userPrompt = new VoiceCommandUserMessage();
-            userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Sind Sie sicher das ich den {destination} Arm heben soll?";
+                //Ausgeben der Antwort
+                var userPrompt = new VoiceCommandUserMessage();
+                userPrompt.DisplayMessage = userPrompt.SpokenMessage = $"Welchen {bodypart} soll ich heben? {handsides[0]} oder {handsides[1]} {bodypart}?";
 
-            // Wird noch nicht angezeigt...
-            var userReprompt = new VoiceCommandUserMessage();
-            userReprompt.DisplayMessage = userReprompt.SpokenMessage = $"Hallo, soll ich nun den {destination} Arm heben, oder nicht?";
+                //Ausgeben einer Nachricht nach längerer Zeit ohne Aktivität
+                var userReprompt = new VoiceCommandUserMessage();
+                userReprompt.DisplayMessage = userReprompt.SpokenMessage = $"Könntest Du dich für einen {bodypart} entscheiden.";
 
-            var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt);
+                //Einrichten der destinationContentTiles welche die Richtungen verwalten
+                var destinationContentTiles = new List<VoiceCommandContentTile>();
+                foreach (string sides in handsides)
+                {
+                    var destinationTile = new VoiceCommandContentTile();
 
-            var voiceCommandConfirmation = await voiceServiceConnection.RequestConfirmationAsync(response);
-            if (voiceCommandConfirmation != null)
-            {
-                if (voiceCommandConfirmation.Confirmed == true)
+                    destinationTile.AppContext = $"{sides}";
+                    destinationTile.Title = $"{sides} {bodypart}";
+
+                    destinationContentTiles.Add(destinationTile);
+                }
+                var response = VoiceCommandResponse.CreateResponseForPrompt(userPrompt, userReprompt, destinationContentTiles);
+
+                //Ausgeben der Antwort nach Auswahl der Seite
+                var voiceCommandDisambiguationResult = await voiceServiceConnection.RequestDisambiguationAsync(response);
+                if (voiceCommandDisambiguationResult != null)
                 {
                     var userMessage = new VoiceCommandUserMessage();
-                    userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, ich hebe den {destination} Arm.";
+                    userMessage.DisplayMessage = userMessage.SpokenMessage = $"Alles klar, {voiceCommandDisambiguationResult.SelectedItem.AppContext} {bodypart} wird gehoben.";
                     response = VoiceCommandResponse.CreateResponse(userMessage);
                     await voiceServiceConnection.ReportSuccessAsync(response);
 
-                    //Befehl Servos
+                    //Servoansteuerung
                 }
-                else
-                {
-                    var userMessage = new VoiceCommandUserMessage();
-                    userMessage.DisplayMessage = userMessage.SpokenMessage = "Na dann eben nicht!";
-                    response = VoiceCommandResponse.CreateResponse(userMessage);
-                    await voiceServiceConnection.ReportSuccessAsync(response);
-                }
+                return String.Empty;
             }
+            
         }
 
         private async Task ShowProgressScreen(string message)

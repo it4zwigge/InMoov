@@ -19,18 +19,19 @@
         <uap:SplashScreen Image="Assets\splash-sdk.png" BackgroundColor="black" />
       </uap:VisualElements>
       <Extensions>
-        <uap:Extension Category="windows.personalAssistantLaunch" />
         <uap:Extension Category="windows.appService" EntryPoint="FHEMApp.VoiceCommands.FHEMAppVoiceCommandService">
           <uap:AppService Name="FHEMAppVoiceCommandService" />
         </uap:Extension>
+        <uap:Extension Category="windows.personalAssistantLaunch" />
       </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <DeviceCapability Name="microphone" />
     <DeviceCapability Name="serialcommunication">
       <Device Id="any">
-        <Function Type="name:serialPort"/>
+        <Function Type="name:serialPort" />
       </Device>
     </DeviceCapability>
   </Capabilities>

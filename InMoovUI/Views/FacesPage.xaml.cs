@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.ProjectOxford.Face.Contract;
 
 namespace InMoov.Views
 {
@@ -75,6 +76,11 @@ namespace InMoov.Views
         public void FaceDetect_off()
         {
            _faceTimer.Stop();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            FaceDetect.CreatePersons();
         }
     }
 }

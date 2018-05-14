@@ -1,76 +1,38 @@
-//*********************************************************
-//
-// Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the MIT License (MIT).
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//*********************************************************
-
 using System;
-
 using Windows.Media;
 using Windows.Graphics.Imaging;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Graphics.Imaging;
-using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.FaceAnalysis;
 using Windows.Media.MediaProperties;
 using Windows.System.Threading;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Shapes;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Microsoft.ProjectOxford.Common.Contract;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.Storage.Pickers;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Storage;
 using System.Linq;
-using Windows.Media.Core;
-using VWFIANCognitveServices;
 using System.IO;
 
 namespace VWFIANCognitveServices
 {
     public sealed partial class TrackFacesInWebcam : Page
     {
+        public FaceServiceClient faceServiceClient = new FaceServiceClient(Keys.FaceServiceKey, Keys.FaceAPI_rootstring);           // Client der API mit Authentifizierungsschlüssel und URL
+        private Person[] _personList;                                                                                               // Array für alle Gesichter
 
-        //SoftwareBitmap convertedSource = null;
-        FaceServiceClient faceServiceClient = new FaceServiceClient(Keys.FaceServiceKey, Keys.FaceAPI_rootstring);
-        private Person[] _personList;
+        public string personGroupId = "6b727d764cb5469f9e822361c545d058";                                                           // Name der Gesichtsdatenbank
+        TimeSpan timerInterval;                                                                                                     // Timer für Erzeugung der einzelnen Frames/Bilder
 
-        string personGroupId = "VW";//"adventure_works_group3";
-        TimeSpan timerInterval;
-
-        //private readonly SolidColorBrush lineBrush = new SolidColorBrush(Windows.UI.Colors.Yellow);
-        //private readonly double lineThickness = 2.0;
-        //private readonly SolidColorBrush fillBrush = new SolidColorBrush(Windows.UI.Colors.Transparent);
-        //private ScenarioState currentState;
         private MediaCapture mediaCapture;
         private VideoEncodingProperties videoProperties;
         private FaceTracker faceTracker;
         private ThreadPoolTimer frameProcessingTimer;
-        private SemaphoreSlim frameProcessingSemaphore = new SemaphoreSlim(1);
 
 
         public TrackFacesInWebcam()
@@ -79,8 +41,8 @@ namespace VWFIANCognitveServices
 
         public async void OnNavigatedTo(NavigationEventArgs e)
         {
-            await StartWebcamStreaming();
-            if (this.faceTracker == null)
+            await StartWebcamStreaming();                           // Starten der Kamera
+            if (this.faceTracker == null)                           // Initialisieren des FaceTrackers zur lokalen Gesichtserkennung - falls nicht aktiv
                 faceTracker = await FaceTracker.CreateAsync();
         }
 
@@ -90,33 +52,33 @@ namespace VWFIANCognitveServices
 
             try
             {
-                this.mediaCapture = new MediaCapture();
+                this.mediaCapture = new MediaCapture();                                                 // Erstellen eines neuen MediaCaptues
                 var captureElement = new CaptureElement();
 
-                MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings();
-                settings.StreamingCaptureMode = StreamingCaptureMode.Video;
-                await this.mediaCapture.InitializeAsync(settings);
+                MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings();     //MediaCapture Settings erstellen
+                settings.StreamingCaptureMode = StreamingCaptureMode.Video;                                 //auf Video Modus setzten
+                await this.mediaCapture.InitializeAsync(settings);                                          // Settings auf das MediaCapture schreiben
                 //this.mediaCapture.Failed += this.MediaCapture_CameraStreamFailed;
 
-                var deviceController = this.mediaCapture.VideoDeviceController;
-                this.videoProperties = deviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview) as VideoEncodingProperties;
-                captureElement.Source = mediaCapture;
-                await this.mediaCapture.StartPreviewAsync();
+                var deviceController = this.mediaCapture.VideoDeviceController;                             //Device Controller für Video-Kamera festlegen
+                this.videoProperties = deviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview) as VideoEncodingProperties;  //VideoProperties festschreiben
+                captureElement.Source = mediaCapture;                                                       //MediaCapture auf CaptureElement anzeigen
+                await this.mediaCapture.StartPreviewAsync();                                                //Media Capture Vorschau starten
 
-                timerInterval = TimeSpan.FromMilliseconds(5000);
+                timerInterval = TimeSpan.FromMilliseconds(5000);                                            // Timer Interval festsetzten - auf 5 Sekunden
                 this.frameProcessingTimer = Windows.System.Threading.ThreadPoolTimer.CreatePeriodicTimer(new Windows.System.Threading.TimerElapsedHandler(ProcessCurrentVideoFrame), timerInterval);
             }
-            catch (System.UnauthorizedAccessException)
+            catch (System.UnauthorizedAccessException)          // Catch für fehlende Zugriffsrechte
             {
                 successful = false;
             }
-            catch (Exception ex)
+            catch (Exception ex)                                // Catch für alle anderen Fehler / Exceptions
             {
                 successful = false;
             }
 
-            return successful;
-        }
+            return successful;                                  // Zurückgabe des Wertes successfull - true oder false
+        }                           // Webcam aktivieren und Bild vorbereiten
 
         private async void ShutdownWebCam()
         {
@@ -150,17 +112,16 @@ namespace VWFIANCognitveServices
         {
             try
             {
-                IList<DetectedFace> faces = null;
+                IList<DetectedFace> faces = null;                                   // erkannte Gesichter auf null setzten
 
-                const BitmapPixelFormat InputPixelFormat = BitmapPixelFormat.Nv12;
-                using (VideoFrame previewFrame = new VideoFrame(InputPixelFormat, 1280, 720))
+                const BitmapPixelFormat InputPixelFormat = BitmapPixelFormat.Nv12;  // Pixelformat auf NV12 festlegen
+                using (VideoFrame previewFrame = new VideoFrame(InputPixelFormat, 1280, 720))   //VideoFrame erstellen - mit den angegebenen Properties
                 {
-                    await this.mediaCapture.GetPreviewFrameAsync(previewFrame);
+                    await this.mediaCapture.GetPreviewFrameAsync(previewFrame);                 //Aktuelles Bild aus MediaCapture in das Freame schreiben
 
-                    // The returned VideoFrame should be in the supported NV12 format but we need to verify this.
-                    if (FaceDetector.IsBitmapPixelFormatSupported(previewFrame.SoftwareBitmap.BitmapPixelFormat))
+                    if (FaceDetector.IsBitmapPixelFormatSupported(previewFrame.SoftwareBitmap.BitmapPixelFormat)) // Prüfen ob VideoFormt gleich NV12 ist - wenn nicht funktioniert der FaceTracker nicht
                     {
-                        faces = await this.faceTracker.ProcessNextFrameAsync(previewFrame);
+                        faces = await this.faceTracker.ProcessNextFrameAsync(previewFrame);    // lokale Auswertung ob Gesichter auf Bild vorhanden, wenn ja, wieviele und wo
                     }
                     else
                     {
@@ -182,7 +143,6 @@ namespace VWFIANCognitveServices
             { }
 
         }        // Verarbeitung des aktuellen Bildes
-
 
         public string FileName;                                                      // Dateiname des Bildes 
         private async Task<StorageFile> WriteableBitmapToStorageFile(WriteableBitmap WB, FileFormat fileFormat) // Abspeichern des Bildes im lokalen Speicher
@@ -251,7 +211,6 @@ namespace VWFIANCognitveServices
             Gif
         }
 
-
         private async Task<bool> CheckIfGroupExistsAsync()
         {
             PersonGroup group = null;
@@ -268,7 +227,6 @@ namespace VWFIANCognitveServices
                 return false;
             }
         }                       // Erstellen oder Holen der Personen-Gruppe über die API
-
 
         public string facedetected = "";                                             // Name der aktuell erkannten Person
         private async void FaceDetect(VideoFrame frame)
@@ -327,86 +285,12 @@ namespace VWFIANCognitveServices
                     }
                 }
             }
-        }                          //  Konvertieren des aktuellen Bildes, transfer zur API und Entgegennahme der Ergebnisse
+        }                           //  Konvertieren des aktuellen Bildes, transfer zur API und Entgegennahme der Ergebnisse
 
         public string GetFaceName()                                                 // Methode zum Abrufen des aktuellen Names
         {
             return facedetected;
         }
 
-
-
-        public void Delete()
-        {
-            //private async void ChangeScenarioState(ScenarioState newState)
-            //{
-            //    // Disable UI while state change is in progress
-
-            //    switch (newState)
-            //    {
-            //        case ScenarioState.Idle:
-
-            //            //   this.ShutdownWebCam();
-            //            this.currentState = newState;
-            //            break;
-
-            //        case ScenarioState.Streaming:
-
-            //            if (!await this.StartWebcamStreaming())
-            //            {
-            //                this.ChangeScenarioState(ScenarioState.Idle);
-            //                break;
-            //            }
-
-            //            this.currentState = newState;
-            //            break;
-            //    }
-            //}
-
-
-            //private void MediaCapture_CameraStreamFailed(MediaCapture sender, object args)
-            //{
-            //    // MediaCapture is not Agile and so we cannot invoke its methods on this caller's thread
-            //    // and instead need to schedule the state change on the UI thread.
-            //    var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            //    {
-            //        ChangeScenarioState(ScenarioState.Idle);
-            //    });
-            //}
-
-
-
-            //private void CameraStreamingButton_Click(object sender, RoutedEventArgs e)
-            //{//
-            //    if (this.currentState == ScenarioState.Streaming)
-            //    {
-            //        this.ChangeScenarioState(ScenarioState.Idle);
-            //    }
-            //    else
-            //    {
-            //        this.ChangeScenarioState(ScenarioState.Streaming);
-            //    }
-            //}
-            //private enum ScenarioState
-            //{
-            //    Idle,
-            //    Streaming
-            //}
-            //private void OnSuspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
-            //{
-            //    if (this.currentState == ScenarioState.Streaming)
-            //    {
-            //        var deferral = e.SuspendingOperation.GetDeferral();
-            //        try
-            //        {
-            //            this.ChangeScenarioState(ScenarioState.Idle);
-            //        }
-            //        finally
-            //        {
-            //            deferral.Complete();
-            //        }
-            //    }
-            //}
-        }
     }
 }

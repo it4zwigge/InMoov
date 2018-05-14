@@ -68,6 +68,7 @@
             <Button x:Name="Button_ON" Content="ON" HorizontalAlignment="Left" Margin="366,190,0,0" VerticalAlignment="Top" Click="Button_ON_Click"/>
             <Button x:Name="Button_OFF" Content="OFF" HorizontalAlignment="Left" Margin="476,190,0,0" VerticalAlignment="Top" Click="Button_OFF_Click"/>
             <TextBlock x:Name="FaceName_TextBlock" HorizontalAlignment="Left" Margin="366,292,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+            <Button Content="Gesicht einlesen" HorizontalAlignment="Left" Margin="645,184,0,0" VerticalAlignment="Top" Width="305" Click="Button_Click"/>
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

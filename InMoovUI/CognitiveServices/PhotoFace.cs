@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Adventure_Works.CognitiveServices
+namespace VWFIANCognitveServices
 {
-    public class PhotoFace
+    public class PhotoFace                              // Klasse für Ergebnisse der Gesichtsapi
     {
-        public string FaceId { get; set; }
-        public Guid PersonId { get; set; }
-        public FaceRectangle Rect { get; set; }
+        public string FaceId { get; set; }              // Eindeutige ID eines jeden Gesichts
+        public Guid PersonId { get; set; }              // Eindeutige ID einer jeden gespeicherten Person
+        public FaceRectangle Rect { get; set; }         // Maße für Rechteck um Gesicht im zur API geschickten Bild
 
-        public string Name { get; set; }
-        public bool Identified { get; set; }
+        public string Name { get; set; }                // Zum Gesicht gehörender Name
+        public bool Identified { get; set; }            // Boolscher Wert, zur Anzeige, ob ein Gesicht gefunden wurde oder nich´t
     }
 }

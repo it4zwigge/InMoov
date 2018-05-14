@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 
-namespace Adventure_Works.CognitiveServices
+namespace VWFIANCognitveServices
 {
     public class FaceAPI
     {
-        private FaceServiceClient _client;
+        private FaceServiceClient _client;                              // Instanzierung des FaceAPI Clients - mit API-Key und URL
 
-        private const string _groupId = "adventure_works_group3";
+        private const string _groupId = "VWBI.Face";                    // Personen Gruppe
 
-        private Person[] _personList;
-
-        public Person[] KnownPeople
+        private Person[] _personList;                                   // Liste aller Personen
+        
+        public Person[] KnownPeople                                     // Liste der bekannten / trainierten Gesichter / Personen
         {
             get
             {
@@ -31,7 +31,7 @@ namespace Adventure_Works.CognitiveServices
         }
 
 
-        private static FaceAPI _instance;
+        private static FaceAPI _instance;                               
 
         public static FaceAPI Instance
         {
@@ -46,9 +46,9 @@ namespace Adventure_Works.CognitiveServices
             }
         }
 
-        public FaceAPI()
+        public FaceAPI()                                                // Konstruktor der FaceAPI-Klasse
         {
-            _client = new FaceServiceClient(Keys.FaceServiceKey, Keys.FaceAPI_rootstring);
+            //_client = new FaceServiceClient(Keys.FaceServiceKey, Keys.FaceAPI_rootstring);
         }
 
         public async Task<IEnumerable<PhotoFace>> FindPeople(IRandomAccessStream stream)
@@ -159,7 +159,6 @@ namespace Adventure_Works.CognitiveServices
         {
             PersonGroup group = null;
 
-            // create group if first time
             try
             {
                 group = await _client.GetPersonGroupAsync(_groupId);

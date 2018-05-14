@@ -47,73 +47,41 @@ using Windows.Foundation;
 using Windows.Storage;
 using System.Linq;
 using Windows.Media.Core;
-using Adventure_Works.CognitiveServices;
-using Adventure_Works;
+using VWFIANCognitveServices;
 using System.IO;
 
-namespace SDKTemplate
+namespace VWFIANCognitveServices
 {
-    /// <summary>
-    /// Page for demonstrating FaceTracking.
-    /// </summary>
     public sealed partial class TrackFacesInWebcam : Page
     {
 
-        SoftwareBitmap convertedSource = null;
+        //SoftwareBitmap convertedSource = null;
         FaceServiceClient faceServiceClient = new FaceServiceClient(Keys.FaceServiceKey, Keys.FaceAPI_rootstring);
-
-        /*Face[] faces;*/                   // The list of detected faces.
         private Person[] _personList;
 
-        private string filenameact = "";
-        string personGroupId = "fd_inmoov-trial";//"adventure_works_group3";
+        string personGroupId = "VW";//"adventure_works_group3";
         TimeSpan timerInterval;
 
-        private readonly SolidColorBrush lineBrush = new SolidColorBrush(Windows.UI.Colors.Yellow);
-        private readonly double lineThickness = 2.0;
-        private readonly SolidColorBrush fillBrush = new SolidColorBrush(Windows.UI.Colors.Transparent);
-        private ScenarioState currentState;
+        //private readonly SolidColorBrush lineBrush = new SolidColorBrush(Windows.UI.Colors.Yellow);
+        //private readonly double lineThickness = 2.0;
+        //private readonly SolidColorBrush fillBrush = new SolidColorBrush(Windows.UI.Colors.Transparent);
+        //private ScenarioState currentState;
         private MediaCapture mediaCapture;
         private VideoEncodingProperties videoProperties;
         private FaceTracker faceTracker;
         private ThreadPoolTimer frameProcessingTimer;
         private SemaphoreSlim frameProcessingSemaphore = new SemaphoreSlim(1);
 
-        public bool test;
 
         public TrackFacesInWebcam()
         {
         }
 
-        private enum ScenarioState
-        {
-            Idle,
-            Streaming
-        }
-
         public async void OnNavigatedTo(NavigationEventArgs e)
         {
-            
-
             await StartWebcamStreaming();
             if (this.faceTracker == null)
                 faceTracker = await FaceTracker.CreateAsync();
-        }
-
-        private void OnSuspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
-        {
-            if (this.currentState == ScenarioState.Streaming)
-            {
-                var deferral = e.SuspendingOperation.GetDeferral();
-                try
-                {
-                    this.ChangeScenarioState(ScenarioState.Idle);
-                }
-                finally
-                {
-                    deferral.Complete();
-                }
-            }
         }
 
         private async Task<bool> StartWebcamStreaming()
@@ -128,20 +96,15 @@ namespace SDKTemplate
                 MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings();
                 settings.StreamingCaptureMode = StreamingCaptureMode.Video;
                 await this.mediaCapture.InitializeAsync(settings);
-                this.mediaCapture.Failed += this.MediaCapture_CameraStreamFailed;
+                //this.mediaCapture.Failed += this.MediaCapture_CameraStreamFailed;
 
                 var deviceController = this.mediaCapture.VideoDeviceController;
                 this.videoProperties = deviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview) as VideoEncodingProperties;
                 captureElement.Source = mediaCapture;
                 await this.mediaCapture.StartPreviewAsync();
 
-                // Use a 66 millisecond interval for our timer, i.e. 15 frames per second
-                /*TimeSpan*/
                 timerInterval = TimeSpan.FromMilliseconds(5000);
                 this.frameProcessingTimer = Windows.System.Threading.ThreadPoolTimer.CreatePeriodicTimer(new Windows.System.Threading.TimerElapsedHandler(ProcessCurrentVideoFrame), timerInterval);
-
-
-
             }
             catch (System.UnauthorizedAccessException)
             {
@@ -149,7 +112,6 @@ namespace SDKTemplate
             }
             catch (Exception ex)
             {
-                
                 successful = false;
             }
 
@@ -182,7 +144,7 @@ namespace SDKTemplate
             this.frameProcessingTimer = null;
             this.mediaCapture = null;
 
-        }
+        }                                       // Kamera ausschalten
 
         private async void ProcessCurrentVideoFrame(ThreadPoolTimer timer)
         {
@@ -219,14 +181,13 @@ namespace SDKTemplate
             finally
             { }
 
-        }
+        }        // Verarbeitung des aktuellen Bildes
 
 
-        public string FileName;
-        private async Task<StorageFile> WriteableBitmapToStorageFile(WriteableBitmap WB, FileFormat fileFormat)
+        public string FileName;                                                      // Dateiname des Bildes 
+        private async Task<StorageFile> WriteableBitmapToStorageFile(WriteableBitmap WB, FileFormat fileFormat) // Abspeichern des Bildes im lokalen Speicher
         {
             FileName = "face" + DateTime.Now.ToString("HHSSmm + yyyyMMdd") + ".";
-            filenameact = FileName;
             Guid BitmapEncoderGuid = BitmapEncoder.JpegEncoderId;
             switch (fileFormat)
             {
@@ -279,9 +240,9 @@ namespace SDKTemplate
 
 
             return file;
-        }
+        }       
 
-        private enum FileFormat
+        private enum FileFormat                                                      // Mögliche Dateiformate für das Abspeichern
         {
             Jpeg,
             Png,
@@ -289,8 +250,6 @@ namespace SDKTemplate
             Tiff,
             Gif
         }
-
-
 
 
         private async Task<bool> CheckIfGroupExistsAsync()
@@ -308,62 +267,10 @@ namespace SDKTemplate
             {
                 return false;
             }
-        }
+        }                       // Erstellen oder Holen der Personen-Gruppe über die API
 
 
-
-        private async void ChangeScenarioState(ScenarioState newState)
-        {
-            // Disable UI while state change is in progress
-
-            switch (newState)
-            {
-                case ScenarioState.Idle:
-
-                    //   this.ShutdownWebCam();
-                    this.currentState = newState;
-                    break;
-
-                case ScenarioState.Streaming:
-
-                    if (!await this.StartWebcamStreaming())
-                    {
-                        this.ChangeScenarioState(ScenarioState.Idle);
-                        break;
-                    }
-
-                    this.currentState = newState;
-                    break;
-            }
-        }
-
-
-        private void MediaCapture_CameraStreamFailed(MediaCapture sender, object args)
-        {
-            // MediaCapture is not Agile and so we cannot invoke its methods on this caller's thread
-            // and instead need to schedule the state change on the UI thread.
-            var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                ChangeScenarioState(ScenarioState.Idle);
-            });
-        }
-
-
-
-        private void CameraStreamingButton_Click(object sender, RoutedEventArgs e)
-        {//
-            if (this.currentState == ScenarioState.Streaming)
-            {
-                this.ChangeScenarioState(ScenarioState.Idle);
-            }
-            else
-            {
-                this.ChangeScenarioState(ScenarioState.Streaming);
-            }
-        }
-
-
-        public string facedetected = "";
+        public string facedetected = "";                                             // Name der aktuell erkannten Person
         private async void FaceDetect(VideoFrame frame)
         {
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
@@ -420,11 +327,86 @@ namespace SDKTemplate
                     }
                 }
             }
-        }
+        }                          //  Konvertieren des aktuellen Bildes, transfer zur API und Entgegennahme der Ergebnisse
 
-        public string GetFaceName()
+        public string GetFaceName()                                                 // Methode zum Abrufen des aktuellen Names
         {
             return facedetected;
+        }
+
+
+
+        public void Delete()
+        {
+            //private async void ChangeScenarioState(ScenarioState newState)
+            //{
+            //    // Disable UI while state change is in progress
+
+            //    switch (newState)
+            //    {
+            //        case ScenarioState.Idle:
+
+            //            //   this.ShutdownWebCam();
+            //            this.currentState = newState;
+            //            break;
+
+            //        case ScenarioState.Streaming:
+
+            //            if (!await this.StartWebcamStreaming())
+            //            {
+            //                this.ChangeScenarioState(ScenarioState.Idle);
+            //                break;
+            //            }
+
+            //            this.currentState = newState;
+            //            break;
+            //    }
+            //}
+
+
+            //private void MediaCapture_CameraStreamFailed(MediaCapture sender, object args)
+            //{
+            //    // MediaCapture is not Agile and so we cannot invoke its methods on this caller's thread
+            //    // and instead need to schedule the state change on the UI thread.
+            //    var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            //    {
+            //        ChangeScenarioState(ScenarioState.Idle);
+            //    });
+            //}
+
+
+
+            //private void CameraStreamingButton_Click(object sender, RoutedEventArgs e)
+            //{//
+            //    if (this.currentState == ScenarioState.Streaming)
+            //    {
+            //        this.ChangeScenarioState(ScenarioState.Idle);
+            //    }
+            //    else
+            //    {
+            //        this.ChangeScenarioState(ScenarioState.Streaming);
+            //    }
+            //}
+            //private enum ScenarioState
+            //{
+            //    Idle,
+            //    Streaming
+            //}
+            //private void OnSuspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
+            //{
+            //    if (this.currentState == ScenarioState.Streaming)
+            //    {
+            //        var deferral = e.SuspendingOperation.GetDeferral();
+            //        try
+            //        {
+            //            this.ChangeScenarioState(ScenarioState.Idle);
+            //        }
+            //        finally
+            //        {
+            //            deferral.Complete();
+            //        }
+            //    }
+            //}
         }
     }
 }

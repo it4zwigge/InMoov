@@ -1,4 +1,4 @@
-﻿using SDKTemplate;
+﻿using VWFIANCognitveServices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,13 +16,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace InMoov.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class FacesPage : Page
     {
         public FacesPage()
@@ -35,17 +30,14 @@ namespace InMoov.Views
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
-            //move commandbar to page bottom on small screens
             if (diagonal < 7)
             {
                 topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
                 bottombar.Visibility = Visibility.Visible;
             }
             else
             {
                 topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
             }
         }

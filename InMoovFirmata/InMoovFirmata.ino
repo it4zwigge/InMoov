@@ -60,9 +60,11 @@ formatted using the GNU C formatting and indenting
 #define SABERTOOTH_MOTOR_STOP 0x43
 #define SABERTOOTH_MOTOR_ZURUECK 0x44
 
-SoftwareSerial SWSerial(NOT_A_PIN, 11); // RX on no pin (unused), TX on pin 11 (to S1).
-SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port
+SoftwareSerial Sabertooth1(NOT_A_PIN, 2);//Sabertooth1 nutzt PIN 2
+SabertoothSimplified ST1(Sabertooth1); 
 
+SoftwareSerial Sabertooth2(NOT_A_PIN, 4);//Sabertooth2 nutzt PIN 4
+SabertoothSimplified ST2(Sabertooth2);
 /*==============================================================================
 * GLOBAL VARIABLES
 *============================================================================*/
@@ -545,18 +547,23 @@ void sysexCallback(byte command, byte argc, byte *argv)
         //{
         for(int power = 0; power <= 127; power++)
         {
-          ST.motor(1, power);
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
           delay(10);
         }               
       }
       break;
-	
 
  case SABERTOOTH_MOTOR_STOP:
       {    
          for(int power = 127; power >= 0; power--)
         {
-          ST.motor(1, power);
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
           delay(10);
         }              
       }
@@ -566,7 +573,10 @@ void sysexCallback(byte command, byte argc, byte *argv)
       {
         for(int power = 0; power >= -127; power--)
         {
-          ST.motor(1, power);
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
           delay(20);
         }
                 
@@ -606,7 +616,6 @@ void disableI2CPins() {
 * SETUP()
 *============================================================================*/
 
-//Sabertooth ST(128);
 
 void systemResetCallback()
 {
@@ -634,16 +643,6 @@ void systemResetCallback()
 	}
 	// by default, do not report any analog inputs
 	analogInputsToReport = 0;
-
-	/* send digital inputs to set the initial state on the host computer,
-	* since once in the loop(), this firmware will only send on change */
-	/*
-	TODO: this can never execute, since no pins default to digital input
-	but it will be needed when/if we support EEPROM stored config
-	for (byte i=0; i < TOTAL_PORTS; i++) {
-	outputPort(i, readPort(i, portConfigInputs[i]), true);
-	}
-	*/
 }
 
 void setup()
@@ -658,8 +657,8 @@ void setup()
 	Firmata.attach(START_SYSEX, sysexCallback);
 	Firmata.attach(SYSTEM_RESET, systemResetCallback);
 
-	SWSerial.begin(9600); //Sabertooth Baudstart
-
+	Sabertooth1.begin(9600); //Sabertooth1 Baudstart
+    Sabertooth2.begin(9600); //Sabertooth2 Baudstart
 	Firmata.begin(57600);
 	systemResetCallback();  // reset to default config
 }

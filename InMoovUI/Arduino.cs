@@ -28,7 +28,10 @@ namespace InMoov
         public string id { get; set; }
         public string kind { get; set; }
         public bool ready { get; set; }
-        static byte SABERTOOTH_MOTOR = 0x42;
+
+        private static byte SABERTOOTH_MOTOR_VOR = 0x42;
+        private static byte SABERTOOTH_MOTOR_STOP = 0x43;
+        private static byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
 
         DispatcherTimer timeout;
 
@@ -86,17 +89,31 @@ namespace InMoov
             this.arduino.analogWrite(pin, value);
         }
 
-        #region InMoov Firmata
-     
-
-        public void STMotor(byte motor, byte speed, byte rampe)
+        public void STMotor_Vor()
         {
-            byte[] message = new byte[3];
-            message[0] = (byte)(motor);
-            message[1] = (byte)(speed);
-            message[2] = (byte)(rampe);
-            firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
+            byte[] message = new byte[1];
+            message[0] = (byte)(0);
+            firmata.sendSysex(SABERTOOTH_MOTOR_VOR,message.AsBuffer());
         }
+
+        public void STMotor_Stop()
+        {
+            byte[] message = new byte[1];
+            message[0] = (byte)(0);
+            firmata.sendSysex(SABERTOOTH_MOTOR_STOP, message.AsBuffer());
+        }
+
+        public void STMotor_Zurueck()
+        {
+            byte[] message = new byte[1];
+            message[0] = (byte)(0);
+            firmata.sendSysex(SABERTOOTH_MOTOR_ZURUECK, message.AsBuffer());
+        }
+
+
+
+        #region InMoov Firmata
+
         #endregion
 
         #region Events
@@ -177,14 +194,5 @@ namespace InMoov
             firmata.sendSysex(NEOPIXEL, message.AsBuffer());
         }
 
-    }
-
-    internal class STMotor
-    {
-
-        public STMotor ()
-        {
-
-        }
     }
 }

@@ -35,11 +35,13 @@ namespace InMoov.Views
 
         private void Vor_Button_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
         {
+            App.Leonardo.STMotor_Stop();
             //App.STMotorStop(1);
         }
 
         private void Vor_Button_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
         {
+            App.Leonardo.STMotor_Vor();
             //App.STMotorVor(1, 0, 0);
         }
 

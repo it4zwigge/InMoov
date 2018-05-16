@@ -8,7 +8,6 @@ using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Microsoft.Maker.Firmata;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
@@ -36,12 +35,12 @@ namespace InMoov.Views
 
         private void Vor_Button_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
         {
-            App.STMotorStop(1);
+            //App.STMotorStop(1);
         }
 
         private void Vor_Button_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
         {
-            App.STMotorVor(1, 0, 0);
+            //App.STMotorVor(1, 0, 0);
         }
 
        

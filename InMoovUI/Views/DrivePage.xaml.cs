@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Threading;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -51,9 +52,21 @@ namespace InMoov.Views
             }
         }
 
+        public static void allLedsOn()
+        {
+           foreach (Arduino ard in App.Arduinos.Values)
+            {
+                ard.digitalWrite(13, Microsoft.Maker.RemoteWiring.PinState.HIGH);
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            App.STMotor(1, 2, 2);
+            Random rnd = new Random();
+            int index = rnd.Next(0, 4);
+            App.Arduinos.ElementAt(index).Value.digitalWrite(13, Microsoft.Maker.RemoteWiring.PinState.HIGH);                  
+            Thread.Sleep(rnd.Next(50, 180));
+            App.Arduinos.ElementAt(index).Value.digitalWrite(13, Microsoft.Maker.RemoteWiring.PinState.LOW);
             //NeoPixelRegister(9, 16);
             //Task.Delay(1000).Wait();
             //SetPixelColor(1, 255, 0, 0);

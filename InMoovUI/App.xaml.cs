@@ -18,6 +18,7 @@ using Microsoft.ApplicationInsights;
 
 namespace InMoov
 {
+    using BodyParts;
     using Microsoft.ApplicationInsights.Channel;
     using Microsoft.Maker.Firmata;
     using Microsoft.Maker.RemoteWiring;
@@ -33,11 +34,64 @@ namespace InMoov
     /// </summary>
     sealed partial class App : Application
     {
+
         static byte NEOPIXEL = 0x72;
         static byte NEOPIXEL_REGISTER = 0x74;
         static byte SABERTOOTH_MOTOR = 0x42;
-        static byte SABERTOOTH_MOTOR_STOP = 0x43;
-        static byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
+
+        public static int readyDevices = 0;
+
+        public static Dictionary<string, Arduino> Arduinos = new Dictionary<string, Arduino>();
+        public static Dictionary<string, BodyPart> BodyParts = new Dictionary<string, BodyPart>();
+
+        public static Arduino ARechts   { get; set; }
+        public static Arduino ALinks    { get; set; }
+        public static Arduino Leonardo  { get; set; }
+
+        public static bool ArduinosReady()
+        {
+            if (readyDevices == App.Arduinos.Values.Count)
+            {
+                foreach (Arduino arduino in App.Arduinos.Values)
+                {
+                    switch (arduino.id.Substring(26, 20))
+                    {
+                        case "55639303834351D0F191":
+                            if (App.Leonardo == null)
+                            {
+                                App.Leonardo = arduino;
+                                Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
+                            }
+                            break;
+                        case "85539313931351C09082":
+                            if (App.ARechts == null)
+                            {
+                                App.ARechts = arduino;
+                                Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
+                            }
+                            break;
+                        case "955303430353518062E0":
+                            if (App.ALinks == null)
+                            {
+                                App.ALinks = arduino;
+                                Debug.WriteLine("Alinks wurde das gerät " + arduino.name + " zugeteilt!");
+                            }
+                            break;
+                    }
+                }
+                //hier navigation freigeben. Hauptstart ansteuern
+                InitializeBodyParts();
+                Views.ConnectPage.Startup();
+                return true;
+            }
+            else return false;
+        }
+
+        public static void InitializeBodyParts()
+        {
+            BodyParts.Add("Rechten Arm", new BodyPart(ARechts, 8, 0, 70, 0));
+            BodyParts.Add("Linken Arm", new BodyPart(ALinks, 8, 0, 70, 0));
+        }
 
         public static IStream Connection
         {
@@ -63,54 +117,11 @@ namespace InMoov
             private set;
         }
 
-        public static void NeoPixelRegister(byte pin, byte count)
-        {
-            byte[] message = new byte[2];
-            message[0] = (byte)(pin);
-            message[1] = (byte)(count);
-            App.Firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
-        }
-
-        public static void SetPixelColor(byte index, byte r, byte g, byte b)
-        {
-            byte[] message = new byte[4];
-            message[0] = (byte)(index);
-            message[1] = (byte)(r);
-            message[2] = (byte)(g);
-            message[3] = (byte)(b);
-            App.Firmata.sendSysex(NEOPIXEL, message.AsBuffer());
-        }
-
-        public static void STMotorVor(byte motor, byte speed, byte rampe)
-        {
-            byte[] message = new byte[3];
-            message[0] = (byte)(motor);
-            message[1] = (byte)(speed);
-            message[2] = (byte)(rampe);
-            App.Firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
-        }
-
-        public static void STMotorStop(byte motor)
-        {
-            byte[] message = new byte[1];
-            message[0] = (byte)(motor);
-            App.Firmata.sendSysex(SABERTOOTH_MOTOR_STOP, message.AsBuffer());
-        }
-
-        public static void STMotorZurueck(byte motor, byte speed, byte rampe)
-        {
-            byte[] message = new byte[3];
-            message[0] = (byte)(motor);
-            message[1] = (byte)(speed);
-            message[2] = (byte)(rampe);
-            App.Firmata.sendSysex(SABERTOOTH_MOTOR_ZURUECK, message.AsBuffer());
-        }
-
-            /// <summary>
-            /// Initializes the singleton application object.  This is the first line of authored code
-            /// executed, and as such is the logical equivalent of main() or WinMain().
-            /// </summary>
-            public App()
+        /// <summary>
+        /// Initializes the singleton application object.  This is the first line of authored code
+        /// executed, and as such is the logical equivalent of main() or WinMain().
+        /// </summary>
+        public App()
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;

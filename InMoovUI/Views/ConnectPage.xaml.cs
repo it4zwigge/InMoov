@@ -43,6 +43,12 @@ namespace InMoov.Views
             App.Telemetry.TrackEvent("ConnectPage_Launched");
         }
 
+        // Hier müssen alle anzusteuernde funktionen eingetragen werden
+        public static void Startup()
+        {
+            
+        }
+
         #region UI events
         /// <summary>
         /// 
@@ -132,49 +138,17 @@ namespace InMoov.Views
                 { "Device_Kind", device.Kind.ToString() }
             };
             App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
-
-            App.Connection = new UsbSerial(device);
-
-            App.Arduino = new RemoteDevice(App.Connection);
-            App.Arduino.DeviceReady += OnDeviceReady;
-            App.Arduino.DeviceConnectionFailed += OnDeviceConnectionFailed;
-
-            App.Firmata = new UwpFirmata();
-            App.Firmata.begin(App.Connection);
-            App.Firmata.FirmataConnectionReady += Firmata_FirmataConnectionReady;
-
-            connectionAttemptStartedTime = DateTime.UtcNow;
-            App.Connection.begin(57600, SerialConfig.SERIAL_8N1);
-
-            //start a timer for connection timeout
-            timeout = new DispatcherTimer
+            foreach (string key in App.Arduinos.Keys)
             {
-                Interval = new TimeSpan(0, 0, 30)
-            };
-            timeout.Tick += Connection_TimeOut;
-            timeout.Start();
+                if (key == device.Id)
+                {
+                    App.Arduinos.Remove(device.Id);
+                    break;
+                }
+            }
+            App.Arduinos.Add(device.Id, new Arduino(device));
         }
         #endregion UI events
-
-        private void OnDeviceReady()
-        {
-            var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
-            {
-                timeout.Stop();
-
-                // Telemetry
-                App.Telemetry.TrackRequest("Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
-                App.Telemetry.TrackMetric("Connection_Page_Time_Spent_In_Seconds", (DateTime.UtcNow - timePageNavigatedTo).TotalSeconds);
-
-                ConnectMessage.Text = "Arduino wurde erfolgreich verbunden!";
-                //this.Frame.Navigate(typeof(MainPage));
-            }));
-        }
-
-        private void Firmata_FirmataConnectionReady()
-        {
-            Debug.WriteLine("Firmata: wurde erfolgreich verbunden!");
-        }
 
         #region Helper
         /// <summary>
@@ -247,11 +221,6 @@ namespace InMoov.Views
             ConnectMessage.Text = "Connection attempt cancelled.";
             App.Telemetry.TrackRequest("Connection_Cancelled_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
 
-            if (App.Connection != null)
-            {
-                App.Connection.ConnectionEstablished -= OnDeviceReady;
-                App.Connection.ConnectionFailed -= OnDeviceConnectionFailed;
-            }
 
             if (cancelTokenSource != null)
             {
@@ -265,33 +234,5 @@ namespace InMoov.Views
             SetUiEnabled(true);
         }
         #endregion Helper
-
-        private void OnDeviceConnectionFailed(string message)
-        {
-            var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
-            {
-                timeout.Stop();
-
-                //telemetry
-                App.Telemetry.TrackRequest("Connection_Failed_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, message, true);
-
-                ConnectMessage.Text = "Connection attempt failed: " + message;
-                SetUiEnabled(true);
-            }));
-        }
-
-        private void Connection_TimeOut(object sender, object e)
-        {
-            var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
-            {
-                timeout.Stop();
-
-                //telemetry
-                App.Telemetry.TrackRequest("Connection_Timeout_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
-
-                ConnectMessage.Text = "Connection attempt timed out.";
-                SetUiEnabled(true);
-            }));
-        }
     }
 }

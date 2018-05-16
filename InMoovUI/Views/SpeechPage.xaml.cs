@@ -389,14 +389,12 @@ namespace InMoov.Views
                     }
                     else if (tag == "GesichtStart")
                     {
-                        fp.FaceDetect_on();
                         string name = fp.nameface_voice;
                         heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
                         resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
                     }
                     else if (tag == "GesichtStop")
                     {
-                        fp.FaceDetect_off();
                         heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
                         resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
                     }
@@ -488,14 +486,12 @@ namespace InMoov.Views
                     }
                     else if (tag == "GesichtStart")
                     {
-                        fp.FaceDetect_on();
                         string name = fp.nameface_voice;
                         heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
                         resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
                     }
                     else if (tag == "GesichtStop")
                     {
-                        fp.FaceDetect_off();
                         heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
                         resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
                     }

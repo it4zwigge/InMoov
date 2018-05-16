@@ -48,7 +48,7 @@ namespace InMoov.Views
         private void _faceTimer_Tick(object sender, object e)
         {
             NavigationEventArgs nero = null;
-            FaceDetect.OnNavigatedTo(nero);
+            FaceDetect.StarteWebcam();
             FaceName_TextBlock.Text = "Hallo " + FaceDetect.GetFaceName();
             nameface_voice = FaceName_TextBlock.Text;
             if (FaceName_TextBlock.Text == "") { }
@@ -76,11 +76,7 @@ namespace InMoov.Views
         public void FaceDetect_off()
         {
            _faceTimer.Stop();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            FaceDetect.CreatePersons();
+            FaceDetect.status = false;
         }
     }
 }

@@ -25,6 +25,23 @@ namespace InMoov.Views
         {
             this.InitializeComponent();
             this.Loaded += FacesPage_Loaded;
+            ToogleFace.Toggled += ToogleFace_Toggled;
+
+        }
+
+        private void ToogleFace_Toggled(object sender, RoutedEventArgs e)
+        {
+            if(ToogleFace.IsOn)
+            {
+                _faceTimer.Tick += _faceTimer_Tick;
+                _faceTimer.Interval = new TimeSpan(0, 0, 3);
+                _faceTimer.Start();
+            }
+            else
+            {
+                _faceTimer.Stop();
+                FaceDetect.status = false;
+            }
         }
 
         private void FacesPage_Loaded(object sender, RoutedEventArgs e)
@@ -47,7 +64,6 @@ namespace InMoov.Views
         public string nameface_voice = null;
         private void _faceTimer_Tick(object sender, object e)
         {
-            NavigationEventArgs nero = null;
             FaceDetect.StarteWebcam();
             FaceName_TextBlock.Text = "Hallo " + FaceDetect.GetFaceName();
             nameface_voice = FaceName_TextBlock.Text;
@@ -57,26 +73,10 @@ namespace InMoov.Views
 
         private void Button_ON_Click(object sender, RoutedEventArgs e)
         {
-            FaceDetect_on();
         }
 
         private void Button_OFF_Click(object sender, RoutedEventArgs e)
         {
-            FaceDetect_off();
-        }
-
-
-        public void FaceDetect_on()
-        {
-            _faceTimer.Tick += _faceTimer_Tick;
-            _faceTimer.Interval = new TimeSpan(0, 0, 3);
-            _faceTimer.Start();
-        }
-
-        public void FaceDetect_off()
-        {
-           _faceTimer.Stop();
-            FaceDetect.status = false;
         }
     }
 }

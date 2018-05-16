@@ -80,7 +80,7 @@ namespace InMoov.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            FaceDetect.CreatePersons();
+            //FaceDetect.CreatePersons();
         }
     }
 }

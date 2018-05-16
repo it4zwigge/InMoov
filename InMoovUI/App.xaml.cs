@@ -36,6 +36,8 @@ namespace InMoov
         static byte NEOPIXEL = 0x72;
         static byte NEOPIXEL_REGISTER = 0x74;
         static byte SABERTOOTH_MOTOR = 0x42;
+        static byte SABERTOOTH_MOTOR_STOP = 0x43;
+        static byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
 
         public static IStream Connection
         {
@@ -79,7 +81,7 @@ namespace InMoov
             App.Firmata.sendSysex(NEOPIXEL, message.AsBuffer());
         }
 
-        public static void STMotor(byte motor, byte speed, byte rampe)
+        public static void STMotorVor(byte motor, byte speed, byte rampe)
         {
             byte[] message = new byte[3];
             message[0] = (byte)(motor);
@@ -88,11 +90,27 @@ namespace InMoov
             App.Firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
         }
 
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
-        public App()
+        public static void STMotorStop(byte motor)
+        {
+            byte[] message = new byte[1];
+            message[0] = (byte)(motor);
+            App.Firmata.sendSysex(SABERTOOTH_MOTOR_STOP, message.AsBuffer());
+        }
+
+        public static void STMotorZurueck(byte motor, byte speed, byte rampe)
+        {
+            byte[] message = new byte[3];
+            message[0] = (byte)(motor);
+            message[1] = (byte)(speed);
+            message[2] = (byte)(rampe);
+            App.Firmata.sendSysex(SABERTOOTH_MOTOR_ZURUECK, message.AsBuffer());
+        }
+
+            /// <summary>
+            /// Initializes the singleton application object.  This is the first line of authored code
+            /// executed, and as such is the logical equivalent of main() or WinMain().
+            /// </summary>
+            public App()
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;

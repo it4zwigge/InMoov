@@ -105,6 +105,7 @@
     <Compile Include="Controls\PageHeader.xaml.cs">
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Fahrwerk.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="FaceDetection.cs" />

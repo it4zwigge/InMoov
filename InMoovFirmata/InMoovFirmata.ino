@@ -56,14 +56,11 @@ formatted using the GNU C formatting and indenting
 //Adafruit_NeoPixel * neopixels = NULL;
 
 
-#define SABERTOOTH_MOTOR_VOR 0x42
-#define SABERTOOTH_MOTOR_STOP 0x43
-#define SABERTOOTH_MOTOR_ZURUECK 0x44
+#define SABERTOOTH_MOTOR 0x42
+#define SABERTOOTH_REGISTER 0x43
 
-//SoftwareSerial Sabertooth2(NOT_A_PIN, 5);//Sabertooth1 nutzt PIN 2
-//SabertoothSimplified ST2(Sabertooth2);
-SoftwareSerial Sabertooth1(NOT_A_PIN, 5);//Sabertooth1 nutzt PIN 2
-SabertoothSimplified ST1(Sabertooth1); 
+SoftwareSerial *saberthooths = NULL;
+SabertoothSimplified ST1 = NULL;
 /*==============================================================================
 * GLOBAL VARIABLES
 *============================================================================*/
@@ -540,48 +537,46 @@ void sysexCallback(byte command, byte argc, byte *argv)
 	* InMoov Cases
 	*=============================================================================*/
 
-	case SABERTOOTH_MOTOR_VOR:
-      {
-        //for (int power = 0; power <= argv[1]; power ++)
-        //{
-        for(int power = 0; power <= 60; power++)
-        {
-          ST1.motor(1, power);
-          ST1.motor(2, power);
-          //ST2.motor(1, power);
-          //ST2.motor(2, power);
-          delay(10);
-        }               
-      }
-      break;
+	case SABERTOOTH_REGISTER:
+		{
+			int pin = argv[0];
 
- case SABERTOOTH_MOTOR_STOP:
-      {    
-         for(int power = 60; power >= 0; power--)
-        {
-          ST1.motor(1, power);
-          ST1.motor(2, power);
-          //ST2.motor(1, power);
-          //ST2.motor(2, power);
-          delay(10);
-        }              
-      }
-      break;
+			if (saberthooths != NULL)
+			{
+				delete saberthooths;
+			}
+			saberthooths = new SoftwareSerial(NOT_A_PIN, pin);
+			ST1 = new SabertoothSimplified(saberthooths);
+		}
+		break;
 
- case SABERTOOTH_MOTOR_ZURUECK:
-      {
-        for(int power = 0; power >= -60; power--)
-        {
-          ST1.motor(1, power);
-          ST1.motor(2, power);
-          //ST2.motor(1, power);
-          //ST2.motor(2, power);
-          delay(20);
-        }
+	case SABERTOOTH_MOTOR_STOP:
+		  {    
+			 for(int power = 60; power >= 0; power--)
+			{
+			  ST1.motor(1, power);
+			  ST1.motor(2, power);
+			  //ST2.motor(1, power);
+			  //ST2.motor(2, power);
+			  delay(10);
+			}              
+		  }
+		  break;
+
+	case SABERTOOTH_MOTOR_ZURUECK:
+		  {
+			for(int power = 0; power >= -60; power--)
+			{
+			  ST1.motor(1, power);
+			  ST1.motor(2, power);
+			  //ST2.motor(1, power);
+			  //ST2.motor(2, power);
+			  delay(20);
+			}
                 
-      }
-      break;     
- }
+		  }
+		  break;     
+	}
 }
 
 void enableI2CPins()

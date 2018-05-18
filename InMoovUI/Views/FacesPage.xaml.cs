@@ -62,13 +62,13 @@ namespace InMoov.Views
         TrackFacesInWebcam FaceDetect = new TrackFacesInWebcam();
         DispatcherTimer _faceTimer = new DispatcherTimer();
         public string nameface_voice = null;
-        private void _faceTimer_Tick(object sender, object e)
+        private async void _faceTimer_Tick(object sender, object e)
         {
             FaceDetect.StarteWebcam();
             FaceName_TextBlock.Text = "Hallo " + FaceDetect.GetFaceName();
             nameface_voice = FaceName_TextBlock.Text;
             if (FaceName_TextBlock.Text == "") { }
-            else { Task.Delay(500); }
+            else { await Task.Delay(5000); }
         }
 
         private void Button_ON_Click(object sender, RoutedEventArgs e)

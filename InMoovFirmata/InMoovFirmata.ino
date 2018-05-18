@@ -60,11 +60,10 @@ formatted using the GNU C formatting and indenting
 #define SABERTOOTH_MOTOR_STOP 0x43
 #define SABERTOOTH_MOTOR_ZURUECK 0x44
 
-SoftwareSerial Sabertooth1(NOT_A_PIN, 2);//Sabertooth1 nutzt PIN 2
+//SoftwareSerial Sabertooth2(NOT_A_PIN, 5);//Sabertooth1 nutzt PIN 2
+//SabertoothSimplified ST2(Sabertooth2);
+SoftwareSerial Sabertooth1(NOT_A_PIN, 5);//Sabertooth1 nutzt PIN 2
 SabertoothSimplified ST1(Sabertooth1); 
-
-SoftwareSerial Sabertooth2(NOT_A_PIN, 4);//Sabertooth2 nutzt PIN 4
-SabertoothSimplified ST2(Sabertooth2);
 /*==============================================================================
 * GLOBAL VARIABLES
 *============================================================================*/
@@ -545,12 +544,12 @@ void sysexCallback(byte command, byte argc, byte *argv)
       {
         //for (int power = 0; power <= argv[1]; power ++)
         //{
-        for(int power = 0; power <= 127; power++)
+        for(int power = 0; power <= 60; power++)
         {
           ST1.motor(1, power);
           ST1.motor(2, power);
-          ST2.motor(1, power);
-          ST2.motor(2, power);
+          //ST2.motor(1, power);
+          //ST2.motor(2, power);
           delay(10);
         }               
       }
@@ -558,12 +557,12 @@ void sysexCallback(byte command, byte argc, byte *argv)
 
  case SABERTOOTH_MOTOR_STOP:
       {    
-         for(int power = 127; power >= 0; power--)
+         for(int power = 60; power >= 0; power--)
         {
           ST1.motor(1, power);
           ST1.motor(2, power);
-          ST2.motor(1, power);
-          ST2.motor(2, power);
+          //ST2.motor(1, power);
+          //ST2.motor(2, power);
           delay(10);
         }              
       }
@@ -571,12 +570,12 @@ void sysexCallback(byte command, byte argc, byte *argv)
 
  case SABERTOOTH_MOTOR_ZURUECK:
       {
-        for(int power = 0; power >= -127; power--)
+        for(int power = 0; power >= -60; power--)
         {
           ST1.motor(1, power);
           ST1.motor(2, power);
-          ST2.motor(1, power);
-          ST2.motor(2, power);
+          //ST2.motor(1, power);
+          //ST2.motor(2, power);
           delay(20);
         }
                 
@@ -658,7 +657,7 @@ void setup()
 	Firmata.attach(SYSTEM_RESET, systemResetCallback);
 
 	Sabertooth1.begin(9600); //Sabertooth1 Baudstart
-    Sabertooth2.begin(9600); //Sabertooth2 Baudstart
+
 	Firmata.begin(57600);
 	systemResetCallback();  // reset to default config
 }

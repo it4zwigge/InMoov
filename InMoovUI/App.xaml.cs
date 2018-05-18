@@ -54,33 +54,31 @@ namespace InMoov
             {
                 foreach (Arduino arduino in App.Arduinos.Values)
                 {
-                    switch (arduino.id.Substring(26, 20))
+                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191")
+                        
                     {
-                        case "55639303834351D0F191":
-                            if (App.Leonardo == null)
-                            {
-                                App.Leonardo = arduino;
-                                Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
-                            }
-                            break;
-                        case "85539313931351C09082":
-                            if (App.ARechts == null)
-                            {
-                                App.ARechts = arduino;
-                                Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
-                            }
-                            break;
-                        case "955303430353518062E0":
-                            if (App.ALinks == null)
-                            {
-                                App.ALinks = arduino;
-                                Debug.WriteLine("Alinks wurde das gerät " + arduino.name + " zugeteilt!");
-                            }
-                            break;
+                        App.Leonardo = arduino;
+                        Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
                     }
+                    else if (arduino.id.Substring(26, 20) == "75533353038351313212")
+                    {
+                        App.ARechts = arduino;
+                        Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
+
+                    }
+                    else if (arduino.id.Substring(26, 20) == "85531303231351812120")
+                    {
+                        App.ALinks = arduino;
+                        Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
+
+                    }
+
                 }
                 //hier navigation freigeben. Hauptstart ansteuern
-                InitializeBodyParts();
+                if (ARechts != null && ALinks != null && Leonardo != null)
+                {
+                    //InitializeBodyParts();
+                }
                 Views.ConnectPage.Startup();
                 return true;
             }

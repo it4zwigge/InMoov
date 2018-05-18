@@ -29,23 +29,18 @@ namespace InMoov.Views
         {
             this.InitializeComponent();
             this.Loaded += DrivePage_Loaded;
-            Vor_Button.PreviewKeyDown += Vor_Button_PreviewKeyDown;
-            Vor_Button.PreviewKeyUp += Vor_Button_PreviewKeyUp;
+            Vor_Button.Click += Vor_Button_Click;
+        }
+
+        private void Vor_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor_Vor();
         }
 
         private void Vor_Button_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
         {
             App.Leonardo.STMotor_Stop();
-            //App.STMotorStop(1);
-        }
-
-        private void Vor_Button_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            App.Leonardo.STMotor_Vor();
-            //App.STMotorVor(1, 0, 0);
-        }
-
-       
+        }       
 
         private void DrivePage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -66,17 +61,6 @@ namespace InMoov.Views
             }
         }
 
-        //private void Button_Click(object sender, RoutedEventArgs e)
-        //{
-        //    //App.STMotor(1, 2, 2);
-        //    //App.STMotor(1, 4, 5);
-        //    App.STMotor(1, 0, 0);
-            
-        //}
-
-        //private void Button_MouseDown(object sender, RoutedEventArgs e)
-        //{
-        //    App.STMotor(1, 0, 0);
-        //}
+       
     }
 }

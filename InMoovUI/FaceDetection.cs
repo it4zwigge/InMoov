@@ -37,7 +37,7 @@ namespace VWFIANCognitveServices
 
         public TrackFacesInWebcam()                                                                                                 //Konstruktor
         {
-            StarteWebcam();
+            
         }
 
         public async void StarteWebcam()

@@ -133,7 +133,7 @@ namespace InMoov
             {
                 this.analog_pins = this.arduino.DeviceHardwareProfile.AnalogPins.ToArray();
                 this.ready = true;
-                Debug.WriteLine("[" + this.name + "] erolgreich verbunden" + kind);
+                Debug.WriteLine("[" + this.name + "] erolgreich verbunden" + id);
                 App.readyDevices++;
                 App.ArduinosReady();
             }

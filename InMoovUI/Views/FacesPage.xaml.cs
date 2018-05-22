@@ -73,7 +73,8 @@ namespace InMoov.Views
         {
             if(TooglePreview.IsOn)
             {
-
+                captureEL.Source = mediaCapture;
+                
             }
             else
             {

@@ -66,6 +66,10 @@
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
             <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Your App Content"/>
             <Button x:Name="Vor_Button" Content="Vor" HorizontalAlignment="Left" Height="170" Margin="594,242,0,0" VerticalAlignment="Top" Width="254"/>
+            <Button x:Name="Stop_Button" Content="Stop" HorizontalAlignment="Left" Height="170" Margin="594,445,0,0" VerticalAlignment="Top" Width="254" Click="Stop_Button_Click"/>
+            <Button x:Name="Rueckwaerts_Button" Content="Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,242,0,0" VerticalAlignment="Top" Width="254" Click="Rueckwaerts_Button_Click"/>
+            <Button x:Name="Stop_R_Button" Content="Stop Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,445,0,0" VerticalAlignment="Top" Width="254" Click="Stop_R_Button_Click"/>
+            <Button x:Name="Drehung_Button" Content="Drehung" HorizontalAlignment="Left" Height="170" Margin="10,346,0,0" VerticalAlignment="Top" Width="254" Click="Drehung_Button_Click" />
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

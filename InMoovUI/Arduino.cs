@@ -32,6 +32,8 @@ namespace InMoov
         private static byte SABERTOOTH_MOTOR_VOR = 0x42;
         private static byte SABERTOOTH_MOTOR_STOP = 0x43;
         private static byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
+        private static byte SABERTOOTH_MOTOR_STOP_ZURUECK = 0x45;
+        private static byte SABERTOOTH_MOTOR_DREHUNG_RECHTS = 0x46;
 
         DispatcherTimer timeout;
 
@@ -89,28 +91,51 @@ namespace InMoov
             this.arduino.analogWrite(pin, value);
         }
 
-        public void STMotor_Vor()
+        public void STMotor_Vor(byte speed)
         {
-            byte[] message = new byte[1];
-            message[0] = (byte)(0);
+            byte[] message = new byte[3];
+            message[0] = (byte)(speed);
+            message[1] = (byte)(speed);
+            message[2] = (byte)(speed);
             firmata.sendSysex(SABERTOOTH_MOTOR_VOR,message.AsBuffer());
         }
 
         public void STMotor_Stop()
         {
-            byte[] message = new byte[1];
+            byte[] message = new byte[3];
             message[0] = (byte)(0);
+            message[1] = (byte)(0);
+            message[2] = (byte)(0);
             firmata.sendSysex(SABERTOOTH_MOTOR_STOP, message.AsBuffer());
         }
 
-        public void STMotor_Zurueck()
+        public void STMotor_Zurueck(byte speed)
         {
-            byte[] message = new byte[1];
-            message[0] = (byte)(0);
+            byte[] message = new byte[3];
+            message[0] = (byte)(speed);
+            message[1] = (byte)(speed);
+            message[2] = (byte)(speed);
             firmata.sendSysex(SABERTOOTH_MOTOR_ZURUECK, message.AsBuffer());
         }
 
 
+        public void STMotor_Stop_Zurueck()
+        {
+            byte[] message = new byte[3];
+            message[0] = (byte)(0);
+            message[1] = (byte)(0);
+            message[2] = (byte)(0);
+            firmata.sendSysex(SABERTOOTH_MOTOR_STOP_ZURUECK, message.AsBuffer());
+        }
+
+        public void STMotor_Drehung()
+        {
+            byte[] message = new byte[3];
+            message[0] = (byte)(0);
+            message[1] = (byte)(0);
+            message[2] = (byte)(0);
+            firmata.sendSysex(SABERTOOTH_MOTOR_DREHUNG_RECHTS, message.AsBuffer());
+        }
 
         #region InMoov Firmata
 

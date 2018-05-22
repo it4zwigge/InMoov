@@ -34,13 +34,18 @@ namespace InMoov.Views
 
         private void Vor_Button_Click(object sender, RoutedEventArgs e)
         {
-            App.Leonardo.STMotor_Vor();
+            App.Leonardo.STMotor_Vor(100);
         }
 
-        private void Vor_Button_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
+        private void Stop_Button_Click(object sender, RoutedEventArgs e)
         {
             App.Leonardo.STMotor_Stop();
-        }       
+        }
+
+        private void Rueckwaerts_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor_Zurueck(100);
+        }
 
         private void DrivePage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -61,6 +66,14 @@ namespace InMoov.Views
             }
         }
 
-       
+        private void Stop_R_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor_Stop_Zurueck();
+        }
+
+        private void Drehung_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor_Drehung();
+        }
     }
 }

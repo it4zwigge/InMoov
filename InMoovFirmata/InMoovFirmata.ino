@@ -652,6 +652,7 @@ void setup()
 	Firmata.attach(SYSTEM_RESET, systemResetCallback);
 
 	Sabertooth1.begin(9600); //Sabertooth1 Baudstart
+	Sabertooth2.begin(9600);//Sabertooth2 Baudstart
 
 	Firmata.begin(57600);
 	systemResetCallback();  // reset to default config

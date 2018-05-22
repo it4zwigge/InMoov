@@ -98,7 +98,6 @@ namespace InMoov.Views
             if (permissionGained)
             {
                 // Enable the recognition buttons.
-                btnRecognizeWithoutUI.IsEnabled = true;
 
                 Language speechLanguage = SpeechRecognizer.SystemSpeechLanguage;
                 string langTag = speechLanguage.LanguageTag;
@@ -114,7 +113,6 @@ namespace InMoov.Views
             {
                 resultTextBlock.Visibility = Visibility.Visible;
                 resultTextBlock.Text = "Permission to access capture resources was not given by the user; please set the application setting in Settings->Privacy->Microphone.";
-                btnRecognizeWithoutUI.IsEnabled = false;
                 cbLanguageSelection.IsEnabled = false;
             }
         }
@@ -344,7 +342,6 @@ namespace InMoov.Views
                 if (compilationResult.Status != SpeechRecognitionResultStatus.Success)
                 {
                     // Disable the recognition buttons.
-                    btnRecognizeWithoutUI.IsEnabled = false;
 
                     // Let the user know that the grammar didn't compile properly.
                     resultTextBlock.Visibility = Visibility.Visible;
@@ -352,7 +349,6 @@ namespace InMoov.Views
                 }
                 else
                 {
-                    btnRecognizeWithoutUI.IsEnabled = true;
 
                     resultTextBlock.Visibility = Visibility.Collapsed;
                 }
@@ -361,7 +357,6 @@ namespace InMoov.Views
             {
                 if ((uint)ex.HResult == HResultRecognizerNotFound)
                 {
-                    btnRecognizeWithoutUI.IsEnabled = false;
 
                     resultTextBlock.Visibility = Visibility.Visible;
                     resultTextBlock.Text = "Speech Language pack for selected language not installed.";
@@ -402,129 +397,131 @@ namespace InMoov.Views
         /// <param name="e">State information about the routed event</param>
         private async void RecognizeWithoutUIListConstraint_Click(object sender, RoutedEventArgs e)
         {
-            ledCaptured = false;
-            colorCaptured = null;
-            numberCaptured = 99;
-            heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-            // Disable the UI while recognition is occurring, and provide feedback to the user about current state.
-            btnRecognizeWithoutUI.IsEnabled = false;
-            cbLanguageSelection.IsEnabled = false;
-            listenWithoutUIButtonText.Text = " listening for speech...";
-
-            // Start recognition.
-            try
+            if(ToggleSpeech.IsOn)
             {
-                // Save the recognition operation so we can cancel it (as it does not provide a blocking
-                // UI, unlike RecognizeWithAsync()
-                recognitionOperation = speechRecognizer.RecognizeAsync();
+                ledCaptured = false;
+                colorCaptured = null;
+                numberCaptured = 99;
+                heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
+                // Disable the UI while recognition is occurring, and provide feedback to the user about current state.
+                cbLanguageSelection.IsEnabled = false;
 
-                SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
-
-                // If successful, display the recognition result. A cancelled task should do nothing.
-                if (speechRecognitionResult.Status == SpeechRecognitionResultStatus.Success)
+                // Start recognition.
+                try
                 {
-                    string tag = "unknown";
-                    if (speechRecognitionResult.Constraint != null)
+                    // Save the recognition operation so we can cancel it (as it does not provide a blocking
+                    // UI, unlike RecognizeWithAsync()
+                    recognitionOperation = speechRecognizer.RecognizeAsync();
+
+                    SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
+
+                    // If successful, display the recognition result. A cancelled task should do nothing.
+                    if (speechRecognitionResult.Status == SpeechRecognitionResultStatus.Success)
                     {
-                        // Only attempt to retreive the tag if we didn't hit the garbage rule.
-                        tag = speechRecognitionResult.Constraint.Tag;
-                    }
-
-                    heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Visible;
-
-                    /*
-                     * +++++++++++++++NEU+++++++++++++++
-                     */
-
-                    if (tag == "RobotName")
-                    {
-                        resultTextBlock.Visibility = Visibility.Visible;
-                        heardYouSayTextBlock.Visibility = Visibility.Visible;
-                        heardYouSayTextBlock.Text = "Startwort erkannt!";
-                        if (isListening == false)
+                        string tag = "unknown";
+                        if (speechRecognitionResult.Constraint != null)
                         {
-                            // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
-                            // This prevents an exception from occurring.
-                            if (speechRecognizer.State == SpeechRecognizerState.Idle)
+                            // Only attempt to retreive the tag if we didn't hit the garbage rule.
+                            tag = speechRecognitionResult.Constraint.Tag;
+                        }
+
+                        heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Visible;
+
+                        /*
+                         * +++++++++++++++NEU+++++++++++++++
+                         */
+
+                        if (tag == "RobotName")
+                        {
+                            resultTextBlock.Visibility = Visibility.Visible;
+                            heardYouSayTextBlock.Visibility = Visibility.Visible;
+                            heardYouSayTextBlock.Text = "Startwort erkannt!";
+                            if (isListening == false)
                             {
-                                cbLanguageSelection.IsEnabled = false;
-                                try
+                                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                                // This prevents an exception from occurring.
+                                if (speechRecognizer.State == SpeechRecognizerState.Idle)
                                 {
-                                    isListening = true;
-                                    btnStopendlessRecognice.IsEnabled = true;
-                                    await speechRecognizer.ContinuousRecognitionSession.StartAsync();
-                                }
-                                catch (Exception ex)
-                                {
-                                    if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                                    cbLanguageSelection.IsEnabled = false;
+                                    try
                                     {
-                                        // Show a UI link to the privacy settings.
+                                        isListening = true;
+                                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
                                     }
-                                    else
+                                    catch (Exception ex)
                                     {
-                                        var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
-                                        await messageDialog.ShowAsync();
+                                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                                        {
+                                            // Show a UI link to the privacy settings.
+                                        }
+                                        else
+                                        {
+                                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                                            await messageDialog.ShowAsync();
+                                        }
+                                        isListening = false;
+                                        cbLanguageSelection.IsEnabled = true;
                                     }
-                                    isListening = false;
-                                    cbLanguageSelection.IsEnabled = true;
                                 }
                             }
                         }
-                    }
-                    else if (tag == "GesichtStart")
-                    {
-                        string name = fp.nameface_voice;
-                        heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-                    }
-                    else if (tag == "GesichtStop")
-                    {
-                        heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
+                        else if (tag == "GesichtStart")
+                        {
+                            string name = fp.nameface_voice;
+                            heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
+                            resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
+                        }
+                        else if (tag == "GesichtStop")
+                        {
+                            heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
+                            resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Salbuespen errorea: etiketa ez da detektatu");
+                            heardYouSayTextBlock.Visibility = Visibility.Collapsed;
+                        }
+
+                        /*
+                         * +++++++++++++++++++++++++++++++++
+                         */
                     }
                     else
                     {
-                        Debug.WriteLine("Salbuespen errorea: etiketa ez da detektatu");
-                        heardYouSayTextBlock.Visibility = Visibility.Collapsed;
+                        resultTextBlock.Visibility = Visibility.Visible;
+                        resultTextBlock.Text = string.Format("Speech Recognition Failed, Status: {0}", speechRecognitionResult.Status.ToString());
                     }
+                }
+                catch (TaskCanceledException exception)
+                {
+                    // TaskCanceledException will be thrown if you exit the scenario while the recognizer is actively
+                    // processing speech. Since this happens here when we navigate out of the scenario, don't try to 
+                    // show a message dialog for this exception.
+                    System.Diagnostics.Debug.WriteLine("TaskCanceledException caught while recognition in progress (can be ignored):");
+                    System.Diagnostics.Debug.WriteLine(exception.ToString());
+                }
+                catch (Exception exception)
+                {
+                    // Handle the speech privacy policy error.
+                    if ((uint)exception.HResult == HResultPrivacyStatementDeclined)
+                    {
+                        resultTextBlock.Visibility = Visibility.Visible;
+                        resultTextBlock.Text = "The privacy statement was declined.";
+                    }
+                    else
+                    {
+                        var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
+                        await messageDialog.ShowAsync();
+                    }
+                }
 
-                    /*
-                     * +++++++++++++++++++++++++++++++++
-                     */
-                }
-                else
-                {
-                    resultTextBlock.Visibility = Visibility.Visible;
-                    resultTextBlock.Text = string.Format("Speech Recognition Failed, Status: {0}", speechRecognitionResult.Status.ToString());
-                }
+                // Reset UI state.
+                cbLanguageSelection.IsEnabled = true;
             }
-            catch (TaskCanceledException exception)
+            else
             {
-                // TaskCanceledException will be thrown if you exit the scenario while the recognizer is actively
-                // processing speech. Since this happens here when we navigate out of the scenario, don't try to 
-                // show a message dialog for this exception.
-                System.Diagnostics.Debug.WriteLine("TaskCanceledException caught while recognition in progress (can be ignored):");
-                System.Diagnostics.Debug.WriteLine(exception.ToString());
+                Debug.WriteLine("Salbuespena: Aktibatuta ez piztuta");
             }
-            catch (Exception exception)
-            {
-                // Handle the speech privacy policy error.
-                if ((uint)exception.HResult == HResultPrivacyStatementDeclined)
-                {
-                    resultTextBlock.Visibility = Visibility.Visible;
-                    resultTextBlock.Text = "The privacy statement was declined.";
-                }
-                else
-                {
-                    var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
-                    await messageDialog.ShowAsync();
-                }
-            }
-
-            // Reset UI state.
-            listenWithoutUIButtonText.Text = " without UI";
-            cbLanguageSelection.IsEnabled = true;
-            btnRecognizeWithoutUI.IsEnabled = true;
         }
 
         /// <summary>
@@ -659,9 +656,9 @@ namespace InMoov.Views
 
         private void StopRecognicing(object sender, RoutedEventArgs e)
         {
-            if(isListening==true)
+            if(isListening == true && ToggleSpeech.IsOn == true)
             {
-                btnRecognizeWithoutUI.IsEnabled = true;
+                ToggleSpeech.IsOn = false;
                 isListening = false;
                 helpTextBlock.Text = "";
                 heardYouSayTextBlock.Visibility = Visibility.Collapsed;

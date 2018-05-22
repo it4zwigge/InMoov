@@ -69,6 +69,7 @@
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="230,29,0,0" VerticalAlignment="Top" Width="364" FontFamily="VW Head Office">
             </HyperlinkButton>
             <ToggleSwitch x:Name="ToogleFace" Header="FaceDetect" HorizontalAlignment="Left" Margin="160,80,0,0" VerticalAlignment="Top"/>
+            <ToggleSwitch x:Name="TooglePreview" Header="Vorschau an/aus" HorizontalAlignment="Left" Margin="250,80,0,0" VerticalAlignment="Top"/>
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

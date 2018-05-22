@@ -63,7 +63,7 @@ namespace VWFIANCognitveServices
                     this.videoProperties = deviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview) as VideoEncodingProperties;  //VideoProperties festschreiben
                     captureElement.Source = mediaCapture;                                                       //MediaCapture auf CaptureElement anzeigen
                     await this.mediaCapture.StartPreviewAsync();                                                //Media Capture Vorschau starten
-
+                    
                     timerInterval = TimeSpan.FromMilliseconds(5000);                                            // Timer Interval festsetzten - auf 5 Sekunden
                     this.frameProcessingTimer = Windows.System.Threading.ThreadPoolTimer.CreatePeriodicTimer(new Windows.System.Threading.TimerElapsedHandler(ProcessCurrentVideoFrame), timerInterval);
                 }
@@ -77,6 +77,7 @@ namespace VWFIANCognitveServices
                 }
             }
         }
+
 
         private async void ProcessCurrentVideoFrame(ThreadPoolTimer timer)
         {

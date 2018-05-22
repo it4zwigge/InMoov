@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Resources.Core;
 using Windows.Foundation;
@@ -42,16 +44,27 @@ namespace InMoov.Views
         /// </summary>
         private static uint HResultRecognizerNotFound = 0x8004503a;
 
+        private bool isListening;
         private SpeechRecognizer speechRecognizer;
         private ResourceContext speechContext;
         private ResourceMap speechResourceMap;
+        private StringBuilder dictatedTextBuilder;
         private bool isPopulatingLanguages = false;
         private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
+        private bool ledCaptured;
+        private string colorCaptured;
+        private int numberCaptured = 99;
+        private List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
+        private List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
+
+        private int number;  // zum Merken erkannter Zahlen
 
         public SpeechPage()
         {
             this.InitializeComponent();
             this.Loaded += SpeechPage_Loaded;
+            isListening = false;
+            dictatedTextBuilder = new StringBuilder();
         }
 
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
@@ -85,7 +98,6 @@ namespace InMoov.Views
             if (permissionGained)
             {
                 // Enable the recognition buttons.
-                btnRecognizeWithUI.IsEnabled = true;
                 btnRecognizeWithoutUI.IsEnabled = true;
 
                 Language speechLanguage = SpeechRecognizer.SystemSpeechLanguage;
@@ -102,7 +114,6 @@ namespace InMoov.Views
             {
                 resultTextBlock.Visibility = Visibility.Visible;
                 resultTextBlock.Text = "Permission to access capture resources was not given by the user; please set the application setting in Settings->Privacy->Microphone.";
-                btnRecognizeWithUI.IsEnabled = false;
                 btnRecognizeWithoutUI.IsEnabled = false;
                 cbLanguageSelection.IsEnabled = false;
             }
@@ -180,24 +191,42 @@ namespace InMoov.Views
         /// speech while not in view.
         /// </summary>
         /// <param name="e">Details about the navigation event</param>
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            if (speechRecognizer != null)
+            if (this.speechRecognizer != null)
             {
-                if (speechRecognizer.State != SpeechRecognizerState.Idle)
+                if (isListening)
                 {
-                    if (recognitionOperation != null)
-                    {
-                        recognitionOperation.Cancel();
-                        recognitionOperation = null;
-                    }
+                    await this.speechRecognizer.ContinuousRecognitionSession.CancelAsync();
+                    isListening = false;
+                    resultTextBlock.Text = " Dictate";
+                    cbLanguageSelection.IsEnabled = true;
                 }
 
+                resultTextBlock.Text = "";
+
+                speechRecognizer.ContinuousRecognitionSession.Completed -= ContinuousRecognitionSession_Completed;
+                speechRecognizer.ContinuousRecognitionSession.ResultGenerated -= ContinuousRecognitionSession_ResultGenerated;
+                speechRecognizer.HypothesisGenerated -= SpeechRecognizer_HypothesisGenerated;
                 speechRecognizer.StateChanged -= SpeechRecognizer_StateChanged;
 
                 this.speechRecognizer.Dispose();
                 this.speechRecognizer = null;
+            }
+            // Prompt the user for permission to access the microphone. This request will only happen
+            // once, it will not re-prompt if the user rejects the permission.
+            bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
+            if (permissionGained)
+            {
+
+                PopulateLanguageDropdown();
+                await InitializeRecognizer(SpeechRecognizer.SystemSpeechLanguage);
+            }
+            else
+            {
+                this.resultTextBlock.Text = "Permission to access capture resources was not given by the user, reset the application setting in Settings->Privacy->Microphone.";
+                cbLanguageSelection.IsEnabled = false;
             }
         }
 
@@ -212,18 +241,38 @@ namespace InMoov.Views
             {
                 // cleanup prior to re-initializing this scenario.
                 speechRecognizer.StateChanged -= SpeechRecognizer_StateChanged;
+                speechRecognizer.ContinuousRecognitionSession.Completed -= ContinuousRecognitionSession_Completed;
+                speechRecognizer.ContinuousRecognitionSession.ResultGenerated -= ContinuousRecognitionSession_ResultGenerated;
+                speechRecognizer.HypothesisGenerated -= SpeechRecognizer_HypothesisGenerated;
 
                 this.speechRecognizer.Dispose();
                 this.speechRecognizer = null;
             }
+
+            this.speechRecognizer = new SpeechRecognizer(recognizerLanguage);
+
+            // Provide feedback to the user about the state of the recognizer. This can be used to provide visual feedback in the form
+            // of an audio indicator to help the user understand whether they're being heard.
+            // Apply the dictation topic constraint to optimize for dictated freeform speech.
+            var dictationConstraint = new SpeechRecognitionTopicConstraint(SpeechRecognitionScenario.Dictation, "dictation");
+            speechRecognizer.Constraints.Add(dictationConstraint);
+            SpeechRecognitionCompilationResult result = await speechRecognizer.CompileConstraintsAsync();
+            if (result.Status != SpeechRecognitionResultStatus.Success)
+            {
+                Debug.WriteLine("ErrorLine264");
+            }
+
+            // Handle continuous recognition events. Completed fires when various error states occur. ResultGenerated fires when
+            // some recognized phrases occur, or the garbage rule is hit. HypothesisGenerated fires during recognition, and
+            // allows us to provide incremental feedback based on what the user's currently saying.
+            speechRecognizer.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
+            speechRecognizer.HypothesisGenerated += SpeechRecognizer_HypothesisGenerated;
+            speechRecognizer.ContinuousRecognitionSession.Completed += ContinuousRecognitionSession_Completed;
+
             try
             {
-                // Create an instance of SpeechRecognizer.
-                speechRecognizer = new SpeechRecognizer(recognizerLanguage);
-
                 // Provide feedback to the user about the state of the recognizer.
                 speechRecognizer.StateChanged += SpeechRecognizer_StateChanged;
-
                 // Add a list constraint to the recognizer.
                 speechRecognizer.Constraints.Add(
                     new SpeechRecognitionListConstraint(
@@ -285,15 +334,9 @@ namespace InMoov.Views
                         }, "CallWayne"));
 
                 // RecognizeWithUIAsync allows developers to customize the prompts.
-                string uiOptionsText = string.Format("Try saying '{0}', '{1}' or '{2}'",
-                    speechResourceMap.GetValue("ListGrammarRobotName3", speechContext).ValueAsString,
-                    speechResourceMap.GetValue("ListGrammarGoToContosoStudio", speechContext).ValueAsString,
-                    speechResourceMap.GetValue("ListGrammarShowMessage", speechContext).ValueAsString);
+                string uiOptionsText = "Ich bin noch nicht fertig, tut mir leid :(";
                 speechRecognizer.UIOptions.ExampleText = uiOptionsText;
-                helpTextBlock.Text = string.Format("{0}\n{1}",
-                    speechResourceMap.GetValue("ListGrammarHelpText", speechContext).ValueAsString,
-                    uiOptionsText);
-
+                helpTextBlock.Text = "Hallo ich bin das InMoov Sprachprogramm\n\nIch bin noch nicht fertig, tut mir leid :( \nAber ich gebe mir mühe :)";
                 // Compile the constraint.
                 SpeechRecognitionCompilationResult compilationResult = await speechRecognizer.CompileConstraintsAsync();
 
@@ -301,7 +344,6 @@ namespace InMoov.Views
                 if (compilationResult.Status != SpeechRecognitionResultStatus.Success)
                 {
                     // Disable the recognition buttons.
-                    btnRecognizeWithUI.IsEnabled = false;
                     btnRecognizeWithoutUI.IsEnabled = false;
 
                     // Let the user know that the grammar didn't compile properly.
@@ -310,7 +352,6 @@ namespace InMoov.Views
                 }
                 else
                 {
-                    btnRecognizeWithUI.IsEnabled = true;
                     btnRecognizeWithoutUI.IsEnabled = true;
 
                     resultTextBlock.Visibility = Visibility.Collapsed;
@@ -320,7 +361,6 @@ namespace InMoov.Views
             {
                 if ((uint)ex.HResult == HResultRecognizerNotFound)
                 {
-                    btnRecognizeWithUI.IsEnabled = false;
                     btnRecognizeWithoutUI.IsEnabled = false;
 
                     resultTextBlock.Visibility = Visibility.Visible;
@@ -343,8 +383,7 @@ namespace InMoov.Views
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                //Wenn Fehler behoben -> App funktioniert
-                //MainPage.Current.NotifyUser("Speech recognizer state: " + args.State.ToString(), NotifyType.StatusMessage);
+
             });
         }
 
@@ -355,89 +394,6 @@ namespace InMoov.Views
         /// <param name="sender">Button that triggered this event</param>
         /// <param name="e">State information about the routed event</param>
         FacesPage fp = new FacesPage();
-        private async void RecognizeWithUIListConstraint_Click(object sender, RoutedEventArgs e)
-        {
-            heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-
-            // Start recognition.
-            try
-            {
-                recognitionOperation = speechRecognizer.RecognizeWithUIAsync();
-
-                SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
-                // If successful, display the recognition result.
-                if (speechRecognitionResult.Status == SpeechRecognitionResultStatus.Success)
-                {
-                    string tag = "unknown";
-                    if (speechRecognitionResult.Constraint != null)
-                    {
-                        // Only attempt to retreive the tag if we didn't hit the garbage rule.
-                        tag = speechRecognitionResult.Constraint.Tag;
-                    }
-
-                    heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Visible;
-                    /*
-                    * Hier kann weitergearbeitet werden
-                    * ++++++++++++++++++++++++++++++++++++++
-                    */
-
-                    if (tag == "RobotName")
-                    {
-                        heardYouSayTextBlock.Text = "Hallo ich bin InMoov, der humanoide Roboter des Volkswagen Bildungsinstitutes";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-
-                    }
-                    else if (tag == "GesichtStart")
-                    {
-                        string name = fp.nameface_voice;
-                        heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-                    }
-                    else if (tag == "GesichtStop")
-                    {
-                        heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-                    }
-                    else
-                    {
-                        heardYouSayTextBlock.Text = "Heard you say";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-                    }
-
-                    /*
-                     * ++++++++++++++++++++++++++++++++++++++
-                     */
-                }
-                else
-                {
-                    resultTextBlock.Visibility = Visibility.Visible;
-                    resultTextBlock.Text = string.Format("Speech Recognition Failed, Status: {0}", speechRecognitionResult.Status.ToString());
-                }
-            }
-            catch (TaskCanceledException exception)
-            {
-                // TaskCanceledException will be thrown if you exit the scenario while the recognizer is actively
-                // processing speech. Since this happens here when we navigate out of the scenario, don't try to 
-                // show a message dialog for this exception.
-                System.Diagnostics.Debug.WriteLine("TaskCanceledException caught while recognition in progress (can be ignored):");
-                System.Diagnostics.Debug.WriteLine(exception.ToString());
-            }
-            catch (Exception exception)
-            {
-                // Handle the speech privacy policy error.
-                if ((uint)exception.HResult == HResultPrivacyStatementDeclined)
-                {
-                    resultTextBlock.Visibility = Visibility.Visible;
-                    resultTextBlock.Text = "The privacy statement was declined.";
-                }
-                else
-                {
-                    var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
-                    await messageDialog.ShowAsync();
-                }
-            }
-        }
-
         /// <summary>
         /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
         /// it back on the screen. Uses developer-provided UI for user feedback.
@@ -446,10 +402,11 @@ namespace InMoov.Views
         /// <param name="e">State information about the routed event</param>
         private async void RecognizeWithoutUIListConstraint_Click(object sender, RoutedEventArgs e)
         {
+            ledCaptured = false;
+            colorCaptured = null;
+            numberCaptured = 99;
             heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-
             // Disable the UI while recognition is occurring, and provide feedback to the user about current state.
-            btnRecognizeWithUI.IsEnabled = false;
             btnRecognizeWithoutUI.IsEnabled = false;
             cbLanguageSelection.IsEnabled = false;
             listenWithoutUIButtonText.Text = " listening for speech...";
@@ -481,8 +438,38 @@ namespace InMoov.Views
 
                     if (tag == "RobotName")
                     {
-                        heardYouSayTextBlock.Text = "Hallo ich bin InMoov, der humanoide Roboter des Volkswagen Bildungsinstitutes";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
+                        resultTextBlock.Visibility = Visibility.Visible;
+                        heardYouSayTextBlock.Visibility = Visibility.Visible;
+                        heardYouSayTextBlock.Text = "Startwort erkannt!";
+                        if (isListening == false)
+                        {
+                            // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                            // This prevents an exception from occurring.
+                            if (speechRecognizer.State == SpeechRecognizerState.Idle)
+                            {
+                                cbLanguageSelection.IsEnabled = false;
+                                try
+                                {
+                                    isListening = true;
+                                    btnStopendlessRecognice.IsEnabled = true;
+                                    await speechRecognizer.ContinuousRecognitionSession.StartAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                                    {
+                                        // Show a UI link to the privacy settings.
+                                    }
+                                    else
+                                    {
+                                        var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                                        await messageDialog.ShowAsync();
+                                    }
+                                    isListening = false;
+                                    cbLanguageSelection.IsEnabled = true;
+                                }
+                            }
+                        }
                     }
                     else if (tag == "GesichtStart")
                     {
@@ -497,8 +484,8 @@ namespace InMoov.Views
                     }
                     else
                     {
-                        heardYouSayTextBlock.Text = "Heard you say";
-                        resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
+                        Debug.WriteLine("Salbuespen errorea: etiketa ez da detektatu");
+                        heardYouSayTextBlock.Visibility = Visibility.Collapsed;
                     }
 
                     /*
@@ -537,8 +524,154 @@ namespace InMoov.Views
             // Reset UI state.
             listenWithoutUIButtonText.Text = " without UI";
             cbLanguageSelection.IsEnabled = true;
-            btnRecognizeWithUI.IsEnabled = true;
             btnRecognizeWithoutUI.IsEnabled = true;
+        }
+
+        /// <summary>
+        /// Handle events fired when error conditions occur, such as the microphone becoming unavailable, or if
+        /// some transient issues occur.
+        /// </summary>
+        /// <param name="sender">The continuous recognition session</param>
+        /// <param name="args">The state of the recognizer</param>
+        private async void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
+        {
+            if (args.Status != SpeechRecognitionResultStatus.Success)
+            {
+                // If TimeoutExceeded occurs, the user has been silent for too long. We can use this to 
+                // cancel recognition if the user in dictation mode and walks away from their device, etc.
+                // In a global-command type scenario, this timeout won't apply automatically.
+                // With dictation (no grammar in place) modes, the default timeout is 20 seconds.
+                if (args.Status == SpeechRecognitionResultStatus.TimeoutExceeded)
+                {
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        helpTextBlock.Text = " Dictate";
+                        cbLanguageSelection.IsEnabled = true;
+                        helpTextBlock.Text = dictatedTextBuilder.ToString();
+                        isListening = false;
+                    });
+                }
+                else
+                {
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        helpTextBlock.Text = " Dictate";
+                        cbLanguageSelection.IsEnabled = true;
+                        isListening = false;
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// While the user is speaking, update the textbox with the partial sentence of what's being said for user feedback.
+        /// </summary>
+        /// <param name="sender">The recognizer that has generated the hypothesis</param>
+        /// <param name="args">The hypothesis formed</param>
+        private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
+        {
+            string hypothesis = args.Hypothesis.Text;
+
+            // Update the textbox with the currently confirmed text, and the hypothesis combined.
+            string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                if (textboxContent.Contains("LED") && ledCaptured != true)
+                {
+                    Debug.WriteLine("LED harrapatua!");
+                    ledCaptured = true;
+                }
+                if (colorCaptured == null)
+                {
+                    foreach (string color in colorlist)
+                    {
+                        if (textboxContent.Contains(color))
+                        {
+                            Debug.WriteLine("koloreak harrapatu dituzte!");
+                            Debug.WriteLine(color);
+                            colorCaptured = color;
+                        }
+                    }
+                }
+                if (numberCaptured == 99)
+                {
+                    foreach (string number in numberlist)
+                    {
+                        if (textboxContent.Contains(number))
+                        {
+                            Debug.WriteLine("kopurua harrapatua!");
+                            Debug.WriteLine(number);
+                            int.TryParse(number, out numberCaptured);
+                        }
+                    }
+                }
+                if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
+                {
+                    helpTextBlock.Text = $"Die LED {numberCaptured} ist jetzt {colorCaptured}";
+                }
+                else
+
+                    helpTextBlock.Text = textboxContent;
+            });
+        }
+
+        /// <summary>
+        /// Handle events fired when a result is generated. Check for high to medium confidence, and then append the
+        /// string to the end of the stringbuffer, and replace the content of the textbox with the string buffer, to
+        /// remove any hypothesis text that may be present.
+        /// </summary>
+        /// <param name="sender">The Recognition session that generated this result</param>
+        /// <param name="args">Details about the recognized speech</param>
+        private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
+        {
+            // We may choose to discard content that has low confidence, as that could indicate that we're picking up
+            // noise via the microphone, or someone could be talking out of earshot.
+            if (args.Result.Confidence == SpeechRecognitionConfidence.Medium ||
+                args.Result.Confidence == SpeechRecognitionConfidence.High)
+            {
+                dictatedTextBuilder.Append(args.Result.Text + " ");
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+
+                    helpTextBlock.Text = dictatedTextBuilder.ToString();
+                });
+            }
+            else
+            {
+                // In some scenarios, a developer may choose to ignore giving the user feedback in this case, if speech
+                // is not the primary input mechanism for the application.
+                // Here, just remove any hypothesis text by resetting it to the last known good.
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    helpTextBlock.Text = dictatedTextBuilder.ToString();
+                    string discardedText = args.Result.Text;
+                    if (!string.IsNullOrEmpty(discardedText))
+                    {
+                        discardedText = discardedText.Length <= 25 ? discardedText : (discardedText.Substring(0, 25) + "...");
+
+                        heardYouSayTextBlock.Text = "Discarded due to low/rejected Confidence: " + discardedText;
+                        heardYouSayTextBlock.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                    }
+                });
+            }
+        }
+
+        private void StopRecognicing(object sender, RoutedEventArgs e)
+        {
+            if(isListening==true)
+            {
+                btnRecognizeWithoutUI.IsEnabled = true;
+                isListening = false;
+                helpTextBlock.Text = "";
+                heardYouSayTextBlock.Visibility = Visibility.Collapsed;
+                resultTextBlock.Visibility = Visibility.Collapsed;
+                dictatedTextBuilder.Clear();
+            }
+            else
+            {
+                Debug.WriteLine("Salbuespen errorea: aitortu ez hasi");
+            }
         }
     }
 }

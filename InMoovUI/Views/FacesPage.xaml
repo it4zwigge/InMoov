@@ -64,13 +64,14 @@
         </ctl:PageHeader>-->
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <CaptureElement x:Name="captureEL" Margin="412,500,401,93" RenderTransformOrigin="0.476,0.553"/>
-            <TextBlock x:Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="160,160,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="331" RenderTransformOrigin="0.502,0.778"/>
-            <TextBlock x:Name="Doku_Box" Text="" FontFamily="VW Head Office"/>
+            <CaptureElement Name="captureEL" Stretch="Uniform"/>
+            <TextBlock Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="160,160,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="331" RenderTransformOrigin="0.502,0.778"/>
+            <TextBlock Name="Doku_Box" Text="" FontFamily="VW Head Office"/>
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="230,29,0,0" VerticalAlignment="Top" Width="364" FontFamily="VW Head Office">
             </HyperlinkButton>
-            <ToggleSwitch x:Name="ToogleFace" Header="FaceDetect" HorizontalAlignment="Left" Margin="160,80,0,0" VerticalAlignment="Top"/>
-            <ToggleSwitch x:Name="TooglePreview" Header="Vorschau an/aus" HorizontalAlignment="Left" Margin="250,80,0,0" VerticalAlignment="Top"/>
+            <ToggleSwitch Name="ToogleFace" Header="FaceDetect" HorizontalAlignment="Left" Margin="160,80,0,0" VerticalAlignment="Top"/>
+            <ToggleSwitch Name="TooglePreview" Header="Vorschau an/aus" HorizontalAlignment="Left" Margin="250,80,0,0" VerticalAlignment="Top"/>
+            <TextBlock Name="Exceptions" Text="" Margin="450,80,0,0"></TextBlock>
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

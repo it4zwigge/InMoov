@@ -26,6 +26,7 @@ using Windows.Media;
 using Windows.System.Threading;
 using Windows.Media.FaceAnalysis;
 using Windows.Media.MediaProperties;
+using Windows.UI.Core;
 
 namespace InMoov.Views
 {
@@ -58,6 +59,7 @@ namespace InMoov.Views
         {
             if(ToogleFace.IsOn)
             {
+               
                 _faceTimer.Tick += _faceTimer_Tick;
                 _faceTimer.Interval = new TimeSpan(0, 0, 3);
                 _faceTimer.Start();
@@ -65,23 +67,37 @@ namespace InMoov.Views
             else
             {
                 _faceTimer.Stop();
-                FaceDetect.status = false;
+                status = false;
+                StopWebcam();
             }
         }
 
-        private void TooglePreview_Toggled(object sender, RoutedEventArgs e)
+        private async void TooglePreview_Toggled(object sender, RoutedEventArgs e)
         {
             if(TooglePreview.IsOn)
             {
-                captureEL.Source = mediaCapture;
-                
+                if (status)
+                {
+                    Exceptions.Text = "Für Vorschau erst FaceDetection deaktivieren";
+                }
+                else
+                {
+                    mediaCapture = new MediaCapture();
+                    await mediaCapture.InitializeAsync();
+                    captureEL.Source = mediaCapture;
+                    displayRequest.RequestActive();
+                    DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
+                    await mediaCapture.StartPreviewAsync();
+                }
             }
             else
             {
+                if(status)
+                {   }
+                else
+                { StopWebcam(); }
             }
         }
-
-        
 
         private void FacesPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -98,25 +114,25 @@ namespace InMoov.Views
                 bottombar.Visibility = Visibility.Collapsed;
             }
         }
-        TrackFacesInWebcam FaceDetect = new TrackFacesInWebcam();
+        //TrackFacesInWebcam FaceDetect = new TrackFacesInWebcam();
         DispatcherTimer _faceTimer = new DispatcherTimer();
         public string nameface_voice = null;
         private async void _faceTimer_Tick(object sender, object e)
         {
             StarteWebcam();
-            FaceName_TextBlock.Text = "Hallo " + GetFaceName();
+            FaceName_TextBlock.Text = "Hallo " + facedetected;
             nameface_voice = FaceName_TextBlock.Text;
             if (FaceName_TextBlock.Text == "") { }
             else { await Task.Delay(5000); }
         }
 
-        private void Button_ON_Click(object sender, RoutedEventArgs e)
-        {
-        }
+        //private void Button_ON_Click(object sender, RoutedEventArgs e)
+        //{
+        //}
 
-        private void Button_OFF_Click(object sender, RoutedEventArgs e)
-        {
-        }
+        //private void Button_OFF_Click(object sender, RoutedEventArgs e)
+        //{
+        //}
 
 
 
@@ -163,7 +179,6 @@ namespace InMoov.Views
             }
         }
 
-
         private async void ProcessCurrentVideoFrame(ThreadPoolTimer timer)
         {
             if (status)
@@ -206,58 +221,64 @@ namespace InMoov.Views
         private async void FaceDetectM(VideoFrame frame)
         {
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
-
-            using (var inputStream = new InMemoryRandomAccessStream())
+            try
             {
-                using (var converted = SoftwareBitmap.Convert(frame.SoftwareBitmap, BitmapPixelFormat.Rgba16))  // kompr. Videoframe -> unkompr. Bitmap
+                using (var inputStream = new InMemoryRandomAccessStream())
                 {
-                    // InputStream im PNG-Format erzeugen
-                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inputStream);     //Encoder für PNG
-                    encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
-                    await encoder.FlushAsync();                                                                 //Daten umwandeln
+                    using (var converted = SoftwareBitmap.Convert(frame.SoftwareBitmap, BitmapPixelFormat.Rgba16))  // kompr. Videoframe -> unkompr. Bitmap
+                    {
+                        // InputStream im PNG-Format erzeugen
+                        var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inputStream);     //Encoder für PNG
+                        encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
+                        await encoder.FlushAsync();                                                                 //Daten umwandeln
 
-                    Face[] faces = null;
-                    try
-                    {
-                        faces = await faceServiceClient.DetectAsync(inputStream.AsStream());                    //Daten zur API schicken
-                    }
-                    catch (FaceAPIException er)
-                    {
-                        Debug.WriteLine("Exception: " + er.ErrorMessage);
-                        return;
-                    }
-
-                    if (await CheckIfGroupExistsAsync())
-                    {
-                        results = await faceServiceClient.IdentifyAsync(personGroupId, faces.Select(f => f.FaceId).ToArray());      //Personen zu Gesichtern von API holen
-                    }
-                    for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
-                    {
-                        var face = faces[i];
-
-                        var photoFace = new PhotoFace()                                                                             //Koordinaten zum Gesicht im Bild
+                        Face[] faces = null;
+                        try
                         {
-                            Rect = face.FaceRectangle,
-                            Identified = false
-                        };
-
-
-                        if (results != null)
+                            faces = await faceServiceClient.DetectAsync(inputStream.AsStream());                    //Daten zur API schicken
+                        }
+                        catch (FaceAPIException er)
                         {
-                            var result = results[i];
-                            if (result.Candidates.Length > 0)
-                            {
-                                photoFace.PersonId = result.Candidates[0].PersonId;
-                                photoFace.Name = _personList.Where(p => p.PersonId == result.Candidates[0].PersonId).FirstOrDefault()?.Name;    //Verknüpfen des Namens
-                                photoFace.Identified = true;
-                                facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
-                                //Debug.WriteLine(photoFace.Name.ToString());
-
-                            }
+                            Debug.WriteLine("Exception: " + er.ErrorMessage);
+                            return;
                         }
 
+                        if (await CheckIfGroupExistsAsync())
+                        {
+                            results = await faceServiceClient.IdentifyAsync(personGroupId, faces.Select(f => f.FaceId).ToArray());      //Personen zu Gesichtern von API holen
+                        }
+                        for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
+                        {
+                            var face = faces[i];
+
+                            var photoFace = new PhotoFace()                                                                             //Koordinaten zum Gesicht im Bild
+                            {
+                                Rect = face.FaceRectangle,
+                                Identified = false
+                            };
+
+
+                            if (results != null)
+                            {
+                                var result = results[i];
+                                if (result.Candidates.Length > 0)
+                                {
+                                    photoFace.PersonId = result.Candidates[0].PersonId;
+                                    photoFace.Name = _personList.Where(p => p.PersonId == result.Candidates[0].PersonId).FirstOrDefault()?.Name;    //Verknüpfen des Namens
+                                    photoFace.Identified = true;
+                                    facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
+                                                                                                                                                    //Debug.WriteLine(photoFace.Name.ToString());
+
+                                }
+                            }
+
+                        }
                     }
                 }
+            }
+            catch
+            {
+                Debug.WriteLine("Try again!");
             }
         }
 
@@ -277,9 +298,29 @@ namespace InMoov.Views
             }
         }
 
-        public string GetFaceName()                                                 // Methode zum Abrufen des aktuellen Names
+        //public string GetFaceName()                                                 // Methode zum Abrufen des aktuellen Names
+        //{
+        //    return facedetected;
+        //}
+
+        public async void StopWebcam()
         {
-            return facedetected;
+            if (mediaCapture != null)
+            {
+                await mediaCapture.StopPreviewAsync();
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    captureEL.Source = null;
+                    if (displayRequest != null)
+                    {
+                        //displayRequest.RequestRelease();
+                    }
+
+                    mediaCapture.Dispose();
+                    mediaCapture = null;
+                });
+            }
         }
     }
 }

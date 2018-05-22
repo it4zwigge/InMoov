@@ -107,7 +107,7 @@
     </Compile>
     <Compile Include="Keys.cs" />
     <Compile Include="NavMenuItem.cs" />
-    <Compile Include="FaceDetection.cs" />
+    <None Include="FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />
     <Compile Include="Triggers\IsTenFootTrigger.cs" />
     <Compile Include="Views\BasicPage.xaml.cs">

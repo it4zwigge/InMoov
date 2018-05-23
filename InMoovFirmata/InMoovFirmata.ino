@@ -50,10 +50,10 @@ formatted using the GNU C formatting and indenting
 /*==============================================================================
 * InMoov Variablen
 *============================================================================*/
-//#define NEOPIXEL 0x72
-//#define NEOPIXEL_REGISTER 0x74
+#define NEOPIXEL 0x72
+#define NEOPIXEL_REGISTER 0x74
 
-//Adafruit_NeoPixel * neopixels = NULL;
+Adafruit_NeoPixel * neopixels = NULL;
 
 
 #define SABERTOOTH_MOTOR 0x42
@@ -575,7 +575,8 @@ void sysexCallback(byte command, byte argc, byte *argv)
 			}
                 
 		  }
-		  break;     
+		  break;
+	case NEOPIXEL_REGISTER
 	}
 }
 

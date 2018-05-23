@@ -103,16 +103,16 @@ namespace InMoov.Views
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
+            //if (diagonal < 7)
+            //{
+            //    topbar.Visibility = Visibility.Collapsed;
+            //    bottombar.Visibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    topbar.Visibility = Visibility.Visible;
+            //    bottombar.Visibility = Visibility.Collapsed;
+            //}
         }
         //TrackFacesInWebcam FaceDetect = new TrackFacesInWebcam();
         DispatcherTimer _faceTimer = new DispatcherTimer();

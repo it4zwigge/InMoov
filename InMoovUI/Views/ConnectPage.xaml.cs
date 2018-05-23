@@ -35,6 +35,8 @@ namespace InMoov.Views
         DateTime timePageNavigatedTo;
         CancellationTokenSource cancelTokenSource;
 
+        public static NeoPixel neopixel;
+
         public ConnectPage()
         {
             this.InitializeComponent();
@@ -46,7 +48,38 @@ namespace InMoov.Views
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
         {
+            neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16); 
+            neopixel.SetPixelColor(2, 0, 255, 0);
+            HalloWelt();
             
+        }
+
+        public static async void HalloWelt()
+        {
+            await WaitForItToWork();
+        }
+
+        public static async Task<bool> WaitForItToWork()
+        {
+            byte r = 0;
+            byte g = 0;
+            byte b = 255;
+            bool succeeded = false;
+            while (!succeeded)
+            {
+                for (int z = 1; z < 3; z++) //Wiederholung x2
+                {
+                    for (byte i = 0; i <= 16; i++)
+                    {
+                        neopixel.SetPixelColor(i, r, g, b);
+                        Thread.Sleep(100);
+
+                        neopixel.SetPixelColor(byte.Parse((i - 1).ToString()), 0, 0, 0);
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+            return succeeded;
         }
 
         #region UI events

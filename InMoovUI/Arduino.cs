@@ -183,7 +183,7 @@ namespace InMoov
         #endregion
     }
 
-    internal class NeoPixel
+    public class NeoPixel
     {
         UwpFirmata firmata;
         byte pin;

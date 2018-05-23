@@ -547,7 +547,7 @@ namespace InMoov.Views
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                textboxContent = textboxContent.ToLower();
+                Debug.WriteLine(textboxContent);
                 #region Gesichtserkennung
                 if (textboxContent.Contains("gesicht") || textboxContent.Contains("gesichtgesichtserkennung"))
                 {
@@ -580,7 +580,7 @@ namespace InMoov.Views
                 {
                     foreach (string color in colorlist)
                     {
-                        if (textCaptured == color)
+                        if (textboxContent.Contains(color))
                         {
                             Debug.WriteLine("koloreak harrapatu dituzte!");
                             Debug.WriteLine(color);
@@ -592,7 +592,7 @@ namespace InMoov.Views
                 {
                     foreach (string number in numberlist)
                     {
-                        if (textCaptured == number)
+                        if (textboxContent.Contains(number))
                         {
                             Debug.WriteLine("kopurua harrapatua!");
                             Debug.WriteLine(number);
@@ -607,6 +607,8 @@ namespace InMoov.Views
                 #endregion
                 else
                     helpTextBlock.Text = textboxContent;
+
+                Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
             });
         }
 

@@ -576,7 +576,27 @@ void sysexCallback(byte command, byte argc, byte *argv)
                 
 		  }
 		  break;
-	case NEOPIXEL_REGISTER
+	case NEOPIXEL_REGISTER:
+		{
+			int pin = argv[0];
+			int count = argv[1];
+
+			if (neopixels != NULL)
+			{
+				delete neopixels;
+			}
+			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRB + NEO_KHZ800);
+			neopixels->begin();
+		}
+	case NEOPIXEL:
+		{
+			int index = argv[0];
+			int red = argv[1];
+			int green = argv[2];
+			int blue = argv[3];
+			neopixels->setPixelColor(index, neopixels->Color(red, green, blue));
+			neopixels->show();
+		}
 	}
 }
 

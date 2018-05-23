@@ -73,9 +73,11 @@ namespace InMoov.Views
                     {
                         neopixel.SetPixelColor(i, r, g, b);
                         Thread.Sleep(100);
-
-                        neopixel.SetPixelColor(byte.Parse((i - 1).ToString()), 0, 0, 0);
-                        Thread.Sleep(100);
+                        if (i >= 1)
+                        {
+                            neopixel.SetPixelColor(byte.Parse((i - 1).ToString()), 0, 0, 0);
+                            Thread.Sleep(100);
+                        }
                     }
                 }
             }

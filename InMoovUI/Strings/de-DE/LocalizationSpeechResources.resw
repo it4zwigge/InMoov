@@ -120,24 +120,6 @@
   <data name="DictationUIOptionsExampleText" xml:space="preserve">
     <value>Z. B. "sprang Franz über den faulen Hund."</value>
   </data>
-  <data name="Gesicht1" xml:space="preserve">
-    <value>Gesichtserkennung</value>
-  </data>
-  <data name="Gesicht2" xml:space="preserve">
-    <value>Erkenne mein Gesicht</value>
-  </data>
-  <data name="Gesicht3" xml:space="preserve">
-    <value>Bitte Gesicht scannen</value>
-  </data>
-  <data name="GesichtStop1" xml:space="preserve">
-    <value>Gesichtserkennung schließen</value>
-  </data>
-  <data name="GesichtStop2" xml:space="preserve">
-    <value>Gesicht Stop!</value>
-  </data>
-  <data name="GesichtStop3" xml:space="preserve">
-    <value>Bitte Gesichtserkennung schließen</value>
-  </data>
   <data name="GrammarHoch" xml:space="preserve">
     <value>Arm hoch</value>
   </data>

@@ -75,14 +75,8 @@
                         <ComboBox x:Name="cbLanguageSelection" SelectionChanged="cbLanguageSelection_SelectionChanged" Margin="15,40,0,0" Width="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
-                        <Button x:Name="btnRecognizeWithoutUI" Click="RecognizeWithoutUIListConstraint_Click" IsEnabled="False" Margin="10,15,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <SymbolIcon Symbol="Microphone" Height="20" VerticalAlignment="Top"/>
-                                <TextBlock x:Name="listenWithoutUIButtonText" Text=" without UI"/>
-                            </StackPanel>
-                        </Button>
-                        <Button x:Name="btnStopendlessRecognice" Click="StopRecognicing" IsEnabled="True" Margin="60,15,0,0" Content="Stop Recognice">
-                        </Button>
+                        <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
+                        <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Click" Margin="10,25,0,0"/>
                     </StackPanel>
                     <TextBlock x:Name="helpTextBlock" Margin="0,50,0,0" Text="Inmoov Speech Recognition" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
                     <TextBlock x:Name="heardYouSayTextBlock" Margin="0,14.5,0,0" Text="Heard you say" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource SubheaderTextBlockStyle}"/>

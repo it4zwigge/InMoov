@@ -106,6 +106,7 @@
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Keys.cs" />
+    <Compile Include="LED.cs" />
     <Compile Include="NavMenuItem.cs" />
     <None Include="FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />

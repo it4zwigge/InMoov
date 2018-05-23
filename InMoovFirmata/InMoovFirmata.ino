@@ -547,7 +547,15 @@ void sysexCallback(byte command, byte argc, byte *argv)
 			int red = argv[1];
 			int green = argv[2];
 			int blue = argv[3];
-			neopixels->setPixelColor(index, neopixels->Color(red, green, blue));
+      int gamma = argv[4];
+      if (gamma == argv[4])
+      {
+              neopixels->setPixelColor(index, neopixels->Color(red, green, blue, gamma));
+      }
+      else
+      {
+              neopixels->setPixelColor(index, neopixels->Color(red, green, blue));
+      }
 			neopixels->show();
 		}
 	}

@@ -452,6 +452,7 @@ namespace InMoov.Views
                         else
                         {
                             Debug.WriteLine("Salbuespen errorea: etiketa ez da detektatu");
+                            recognitionOperation = speechRecognizer.RecognizeAsync();
                             heardYouSayTextBlock.Visibility = Visibility.Collapsed;
                         }
 

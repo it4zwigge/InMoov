@@ -603,6 +603,14 @@ namespace InMoov.Views
                 if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
                 {
                     helpTextBlock.Text = $"Die LED {numberCaptured} ist jetzt {colorCaptured}";
+                    if(numberCaptured <= 4)
+                    {
+                        Animation.StartAnimation("Loading");
+                    }
+                    if(numberCaptured > 4)
+                    {
+                        Animation.StartAnimation("error");
+                    }
                 }
                 #endregion
                 else

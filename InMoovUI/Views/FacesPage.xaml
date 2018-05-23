@@ -66,6 +66,9 @@
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
             <CaptureElement Name="captureEL" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,169,0,0" VerticalAlignment="Top"/>
             <TextBlock Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="412,90,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="247" RenderTransformOrigin="0.502,0.778" Height="22"/>
+            <TextBlock Name="FaceBirthday_TextBlock" Text="Gesicht Geburtsdatum" />
+            <TextBlock Name="FaceFirstName_TextBlock" Text="Gesicht Vorname" />
+            <TextBlock Name="FaceSurename_TextBlock" Text="Gesicht Nachname" />
             <TextBlock Name="Doku_Box" Text="" FontFamily="VW Head Office"/>
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="230,29,0,0" VerticalAlignment="Top" Width="364" FontFamily="VW Head Office">
             </HyperlinkButton>

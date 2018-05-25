@@ -44,19 +44,19 @@ namespace InMoov.Views
         private FaceTracker faceTracker;                                                                                            //lokale Erkennung ob Gesichter im Bild
         private ThreadPoolTimer frameProcessingTimer;
         public bool status = false;                                                                                                 //Beschreibt ob Erkennung an oderr aus
-
         public XML_Data xML_Data;
+
 
         DisplayRequest displayRequest = new DisplayRequest();
         public FacesPage()
         {
-            
+                
             this.InitializeComponent();
             this.Loaded += FacesPage_Loaded;
             ToogleFace.Toggled += ToogleFace_Toggled;
             TooglePreview.Toggled += TooglePreview_Toggled;
             _faceTimer.Tick += _faceTimer_Tick;
-            _faceTimer.Interval = new TimeSpan(0, 0, 5);
+            _faceTimer.Interval = new TimeSpan(0, 0, 3);
         }
 
         private void ToogleFace_Toggled(object sender, RoutedEventArgs e)
@@ -131,6 +131,10 @@ namespace InMoov.Views
             else { await Task.Delay(5000); }
         }
 
+        private void Stop_faceTimer()
+        {
+         
+        }
        
 
 
@@ -214,6 +218,11 @@ namespace InMoov.Views
         public string facedetected = "";
         private async void FaceDetectM(VideoFrame frame)
         {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                 _faceTimer.Stop();
+            });
+
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
             {
@@ -225,6 +234,8 @@ namespace InMoov.Views
                         var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inputStream);     //Encoder für PNG
                         encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
                         await encoder.FlushAsync();                                                                 //Daten umwandeln
+
+                        StopWebcam();
 
                         Face[] faces = null;
                         try
@@ -292,6 +303,11 @@ namespace InMoov.Views
             {
                 Debug.WriteLine("Try again!");
             }
+
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                _faceTimer.Start();
+            });
         }
 
         private async Task<bool> CheckIfGroupExistsAsync()

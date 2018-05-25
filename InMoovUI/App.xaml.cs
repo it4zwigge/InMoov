@@ -24,6 +24,7 @@ namespace InMoov
     using Microsoft.Maker.RemoteWiring;
     using Microsoft.Maker.Serial;
     using System.Diagnostics;
+    using System.Threading.Tasks;
     using Views;
     using Windows.Media.SpeechRecognition;
     using Windows.Storage;
@@ -48,13 +49,15 @@ namespace InMoov
         public static Arduino ALinks    { get; set; }
         public static Arduino Leonardo  { get; set; }
 
+        public static NeoPixel neopixel { get; set; }
+
         public static bool ArduinosReady()
         {
             if (readyDevices == App.Arduinos.Values.Count)
             {
                 foreach (Arduino arduino in App.Arduinos.Values)
                 {
-                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191")
+                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082")
                         
                     {
                         App.Leonardo = arduino;
@@ -75,14 +78,33 @@ namespace InMoov
 
                 }
                 //hier navigation freigeben. Hauptstart ansteuern
+                ReadyDevices();
+                return true;
+            }
+            else return false;
+        }
+        public static async void ReadyDevices()
+        {
+            await PairDevices();
+        }
+
+        private static async Task<bool> PairDevices()
+        {
+            bool succeeded = false;
+            while (!succeeded)
+            {
                 if (ARechts != null && ALinks != null && Leonardo != null)
                 {
                     //InitializeBodyParts();
                 }
-                Views.ConnectPage.Startup();
-                return true;
+
+                if (Leonardo.ready == true)
+                {
+                    succeeded = true;
+                    Views.ConnectPage.Startup();
+                }
             }
-            else return false;
+            return succeeded;
         }
 
         public static void InitializeBodyParts()

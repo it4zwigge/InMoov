@@ -51,7 +51,7 @@
             <CommandBar.Content>
                 <ctl:PageHeader>
                     <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
+                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBarQASWSDSXCD Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
                     </ctl:PageHeader.HeaderContent>
                 </ctl:PageHeader>
             </CommandBar.Content>

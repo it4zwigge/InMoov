@@ -183,7 +183,7 @@ namespace InMoov
         #endregion
     }
 
-    internal class NeoPixel
+    public class NeoPixel
     {
         UwpFirmata firmata;
         byte pin;
@@ -218,6 +218,17 @@ namespace InMoov
             message[3] = (byte)(b);
             firmata.sendSysex(NEOPIXEL, message.AsBuffer());
         }
+        public void SetPixelColor(byte index, byte r, byte g, byte b, byte gamma)
+        {
+            byte[] message = new byte[5];
+            message[0] = (byte)(index);
+            message[1] = (byte)(r);
+            message[2] = (byte)(g);
+            message[3] = (byte)(b);
+            message[3] = (byte)(gamma);
+            firmata.sendSysex(NEOPIXEL, message.AsBuffer());
+        }
+
 
     }
 }

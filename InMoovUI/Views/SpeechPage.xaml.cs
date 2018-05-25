@@ -51,13 +51,16 @@ namespace InMoov.Views
         private StringBuilder dictatedTextBuilder;
         private bool isPopulatingLanguages = false;
         private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
+        private string textCaptured;
+        private int[] facedetect = new int[2];
         private bool ledCaptured;
         private string colorCaptured;
         private int numberCaptured = 99;
         private List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
         private List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
-
-        private int number;  // zum Merken erkannter Zahlen
+        private List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
+        private List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
+        private List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
 
         public SpeechPage()
         {
@@ -284,22 +287,6 @@ namespace InMoov.Views
                     new SpeechRecognitionListConstraint(
                         new List<string>()
                         {
-                        speechResourceMap.GetValue("Gesicht1", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("Gesicht2", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("Gesicht3", speechContext).ValueAsString
-                        }, "GesichtStart"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("GesichtStop1", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("GesichtStop2", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("GesichtStop3", speechContext).ValueAsString
-                        }, "GesichtStop"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
                         speechResourceMap.GetValue("ListGrammarGoToContosoStudio", speechContext).ValueAsString
                         }, "GoToContosoStudio"));
                 speechRecognizer.Constraints.Add(
@@ -465,20 +452,10 @@ namespace InMoov.Views
                                 }
                             }
                         }
-                        else if (tag == "GesichtStart")
-                        {
-                            string name = fp.nameface_voice;
-                            heardYouSayTextBlock.Text = "Starte Gesichtserkennung";
-                            resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-                        }
-                        else if (tag == "GesichtStop")
-                        {
-                            heardYouSayTextBlock.Text = "Stope Gesichtserkennung";
-                            resultTextBlock.Text = string.Format("Heard: '{0}', (Tag: '{1}', Confidence: {2})", speechRecognitionResult.Text, tag, speechRecognitionResult.Confidence.ToString());
-                        }
                         else
                         {
                             Debug.WriteLine("Salbuespen errorea: etiketa ez da detektatu");
+                            recognitionOperation = speechRecognizer.RecognizeAsync();
                             heardYouSayTextBlock.Visibility = Visibility.Collapsed;
                         }
 
@@ -573,7 +550,40 @@ namespace InMoov.Views
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                if (textboxContent.Contains("LED") && ledCaptured != true)
+                Debug.WriteLine(textboxContent);
+                #region Gesichtserkennung
+                foreach (string facedet in facelist)
+                {
+                    if (textboxContent.Contains(facedet))
+                    {
+                        facedetect[0] = 1;
+                    }
+                }
+                foreach (string open in openList)
+                {
+                    if (textboxContent.Contains(open))
+                    {
+                        facedetect[1] = 1;
+                    }
+                }
+                foreach (string close in closeList)
+                {
+                    if (textboxContent.Contains(close))
+                    {
+                        facedetect[1] = 2;
+                    }
+                }
+                if(facedetect[0] == 1 && facedetect[1] == 1)
+                {
+                    fp.StarteWebcam();
+                }
+                else if(facedetect[0] == 1 && facedetect[1] == 2)
+                {
+                    fp.StopWebcam();
+                }
+                #endregion
+                #region LED
+                if (textboxContent.Contains("led") && ledCaptured != true)
                 {
                     Debug.WriteLine("LED harrapatua!");
                     ledCaptured = true;
@@ -604,11 +614,13 @@ namespace InMoov.Views
                 }
                 if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
                 {
-                    helpTextBlock.Text = $"Die LED {numberCaptured} ist jetzt {colorCaptured}";
+                    helpTextBlock.Text = $"Die LED {numberCaptured} ist jetzt {colorCaptured}"; 
                 }
+                #endregion
                 else
-
                     helpTextBlock.Text = textboxContent;
+
+                Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
             });
         }
 

@@ -29,8 +29,6 @@ formatted using the GNU C formatting and indenting
 #include <Servo.h>
 #include <Wire.h>
 #include <Firmata.h>
-#include <SoftwareSerial.h>
-#include <SabertoothSimplified.h>
 
 // move the following defines to Firmata.h?
 #define I2C_WRITE B00000000
@@ -45,22 +43,16 @@ formatted using the GNU C formatting and indenting
 
 #define REGISTER_NOT_SPECIFIED -1
 
-//#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>
 
 /*==============================================================================
 * InMoov Variablen
 *============================================================================*/
-//#define NEOPIXEL 0x72
-//#define NEOPIXEL_REGISTER 0x74
+#define NEOPIXEL 0x72
+#define NEOPIXEL_REGISTER 0x74
 
-//Adafruit_NeoPixel * neopixels = NULL;
+Adafruit_NeoPixel *neopixels = NULL;
 
-
-#define SABERTOOTH_MOTOR 0x42
-#define SABERTOOTH_REGISTER 0x43
-
-SoftwareSerial *saberthooths = NULL;
-SabertoothSimplified ST1 = NULL;
 /*==============================================================================
 * GLOBAL VARIABLES
 *============================================================================*/
@@ -537,45 +529,35 @@ void sysexCallback(byte command, byte argc, byte *argv)
 	* InMoov Cases
 	*=============================================================================*/
 
-	case SABERTOOTH_REGISTER:
+	case NEOPIXEL_REGISTER:
 		{
 			int pin = argv[0];
+			int count = argv[1];
 
-			if (saberthooths != NULL)
+			if (neopixels != NULL)
 			{
-				delete saberthooths;
+				delete neopixels;
 			}
-			saberthooths = new SoftwareSerial(NOT_A_PIN, pin);
-			ST1 = new SabertoothSimplified(saberthooths);
+			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRB + NEO_KHZ800);
+			neopixels->begin();
 		}
-		break;
-
-	case SABERTOOTH_MOTOR_STOP:
-		  {    
-			 for(int power = 60; power >= 0; power--)
-			{
-			  ST1.motor(1, power);
-			  ST1.motor(2, power);
-			  //ST2.motor(1, power);
-			  //ST2.motor(2, power);
-			  delay(10);
-			}              
-		  }
-		  break;
-
-	case SABERTOOTH_MOTOR_ZURUECK:
-		  {
-			for(int power = 0; power >= -60; power--)
-			{
-			  ST1.motor(1, power);
-			  ST1.motor(2, power);
-			  //ST2.motor(1, power);
-			  //ST2.motor(2, power);
-			  delay(20);
-			}
-                
-		  }
-		  break;     
+	case NEOPIXEL:
+		{
+			int index = argv[0];
+			int red = argv[1];
+			int green = argv[2];
+			int blue = argv[3];
+      int gamma = argv[4];
+      if (gamma == argv[4])
+      {
+              neopixels->setPixelColor(index, neopixels->Color(red, green, blue, gamma));
+      }
+      else
+      {
+              neopixels->setPixelColor(index, neopixels->Color(red, green, blue));
+      }
+			neopixels->show();
+		}
 	}
 }
 
@@ -650,9 +632,6 @@ void setup()
 	Firmata.attach(SET_PIN_MODE, setPinModeCallback);
 	Firmata.attach(START_SYSEX, sysexCallback);
 	Firmata.attach(SYSTEM_RESET, systemResetCallback);
-
-	Sabertooth1.begin(9600); //Sabertooth1 Baudstart
-	Sabertooth2.begin(9600);//Sabertooth2 Baudstart
 
 	Firmata.begin(57600);
 	systemResetCallback();  // reset to default config

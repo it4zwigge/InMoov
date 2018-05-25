@@ -51,8 +51,17 @@ namespace InMoov.Views
         public static void InitializeNeoPixel()
         {
             App.neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16);
-            App.neopixel.SetPixelColor(2, 0, 255, 0);
-            Animation.StartAnimation("error");
+            ReadyNeopixel();
+            //Animation.StartAnimation("error");
+        }
+
+        public static async void ReadyNeopixel()
+        {
+            for(byte i = 0; i <=16; i++)
+            {
+                App.neopixel.SetPixelColor(i ,0, 0, 0);
+            }
+            await App.turnConnected();
         }
     }
 }

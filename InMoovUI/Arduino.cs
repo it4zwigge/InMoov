@@ -147,11 +147,14 @@ namespace InMoov
         private void Arduino_DeviceConnectionLost(string message)
             {
                 Debug.WriteLine("[" + this.name + "] Verbindung verloren : " + message);
+                App.noDevice++;
+                App.readyDevices--;
             }
 
             private void Arduino_DeviceConnectionFailed(string message)
             {
                 Debug.WriteLine("[" + this.name + "] konnte nicht verbinden : " + message);
+                App.noDevice++;
             }
 
             private void Arduino_DeviceReady()

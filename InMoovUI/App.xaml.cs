@@ -41,6 +41,7 @@ namespace InMoov
         static byte SABERTOOTH_MOTOR = 0x42;
 
         public static int readyDevices = 0;
+        public static int noDevice = 0;
 
         public static Dictionary<string, Arduino> Arduinos = new Dictionary<string, Arduino>();
         public static Dictionary<string, BodyPart> BodyParts = new Dictionary<string, BodyPart>();
@@ -93,15 +94,36 @@ namespace InMoov
             bool succeeded = false;
             while (!succeeded)
             {
-                if (ARechts != null && ALinks != null && Leonardo != null)
-                {
-                    //InitializeBodyParts();
-                }
-
                 if (Leonardo.ready == true)
                 {
                     succeeded = true;
                     Views.ConnectPage.Startup();
+                }
+                if (ARechts != null && ALinks != null && Leonardo != null)
+                {
+                    //InitializeBodyParts();
+                }
+            }
+            return succeeded;
+        }
+
+        public static async Task<bool> turnConnected()
+        {
+            bool succeeded = false;
+            while (!succeeded)
+            {
+                for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
+                {
+                    neopixel.SetPixelColor(pixel, 0, 100, 0);
+                }
+                for (byte pixel = byte.Parse((readyDevices*6).ToString()); pixel < 16; pixel++)
+                {
+                    neopixel.SetPixelColor(pixel, 100, 0, 0);
+                }
+                if (readyDevices ==3)
+                {
+                    await Task.Delay(2000);
+                    succeeded = true;
                 }
             }
             return succeeded;

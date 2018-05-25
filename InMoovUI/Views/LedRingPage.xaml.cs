@@ -52,7 +52,6 @@ namespace InMoov.Views
         {
             App.neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16);
             App.neopixel.SetPixelColor(2, 0, 255, 0);
-            Animation.StartAnimation("error");
         }
     }
 }

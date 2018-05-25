@@ -583,7 +583,7 @@ namespace InMoov.Views
                 }
                 #endregion
                 #region LED
-                if (textboxContent.Contains("led") && ledCaptured != true)
+                if ((textboxContent.Contains("LED")||textboxContent.Contains("led")) && ledCaptured != true)
                 {
                     Debug.WriteLine("LED harrapatua!");
                     ledCaptured = true;

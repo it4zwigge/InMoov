@@ -66,6 +66,8 @@ SabertoothSimplified ST2(Sabertooth2);
 SoftwareSerial Sabertooth1(NOT_A_PIN, 5);//Sabertooth1 nutzt PIN 2
 SabertoothSimplified ST1(Sabertooth1); 
 
+int STspeed = 0;
+
 /*==============================================================================
 * GLOBAL VARIABLES
 *============================================================================*/
@@ -551,7 +553,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
 			{
 				delete neopixels;
 			}
-			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRB + NEO_KHZ800);
+			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRBW + NEO_KHZ800);
 			neopixels->begin();
 		}
    break;

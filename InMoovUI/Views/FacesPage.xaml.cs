@@ -163,7 +163,7 @@ namespace InMoov.Views
                     captureElement.Source = mediaCapture;                                                       //MediaCapture auf CaptureElement anzeigen
                     await this.mediaCapture.StartPreviewAsync();                                                //Media Capture Vorschau starten
 
-                    timerInterval = TimeSpan.FromMilliseconds(5000);                                            // Timer Interval festsetzten - auf 5 Sekunden
+                    timerInterval = TimeSpan.FromMilliseconds(3000);                                            // Timer Interval festsetzten - auf 5 Sekunden
                     this.frameProcessingTimer = Windows.System.Threading.ThreadPoolTimer.CreatePeriodicTimer(new Windows.System.Threading.TimerElapsedHandler(ProcessCurrentVideoFrame), timerInterval);
                 }
                 catch (System.UnauthorizedAccessException)          // Catch für fehlende Zugriffsrechte

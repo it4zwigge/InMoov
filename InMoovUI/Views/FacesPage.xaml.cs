@@ -237,7 +237,7 @@ namespace InMoov.Views
                         encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
                         await encoder.FlushAsync();                                                                 //Daten umwandeln
 
-                        StopWebcam();
+                        //StopWebcam();
 
                         Face[] faces = null;
                         try

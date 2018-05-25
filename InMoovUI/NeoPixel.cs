@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maker.Firmata;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -106,23 +107,14 @@ namespace InMoov
 
         private static async Task<bool> Error() // noch nicht fertig
         {
+            Random rnd = new Random();
             while (!stop)
             {
-                for (byte y = 0; y < 255; y += 1)
+                App.neopixel.SetPixelColor(byte.Parse((rnd.Next(0, 16)).ToString()), 0, 255, 0);
+                await Task.Delay(100);
+                if (rnd.Next(0, 2) == 1)
                 {
-                    for (byte i = 0; i <= 16; i++)
-                    {
-                        App.neopixel.SetPixelColor(i, y, 0, 0);
-                    }
-                    Task.Delay(2).Wait();
-                }
-                for (byte z = 255; z >= 0; z -= 1)
-                {
-                    for (byte i = 0; i <= 16; i++)
-                    {
-                        App.neopixel.SetPixelColor(i, z, 0, 0);
-                    }
-                    Task.Delay(2).Wait();
+                    App.neopixel.SetPixelColor(byte.Parse((rnd.Next(0, 16)).ToString()), 0, 0, 0);
                 }
             }
             stop = false;

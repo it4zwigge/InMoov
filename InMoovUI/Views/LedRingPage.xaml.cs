@@ -65,5 +65,20 @@ namespace InMoov.Views
             }
             await App.turnConnected();
         }
+
+        private void Neopixel_Reset_Click(object sender, RoutedEventArgs e)
+        {
+            App.neopixel.StopAnimation();
+        }
+
+        private void Facedetection_Click(object sender, RoutedEventArgs e)
+        {
+            App.neopixel.SetAnimation(AnimationID.Facedetection);
+        }
+
+        private void Error_Click(object sender, RoutedEventArgs e)
+        {
+            App.neopixel.SetAnimation(AnimationID.Error);
+        }
     }
 }

@@ -27,6 +27,7 @@ using Windows.System.Threading;
 using Windows.Media.FaceAnalysis;
 using Windows.Media.MediaProperties;
 using Windows.UI.Core;
+using Test_UWP_schreiben;
 
 namespace InMoov.Views
 {
@@ -44,6 +45,8 @@ namespace InMoov.Views
         private ThreadPoolTimer frameProcessingTimer;
         public bool status = false;                                                                                                 //Beschreibt ob Erkennung an oderr aus
 
+        public XML_Data xML_Data;
+
         DisplayRequest displayRequest = new DisplayRequest();
         public FacesPage()
         {
@@ -52,17 +55,16 @@ namespace InMoov.Views
             this.Loaded += FacesPage_Loaded;
             ToogleFace.Toggled += ToogleFace_Toggled;
             TooglePreview.Toggled += TooglePreview_Toggled;
-           
+            _faceTimer.Tick += _faceTimer_Tick;
+            _faceTimer.Interval = new TimeSpan(0, 0, 5);
         }
 
         private void ToogleFace_Toggled(object sender, RoutedEventArgs e)
         {
             if(ToogleFace.IsOn)
             {
-               
-                _faceTimer.Tick += _faceTimer_Tick;
-                _faceTimer.Interval = new TimeSpan(0, 0, 3);
                 _faceTimer.Start();
+                status = true;
             }
             else
             {
@@ -88,6 +90,8 @@ namespace InMoov.Views
                     displayRequest.RequestActive();
                     DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
                     await mediaCapture.StartPreviewAsync();
+
+
                 }
             }
             else
@@ -114,11 +118,12 @@ namespace InMoov.Views
                 bottombar.Visibility = Visibility.Collapsed;
             }
         }
-        //TrackFacesInWebcam FaceDetect = new TrackFacesInWebcam();
+
         DispatcherTimer _faceTimer = new DispatcherTimer();
         public string nameface_voice = null;
         private async void _faceTimer_Tick(object sender, object e)
         {
+            FaceName_TextBlock.Text = facedetected;
             StarteWebcam();
             FaceName_TextBlock.Text = "Hallo " + facedetected;
             nameface_voice = FaceName_TextBlock.Text;
@@ -126,18 +131,7 @@ namespace InMoov.Views
             else { await Task.Delay(5000); }
         }
 
-        //private void Button_ON_Click(object sender, RoutedEventArgs e)
-        //{
-        //}
-
-        //private void Button_OFF_Click(object sender, RoutedEventArgs e)
-        //{
-        //}
-
-
-
-
-
+       
 
 
 
@@ -247,6 +241,21 @@ namespace InMoov.Views
                         {
                             results = await faceServiceClient.IdentifyAsync(personGroupId, faces.Select(f => f.FaceId).ToArray());      //Personen zu Gesichtern von API holen
                         }
+
+                        //    #region XML {                        
+                        //    if (results != null)
+                        //    {
+                        //        var result = results[0];
+                        //        if (result.Candidates.Length > 0)
+                        //        {
+                        //            xML_Data = new XML_Data();
+                        //            facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
+
+                        //        }
+                        //    }
+                        //    }
+                        //#endregion XML
+
                         for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
                         {
                             var face = faces[i];
@@ -269,12 +278,15 @@ namespace InMoov.Views
                                     facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
                                                                                                                                                     //Debug.WriteLine(photoFace.Name.ToString());
 
+                                    //xML_Data = new XML_Data();
+                                    //facedetected = xML_Data.GetVorName(photoFace.PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
+
                                 }
                             }
 
                         }
                     }
-                }
+                    }
             }
             catch
             {

@@ -99,6 +99,7 @@
     <Compile Include="AudioCapturePermissions.cs" />
     <Compile Include="BodyPart.cs" />
     <Compile Include="CognitiveServices\PhotoFace.cs" />
+    <Compile Include="CognitiveServices\XML_Data.cs" />
     <Compile Include="Communication\Connection.cs" />
     <Compile Include="Communication\Connections.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
@@ -107,7 +108,7 @@
     </Compile>
     <Compile Include="Keys.cs" />
     <Compile Include="NavMenuItem.cs" />
-    <None Include="FaceDetection.cs.orig" />
+    <None Include="CognitiveServices\FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />
     <Compile Include="Triggers\IsTenFootTrigger.cs" />
     <Compile Include="Views\BasicPage.xaml.cs">

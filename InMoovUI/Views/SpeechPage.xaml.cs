@@ -58,6 +58,9 @@ namespace InMoov.Views
         private int numberCaptured = 99;
         private List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
         private List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
+        private List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
+        private List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
+        private List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
 
         public SpeechPage()
         {
@@ -549,17 +552,26 @@ namespace InMoov.Views
             {
                 Debug.WriteLine(textboxContent);
                 #region Gesichtserkennung
-                if (textboxContent.Contains("gesicht") || textboxContent.Contains("gesichtgesichtserkennung"))
+                foreach (string facedet in facelist)
                 {
-                    facedetect[0] = 1;
+                    if (textboxContent.Contains(facedet))
+                    {
+                        facedetect[0] = 1;
+                    }
                 }
-                if (textboxContent.Contains("starte") ||textboxContent.Contains("öffne"))
+                foreach (string open in openList)
                 {
-                    facedetect[1] = 1;
+                    if (textboxContent.Contains(open))
+                    {
+                        facedetect[1] = 1;
+                    }
                 }
-                else if(textboxContent.Contains("stoppe"))
+                foreach (string close in closeList)
                 {
-                    facedetect[1] = 2;
+                    if (textboxContent.Contains(close))
+                    {
+                        facedetect[1] = 2;
+                    }
                 }
                 if(facedetect[0] == 1 && facedetect[1] == 1)
                 {

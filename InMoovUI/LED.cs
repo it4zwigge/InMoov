@@ -34,6 +34,8 @@ namespace InMoov
             }
         }
 
+        
+
         //private static async Task<bool> Loading(byte r, byte g, byte b)
         //{
         //    bool succeeded = false;

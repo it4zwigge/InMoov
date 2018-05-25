@@ -220,6 +220,7 @@ namespace InMoov.Views
         public string facedetected = "";
         private async void FaceDetectM(VideoFrame frame)
         {
+            Animation.StartAnimation("loading", false);
             //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //{
             //     _faceTimer.Stop();
@@ -237,7 +238,7 @@ namespace InMoov.Views
                         encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
                         await encoder.FlushAsync();                                                                 //Daten umwandeln
 
-                        StopWebcam();
+                        //StopWebcam();
 
                         Face[] faces = null;
                         try
@@ -310,6 +311,7 @@ namespace InMoov.Views
             //{
             //    _faceTimer.Start();
             //});
+            Animation.StartAnimation("loading", true);
         }
 
         private async Task<bool> CheckIfGroupExistsAsync()

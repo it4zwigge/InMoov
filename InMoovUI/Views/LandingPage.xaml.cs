@@ -47,6 +47,7 @@ namespace InMoov.Views
             }
         }
 
+
         private void AutoConnect()
         {
             Dictionary<string, UsbSerial> devices = new Dictionary<string, UsbSerial>();

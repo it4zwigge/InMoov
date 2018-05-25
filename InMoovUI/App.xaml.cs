@@ -35,11 +35,6 @@ namespace InMoov
     /// </summary>
     sealed partial class App : Application
     {
-
-        static byte NEOPIXEL = 0x72;
-        static byte NEOPIXEL_REGISTER = 0x74;
-        static byte SABERTOOTH_MOTOR = 0x42;
-
         public static int readyDevices = 0;
         public static int noDevice = 0;
 
@@ -78,7 +73,7 @@ namespace InMoov
                     }
 
                 }
-                //hier navigation freigeben. Hauptstart ansteuern
+                //Alles zugeteilt, Roboter kann aufwachen.
                 ReadyDevices();
                 return true;
             }
@@ -97,7 +92,7 @@ namespace InMoov
                 if (Leonardo.ready == true)
                 {
                     succeeded = true;
-                    Views.ConnectPage.Startup();
+                    Views.LedRingPage.InitializeNeoPixel();
                 }
                 if (ARechts != null && ALinks != null && Leonardo != null)
                 {
@@ -115,14 +110,22 @@ namespace InMoov
                 for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
                 {
                     neopixel.SetPixelColor(pixel, 0, 100, 0);
+                    await Task.Delay(100);
                 }
-                for (byte pixel = byte.Parse((readyDevices*6).ToString()); pixel < 16; pixel++)
+                for (byte pixel = byte.Parse((readyDevices * 6).ToString()); pixel < 16; pixel++)
                 {
                     neopixel.SetPixelColor(pixel, 100, 0, 0);
+                    await Task.Delay(100);
                 }
-                if (readyDevices ==3)
+                if (readyDevices == 3)
                 {
                     await Task.Delay(2000);
+                    for (byte i = 0; i < 16; i++)
+                    {
+                        neopixel.SetPixelColor(i, 0, 0, 0);
+                        await Task.Delay(100);
+                    }
+                    Views.ConnectPage.Startup();
                     succeeded = true;
                 }
             }

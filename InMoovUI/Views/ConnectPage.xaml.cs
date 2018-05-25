@@ -45,8 +45,10 @@ namespace InMoov.Views
 
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
-        {
-            Views.LedRingPage.InitializeNeoPixel();   // initialisiert die NeoPixel LED im Bauch        
+        {   
+            App.neopixel.SetAnimation(AnimationID.Facedetection);
+            Task.Delay(10000);
+            App.neopixel.StopAnimation();
         }
 
 

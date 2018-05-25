@@ -163,7 +163,7 @@ namespace InMoov.Views
                     captureElement.Source = mediaCapture;                                                       //MediaCapture auf CaptureElement anzeigen
                     await this.mediaCapture.StartPreviewAsync();                                                //Media Capture Vorschau starten
 
-                    timerInterval = TimeSpan.FromMilliseconds(5000);                                            // Timer Interval festsetzten - auf 5 Sekunden
+                    timerInterval = TimeSpan.FromMilliseconds(3000);                                            // Timer Interval festsetzten - auf 5 Sekunden
                     this.frameProcessingTimer = Windows.System.Threading.ThreadPoolTimer.CreatePeriodicTimer(new Windows.System.Threading.TimerElapsedHandler(ProcessCurrentVideoFrame), timerInterval);
                 }
                 catch (System.UnauthorizedAccessException)          // Catch für fehlende Zugriffsrechte
@@ -201,7 +201,9 @@ namespace InMoov.Views
 
                         if (faces.Count > 0)
                         {
+                            //_faceTimer.Stop();
                             FaceDetectM(previewFrame);                                           //Aufruf der API-Methode
+                            //_faceTimer.Start();
                         }
 
                     }
@@ -218,10 +220,11 @@ namespace InMoov.Views
         public string facedetected = "";
         private async void FaceDetectM(VideoFrame frame)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                 _faceTimer.Stop();
-            });
+            App.neopixel.SetAnimation(AnimationID.Facedetection);
+            //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //     _faceTimer.Stop();
+            //});
 
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
@@ -235,7 +238,7 @@ namespace InMoov.Views
                         encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
                         await encoder.FlushAsync();                                                                 //Daten umwandeln
 
-                        StopWebcam();
+                        //StopWebcam();
 
                         Face[] faces = null;
                         try
@@ -304,10 +307,11 @@ namespace InMoov.Views
                 Debug.WriteLine("Try again!");
             }
 
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                _faceTimer.Start();
-            });
+            //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //    _faceTimer.Start();
+            //});
+            App.neopixel.StopAnimation();
         }
 
         private async Task<bool> CheckIfGroupExistsAsync()

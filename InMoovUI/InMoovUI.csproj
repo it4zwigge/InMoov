@@ -107,7 +107,7 @@
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Keys.cs" />
-    <Compile Include="LED.cs" />
+    <Compile Include="NeoPixel.cs" />
     <Compile Include="NavMenuItem.cs" />
     <None Include="CognitiveServices\FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />

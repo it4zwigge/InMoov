@@ -35,8 +35,6 @@ namespace InMoov
         private static byte SABERTOOTH_MOTOR_STOP_ZURUECK = 0x45;
         private static byte SABERTOOTH_MOTOR_DREHUNG_RECHTS = 0x46;
 
-        DispatcherTimer timeout;
-
         public Arduino(DeviceInformation device)
         {
             this.connection = new UsbSerial(device);
@@ -91,6 +89,8 @@ namespace InMoov
             this.arduino.analogWrite(pin, value);
         }
 
+        #region InMoov Firmata
+
         public void STMotor_Vor(byte speed)
         {
             byte[] message = new byte[3];
@@ -137,8 +137,6 @@ namespace InMoov
             firmata.sendSysex(SABERTOOTH_MOTOR_DREHUNG_RECHTS, message.AsBuffer());
         }
 
-        #region InMoov Firmata
-
         #endregion
 
         #region Events
@@ -184,54 +182,5 @@ namespace InMoov
             }
             #endregion
         #endregion
-    }
-
-    public class NeoPixel
-    {
-        UwpFirmata firmata;
-        byte pin;
-        byte leds;
-
-        static byte NEOPIXEL = 0x72;
-        static byte NEOPIXEL_REGISTER = 0x74;
-
-        public NeoPixel(UwpFirmata firmata, byte pin, byte led_count)
-        {
-            this.firmata = firmata;
-            this.pin = pin;
-            this.leds = led_count;
-
-            NeoPixelRegister(this.pin, this.leds);
-        }
-
-        private void NeoPixelRegister(byte pin, byte count)
-        {
-            byte[] message = new byte[2];
-            message[0] = (byte)(pin);
-            message[1] = (byte)(count);
-            firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
-        }
-
-        public void SetPixelColor(byte index, byte r, byte g, byte b)
-        {
-            byte[] message = new byte[4];
-            message[0] = (byte)(index);
-            message[1] = (byte)(r);
-            message[2] = (byte)(g);
-            message[3] = (byte)(b);
-            firmata.sendSysex(NEOPIXEL, message.AsBuffer());
-        }
-        public void SetPixelColor(byte index, byte r, byte g, byte b, byte gamma)
-        {
-            byte[] message = new byte[5];
-            message[0] = (byte)(index);
-            message[1] = (byte)(r);
-            message[2] = (byte)(g);
-            message[3] = (byte)(b);
-            message[3] = (byte)(gamma);
-            firmata.sendSysex(NEOPIXEL, message.AsBuffer());
-        }
-
-
     }
 }

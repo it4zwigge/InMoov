@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
@@ -60,6 +61,7 @@ namespace InMoov.Views
             for(byte i = 0; i <=16; i++)
             {
                 App.neopixel.SetPixelColor(i ,0, 0, 0);
+                Task.Delay(5).Wait();
             }
             await App.turnConnected();
         }

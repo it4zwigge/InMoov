@@ -61,20 +61,21 @@ namespace InMoov
             bool succeeded = false;
             while (!succeeded)
             {
-                for (byte z = 0; z < 255; z++)
+                for (byte y = 0; y < 255; y+=1)
                 {
                     for (byte i = 0; i <= 16; i++)
                     {
-                        App.neopixel.SetPixelColor(i, r, g, b, z);
+                        App.neopixel.SetPixelColor(i, y, 0, 0);
                     }
+                    Task.Delay(2).Wait();
                 }
-                for (byte z = 255; z >= 0; z--)
+                for (byte z = 255; z >= 0; z-=1)
                 {
                     for (byte i = 0; i <= 16; i++)
                     {
-                        App.neopixel.SetPixelColor(i, r, g, b, z);
-                        Thread.Sleep(50);
+                        App.neopixel.SetPixelColor(i, z, 0, 0);
                     }
+                    Task.Delay(2).Wait();
                 }
             }
             return succeeded;

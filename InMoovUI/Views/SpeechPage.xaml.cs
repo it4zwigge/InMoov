@@ -465,8 +465,7 @@ namespace InMoov.Views
                     }
                     else
                     {
-                        resultTextBlock.Visibility = Visibility.Visible;
-                        resultTextBlock.Text = string.Format("Speech Recognition Failed, Status: {0}", speechRecognitionResult.Status.ToString());
+                        recognitionOperation = speechRecognizer.RecognizeAsync();
                     }
                 }
                 catch (TaskCanceledException exception)
@@ -583,7 +582,7 @@ namespace InMoov.Views
                 }
                 #endregion
                 #region LED
-                if (textboxContent.Contains("led") && ledCaptured != true)
+                if ((textboxContent.Contains("LED")||textboxContent.Contains("led")) && ledCaptured != true)
                 {
                     Debug.WriteLine("LED harrapatua!");
                     ledCaptured = true;

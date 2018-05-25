@@ -58,6 +58,9 @@ namespace InMoov.Views
         private int numberCaptured = 99;
         private List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
         private List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
+        private List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
+        private List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
+        private List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
 
         public SpeechPage()
         {
@@ -547,19 +550,28 @@ namespace InMoov.Views
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                textboxContent = textboxContent.ToLower();
+                Debug.WriteLine(textboxContent);
                 #region Gesichtserkennung
-                if (textboxContent.Contains("gesicht") || textboxContent.Contains("gesichtgesichtserkennung"))
+                foreach (string facedet in facelist)
                 {
-                    facedetect[0] = 1;
+                    if (textboxContent.Contains(facedet))
+                    {
+                        facedetect[0] = 1;
+                    }
                 }
-                if (textboxContent.Contains("starte") ||textboxContent.Contains("öffne"))
+                foreach (string open in openList)
                 {
-                    facedetect[1] = 1;
+                    if (textboxContent.Contains(open))
+                    {
+                        facedetect[1] = 1;
+                    }
                 }
-                else if(textboxContent.Contains("stoppe"))
+                foreach (string close in closeList)
                 {
-                    facedetect[1] = 2;
+                    if (textboxContent.Contains(close))
+                    {
+                        facedetect[1] = 2;
+                    }
                 }
                 if(facedetect[0] == 1 && facedetect[1] == 1)
                 {
@@ -571,7 +583,7 @@ namespace InMoov.Views
                 }
                 #endregion
                 #region LED
-                if (textboxContent.Contains("led") && ledCaptured != true)
+                if ((textboxContent.Contains("LED")||textboxContent.Contains("led")) && ledCaptured != true)
                 {
                     Debug.WriteLine("LED harrapatua!");
                     ledCaptured = true;
@@ -580,7 +592,7 @@ namespace InMoov.Views
                 {
                     foreach (string color in colorlist)
                     {
-                        if (textCaptured == color)
+                        if (textboxContent.Contains(color))
                         {
                             Debug.WriteLine("koloreak harrapatu dituzte!");
                             Debug.WriteLine(color);
@@ -592,7 +604,7 @@ namespace InMoov.Views
                 {
                     foreach (string number in numberlist)
                     {
-                        if (textCaptured == number)
+                        if (textboxContent.Contains(number))
                         {
                             Debug.WriteLine("kopurua harrapatua!");
                             Debug.WriteLine(number);
@@ -607,6 +619,8 @@ namespace InMoov.Views
                 #endregion
                 else
                     helpTextBlock.Text = textboxContent;
+
+                Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
             });
         }
 

@@ -221,8 +221,9 @@ namespace InMoov.Views
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                  _faceTimer.Stop();
+                Animation.StartAnimation("Loading");
             });
-
+            
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
             {
@@ -307,6 +308,7 @@ namespace InMoov.Views
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 _faceTimer.Start();
+                Animation.StartAnimation("Loading", true);
             });
         }
 

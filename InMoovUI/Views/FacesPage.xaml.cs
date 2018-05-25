@@ -201,7 +201,9 @@ namespace InMoov.Views
 
                         if (faces.Count > 0)
                         {
+                            //_faceTimer.Stop();
                             FaceDetectM(previewFrame);                                           //Aufruf der API-Methode
+                            //_faceTimer.Start();
                         }
 
                     }
@@ -218,12 +220,11 @@ namespace InMoov.Views
         public string facedetected = "";
         private async void FaceDetectM(VideoFrame frame)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                 _faceTimer.Stop();
-                Animation.StartAnimation("Loading");
-            });
-            
+            //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //     _faceTimer.Stop();
+            //});
+
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
             {
@@ -305,11 +306,10 @@ namespace InMoov.Views
                 Debug.WriteLine("Try again!");
             }
 
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                _faceTimer.Start();
-                Animation.StartAnimation("Loading", true);
-            });
+            //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //    _faceTimer.Start();
+            //});
         }
 
         private async Task<bool> CheckIfGroupExistsAsync()

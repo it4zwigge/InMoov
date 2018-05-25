@@ -115,14 +115,21 @@ namespace InMoov
                 for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
                 {
                     neopixel.SetPixelColor(pixel, 0, 100, 0);
+                    await Task.Delay(100);
                 }
-                for (byte pixel = byte.Parse((readyDevices*6).ToString()); pixel < 16; pixel++)
+                for (byte pixel = byte.Parse((readyDevices * 6).ToString()); pixel < 16; pixel++)
                 {
                     neopixel.SetPixelColor(pixel, 100, 0, 0);
+                    await Task.Delay(100);
                 }
                 if (readyDevices ==3)
                 {
                     await Task.Delay(2000);
+                    for (byte i = 0; i < 16; i++)
+                    {
+                        neopixel.SetPixelColor(i, 0, 0, 0);
+                        await Task.Delay(100);
+                    }
                     succeeded = true;
                 }
             }

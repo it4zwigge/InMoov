@@ -69,8 +69,7 @@ namespace InMoov.Views
             this.Loaded += SpeechPage_Loaded;
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
-            App.neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16);
-            LedRingPage.ReadyNeopixel();
+            LedRingPage.InitializeNeoPixel();
         }
 
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)

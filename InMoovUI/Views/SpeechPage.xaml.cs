@@ -521,12 +521,12 @@ namespace InMoov.Views
                             byte.TryParse(number, out numberCaptured);
                         }
                     }
-                    numberCaptured++;
                 }
 
                 if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
                 {
-                    resultTextBlock.Text = "Die LED" + numberCaptured.ToString() + " ist jetzt " + colorCaptured.ToString();
+                    numberCaptured++;
+                    helpTextBlock.Text = "Die LED" + numberCaptured.ToString() + " ist jetzt " + colorCaptured.ToString();
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
                     App.neopixel.SetPixelColor((numberCaptured), color[0], color[1], color[2]);
                 }

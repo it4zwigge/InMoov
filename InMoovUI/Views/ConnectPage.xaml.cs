@@ -46,9 +46,7 @@ namespace InMoov.Views
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
         {   
-            App.neopixel.SetAnimation(AnimationID.Facedetection);
-            Task.Delay(10000);
-            App.neopixel.StopAnimation();
+            //App.neopixel.SetAnimation(AnimationID.Listening);
         }
 
 

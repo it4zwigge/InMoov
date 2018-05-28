@@ -51,7 +51,7 @@ namespace InMoov
             this.firmata.FirmataConnectionFailed += Firmata_FirmataConnectionFailed;
             this.firmata.FirmataConnectionLost += Firmata_FirmataConnectionLost;
 
-            this.connection.begin(57600, SerialConfig.SERIAL_8N1);
+            this.connection.begin(115200, SerialConfig.SERIAL_8N1);
 
             this.ready = false;
             this.name = device.Name;

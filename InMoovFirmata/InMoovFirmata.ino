@@ -31,6 +31,7 @@ formatted using the GNU C formatting and indenting
 #include <Firmata.h>
 #include <SoftwareSerial.h>
 #include <SabertoothSimplified.h>
+#include <Adafruit_NeoPixel.h>
 
 // move the following defines to Firmata.h?
 #define I2C_WRITE B00000000
@@ -45,7 +46,6 @@ formatted using the GNU C formatting and indenting
 
 #define REGISTER_NOT_SPECIFIED -1
 
-#include <Adafruit_NeoPixel.h>
 
 /*==============================================================================
 * InMoov Variablen
@@ -59,7 +59,7 @@ formatted using the GNU C formatting and indenting
 #define SABERTOOTH_MOTOR_STOP_R 0x45
 #define SABERTOOTH_MOTOR_DREHUNG_RECHTS 0x46
 
-Adafruit_NeoPixel *neopixels = NULL;
+Adafruit_NeoPixel * neopixels = NULL;
 
 SoftwareSerial Sabertooth2(NOT_A_PIN, 3);//Sabertooth1 nutzt PIN 2
 SabertoothSimplified ST2(Sabertooth2);
@@ -553,7 +553,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
 			{
 				delete neopixels;
 			}
-			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRBW + NEO_KHZ800);
+			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRB + NEO_KHZ800);
 			neopixels->begin();
 		}
    break;
@@ -719,7 +719,7 @@ void setup()
   Sabertooth1.begin(9600); //Sabertooth1 Baudstart
   Sabertooth2.begin(9600); //Sabertooth1 Baudstart
 
-	Firmata.begin(57600);
+	Firmata.begin(115200);
 	systemResetCallback();  // reset to default config
 }
 

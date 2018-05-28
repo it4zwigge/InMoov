@@ -53,7 +53,7 @@ namespace InMoov
             {
                 foreach (Arduino arduino in App.Arduinos.Values)
                 {
-                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082")
+                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082" || arduino.id.Substring(26, 20) == "95530343634351901162")
                         
                     {
                         App.Leonardo = arduino;

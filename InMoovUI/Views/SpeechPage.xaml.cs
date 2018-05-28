@@ -71,7 +71,7 @@ namespace InMoov.Views
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
 
-            //LedRingPage.InitializeNeoPixel();
+            LedRingPage.InitializeNeoPixel();
         }
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -526,8 +526,9 @@ namespace InMoov.Views
                     newNum = GetMostUsedValue(numbers, out int exNum);
                     resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
                     exNum--;
+                    byte.TryParse(exNum.ToString(), out byte NexNum);
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    //App.neopixel.SetPixelColor((exNum), color[0], color[1], color[2]);
+                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
                 }
                 #endregion
                 helpTextBlock.Text = textboxContent;

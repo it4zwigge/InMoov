@@ -55,12 +55,13 @@ namespace InMoov.Views
         private int[] facedetect = new int[2];
         private bool ledCaptured;
         private string colorCaptured;
-        private int numberCaptured = 99;
-        private List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
-        private List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
-        private List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
-        private List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
-        private List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        private byte numberCaptured = 99;
+        private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
+        private static List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
+        private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
+        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
+        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        private byte[] color = new byte[3];
 
         public SpeechPage()
         {
@@ -68,6 +69,8 @@ namespace InMoov.Views
             this.Loaded += SpeechPage_Loaded;
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
+            App.neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16);
+            LedRingPage.ReadyNeopixel();
         }
 
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
@@ -432,6 +435,7 @@ namespace InMoov.Views
 
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
+                //Search after Face-Detection Phrases/Words
                 #region Gesichtserkennung
                 foreach (string facedet in facelist)
                 {
@@ -463,20 +467,48 @@ namespace InMoov.Views
                     fp.StopWebcam();
                 }
                 #endregion
+                //LED Search-Algorithm
                 #region LED
                 if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
                 {
-                    Debug.WriteLine("LED harrapatua!");
+                    Debug.WriteLine("LED captured!");
                     ledCaptured = true;
                 }
                 if (colorCaptured == null)
                 {
-                    foreach (string color in colorlist)
+                    //Search if captured Word is any of the given colors
+                    foreach (string colorS in colorlist)
                     {
-                        if (textboxContent.Contains(color))
+                        if (textboxContent.Contains(colorS))
                         {
-                            Debug.WriteLine(color);
-                            colorCaptured = color;
+                            Debug.WriteLine("Color captured: " + colorS);
+                            colorCaptured = colorS;
+                            switch (colorCaptured)
+                            {
+                                case "rot":
+                                    color[0] = 255;             //R
+                                    color[1] = 0;               //G
+                                    color[2] = 0;               //B
+                                    break;
+                                case "blau":
+                                    color[0] = 0;               //R
+                                    color[1] = 0;               //G
+                                    color[2] = 255;             //B
+                                    break;
+                                case "grün":
+                                    color[0] = 0;               //R
+                                    color[1] = 255;             //G
+                                    color[2] = 0;               //B
+                                    break;
+                                case "gelb":
+                                    color[0] = 255;             //R
+                                    color[1] = 255;             //G
+                                    color[2] = 0;               //B
+                                    break;
+                                default:
+                                    color[0] = color[1] = color[2] = 0;
+                                    break;
+                            }
                         }
                     }
                 }
@@ -486,9 +518,8 @@ namespace InMoov.Views
                     {
                         if (textboxContent.Contains(number))
                         {
-                            Debug.WriteLine("kopurua harrapatua!");
-                            Debug.WriteLine(number);
-                            int.TryParse(number, out numberCaptured);
+                            Debug.WriteLine("number captured: " + number);
+                            byte.TryParse(number, out numberCaptured);
                         }
                     }
                 }
@@ -496,8 +527,8 @@ namespace InMoov.Views
                 if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
                 {
                     resultTextBlock.Text = "Die LED" + numberCaptured.ToString() + " ist jetzt " + colorCaptured.ToString();
-                    helpTextBlock.Text = "Die LED" + numberCaptured.ToString() + " ist jetzt " + colorCaptured.ToString();
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
+                    App.neopixel.SetPixelColor(numberCaptured, color[0], color[1], color[2]);
                 }
                 #endregion
 

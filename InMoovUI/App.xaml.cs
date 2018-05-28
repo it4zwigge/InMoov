@@ -117,7 +117,7 @@ namespace InMoov
                     neopixel.SetPixelColor(pixel, 100, 0, 0);
                     await Task.Delay(100);
                 }
-                if (readyDevices == 3)
+                if (readyDevices == 1)
                 {
                     await Task.Delay(2000);
                     for (byte i = 0; i < 16; i++)

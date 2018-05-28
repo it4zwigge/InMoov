@@ -58,7 +58,7 @@ namespace InMoov.Views
         private bool ledCaptured;
         private string colorCaptured;
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
-        private static List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
+        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
@@ -519,6 +519,48 @@ namespace InMoov.Views
                         numbers[zel] = newNum;
                         zel++;
                     }
+                    else if (textboxContent.Contains("eins"))
+                    {
+                        Debug.WriteLine(1);
+                        numbers[zel] = 1;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("elf"))
+                    {
+                        Debug.WriteLine(11);
+                        numbers[zel] = 11;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("zwölf"))
+                    {
+                        Debug.WriteLine(12);
+                        numbers[zel] = 12;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("dreizehn"))
+                    {
+                        Debug.WriteLine(13);
+                        numbers[zel] = 13;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("vierzehn"))
+                    {
+                        Debug.WriteLine(14);
+                        numbers[zel] = 14;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("fünfzehn"))
+                    {
+                        Debug.WriteLine(15);
+                        numbers[zel] = 15;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("sechzehn"))
+                    {
+                        Debug.WriteLine(16);
+                        numbers[zel] = 16;
+                        zel++;
+                    }
                 }
 
                 if (ledCaptured == true && colorCaptured != null)
@@ -529,6 +571,9 @@ namespace InMoov.Views
                     byte.TryParse(exNum.ToString(), out byte NexNum);
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
                     App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+                    ledCaptured = false;
+                    
+
                 }
                 #endregion
                 helpTextBlock.Text = textboxContent;
@@ -595,10 +640,6 @@ namespace InMoov.Views
                     if (ArrayOfNumbers[i] == ArrayOfNumbers[j])
                     {
                         l_count++;
-                    }
-                    if(ArrayOfNumbers[i] == 1 && ArrayOfNumbers[j] <= 6)
-                    {
-                        ArrayOfNumbers[i] = ArrayOfNumbers[i++] = (10 + ArrayOfNumbers[i++]);
                     }
                 }
 

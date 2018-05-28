@@ -54,11 +54,11 @@ namespace InMoov.Views
         private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
         private string textCaptured;
         private int[] facedetect = new int[2];
-        private int[] numbers = new int[1000];          //Numbers which are getting captured by speechrecognition
+        private int[] numbers = new int[50];          //Numbers which are getting captured by speechrecognition
         private bool ledCaptured;
         private string colorCaptured;
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
-        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"};
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
@@ -71,7 +71,7 @@ namespace InMoov.Views
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
 
-            LedRingPage.InitializeNeoPixel();
+            //LedRingPage.InitializeNeoPixel();
         }
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -515,7 +515,6 @@ namespace InMoov.Views
                     if (textboxContent.Contains(number))
                     {
                         int.TryParse(number, out newNum);
-                        Debug.WriteLine(newNum);
                         numbers[zel] = newNum;
                         zel++;
                     }
@@ -523,42 +522,6 @@ namespace InMoov.Views
                     {
                         Debug.WriteLine(1);
                         numbers[zel] = 1;
-                        zel++;
-                    }
-                    else if (textboxContent.Contains("elf"))
-                    {
-                        Debug.WriteLine(11);
-                        numbers[zel] = 11;
-                        zel++;
-                    }
-                    else if (textboxContent.Contains("zwölf"))
-                    {
-                        Debug.WriteLine(12);
-                        numbers[zel] = 12;
-                        zel++;
-                    }
-                    else if (textboxContent.Contains("dreizehn"))
-                    {
-                        Debug.WriteLine(13);
-                        numbers[zel] = 13;
-                        zel++;
-                    }
-                    else if (textboxContent.Contains("vierzehn"))
-                    {
-                        Debug.WriteLine(14);
-                        numbers[zel] = 14;
-                        zel++;
-                    }
-                    else if (textboxContent.Contains("fünfzehn"))
-                    {
-                        Debug.WriteLine(15);
-                        numbers[zel] = 15;
-                        zel++;
-                    }
-                    else if (textboxContent.Contains("sechzehn"))
-                    {
-                        Debug.WriteLine(16);
-                        numbers[zel] = 16;
                         zel++;
                     }
                 }
@@ -570,7 +533,7 @@ namespace InMoov.Views
                     exNum--;
                     byte.TryParse(exNum.ToString(), out byte NexNum);
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+                    //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
                     ledCaptured = false;
                     
 
@@ -640,6 +603,13 @@ namespace InMoov.Views
                     if (ArrayOfNumbers[i] == ArrayOfNumbers[j])
                     {
                         l_count++;
+                    }
+                    if(ArrayOfNumbers[i] >= 10 && i < 25)
+                    {
+                        for(int k = 25; k < ArrayOfNumbers.Length; k++)
+                        {
+                            ArrayOfNumbers[k] = ArrayOfNumbers[i];
+                        }
                     }
                 }
 

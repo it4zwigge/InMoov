@@ -71,7 +71,7 @@ namespace InMoov.Views
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
 
-            //LedRingPage.InitializeNeoPixel();
+            LedRingPage.InitializeNeoPixel();
         }
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -533,8 +533,13 @@ namespace InMoov.Views
                     exNum--;
                     byte.TryParse(exNum.ToString(), out byte NexNum);
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
                     ledCaptured = false;
+                    zel = 0;
+                    for(int i = 0; i < numbers.Length; i++)
+                    {
+                        numbers[i] = 0;
+                    }
                     
 
                 }

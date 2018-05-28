@@ -12,6 +12,7 @@ using Windows.Foundation.Collections;
 using Windows.Globalization;
 using Windows.Graphics.Display;
 using Windows.Media.SpeechRecognition;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -53,9 +54,9 @@ namespace InMoov.Views
         private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
         private string textCaptured;
         private int[] facedetect = new int[2];
+        private int[] numbers = new int[1000];          //Numbers which are getting captured by speechrecognition
         private bool ledCaptured;
         private string colorCaptured;
-        private byte numberCaptured = 99;
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
         private static List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
@@ -69,9 +70,9 @@ namespace InMoov.Views
             this.Loaded += SpeechPage_Loaded;
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
-            LedRingPage.InitializeNeoPixel();
-        }
 
+            //LedRingPage.InitializeNeoPixel();
+        }
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -343,7 +344,6 @@ namespace InMoov.Views
             {
                 ledCaptured = false;
                 colorCaptured = null;
-                numberCaptured = 99;
                 heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
                 // Disable the UI while recognition is occurring, and provide feedback to the user about current state.
                 cbLanguageSelection.IsEnabled = false;
@@ -352,6 +352,7 @@ namespace InMoov.Views
                 {
                     // Save the recognition operation so we can cancel it (as it does not provide a blocking
                     // UI, unlike RecognizeWithAsync()
+                    Debug.WriteLine("TEXT");
                     recognitionOperation = speechRecognizer.RecognizeAsync();
 
                     SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
@@ -431,7 +432,7 @@ namespace InMoov.Views
             // Update the textbox with the currently confirmed text, and the hypothesis combined.
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
 
-
+            int zel = 0;
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 //Search after Face-Detection Phrases/Words
@@ -473,67 +474,62 @@ namespace InMoov.Views
                     Debug.WriteLine("LED captured!");
                     ledCaptured = true;
                 }
-                if (colorCaptured == null)
+                //Search if captured Word is any of the given colors
+                foreach (string colorS in colorlist)
                 {
-                    //Search if captured Word is any of the given colors
-                    foreach (string colorS in colorlist)
+                    if (textboxContent.Contains(colorS))
                     {
-                        if (textboxContent.Contains(colorS))
+                        Debug.WriteLine("Color captured: " + colorS);
+                        colorCaptured = colorS;
+                        switch (colorCaptured)
                         {
-                            Debug.WriteLine("Color captured: " + colorS);
-                            colorCaptured = colorS;
-                            switch (colorCaptured)
-                            {
-                                case "rot":
-                                    color[0] = 255;             //R
-                                    color[1] = 0;               //G
-                                    color[2] = 0;               //B
-                                    break;
-                                case "blau":
-                                    color[0] = 0;               //R
-                                    color[1] = 0;               //G
-                                    color[2] = 255;             //B
-                                    break;
-                                case "grün":
-                                    color[0] = 0;               //R
-                                    color[1] = 255;             //G
-                                    color[2] = 0;               //B
-                                    break;
-                                case "gelb":
-                                    color[0] = 255;             //R
-                                    color[1] = 255;             //G
-                                    color[2] = 0;               //B
-                                    break;
-                                default:
-                                    color[0] = color[1] = color[2] = 0;
-                                    break;
-                            }
+                            case "rot":
+                                color[0] = 255;             //R
+                                color[1] = 0;               //G
+                                color[2] = 0;               //B
+                                break;
+                            case "blau":
+                                color[0] = 0;               //R
+                                color[1] = 0;               //G
+                                color[2] = 255;             //B
+                                break;
+                            case "grün":
+                                color[0] = 0;               //R
+                                color[1] = 255;             //G
+                                color[2] = 0;               //B
+                                break;
+                            case "gelb":
+                                color[0] = 255;             //R
+                                color[1] = 255;             //G
+                                color[2] = 0;               //B
+                                break;
+                            default:
+                                color[0] = color[1] = color[2] = 0;
+                                break;
                         }
                     }
                 }
-                if (numberCaptured == 99)
+                int newNum = 0;
+                foreach (string number in numberlist)
                 {
-                    foreach (string number in numberlist)
+                    if (textboxContent.Contains(number))
                     {
-                        if (textboxContent.Contains(number))
-                        {
-                            Debug.WriteLine("number captured: " + number);
-                            byte.TryParse(number, out numberCaptured);
-                        }
+                        int.TryParse(number, out newNum);
+                        Debug.WriteLine(newNum);
+                        numbers[zel] = newNum;
+                        zel++;
                     }
-                    numberCaptured++;
                 }
 
-                if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
+                if (ledCaptured == true && colorCaptured != null)
                 {
-                    resultTextBlock.Text = "Die LED" + numberCaptured.ToString() + " ist jetzt " + colorCaptured.ToString();
-                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
-                    App.neopixel.SetPixelColor((numberCaptured), color[0], color[1], color[2]);
+                    newNum = GetMostUsedValue(numbers, out int exNum);
+                    resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
+                    exNum--;
+                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
+                    //App.neopixel.SetPixelColor((exNum), color[0], color[1], color[2]);
                 }
                 #endregion
-
-
-                Debug.WriteLine("helloWorld");
                 helpTextBlock.Text = textboxContent;
             });
         }
@@ -580,8 +576,42 @@ namespace InMoov.Views
             }
             else
             {
-                Debug.WriteLine("Salbuespen errorea: aitortu ez hasi");
+                //AUSNAHMEFEHLER!!!
             }
+        }
+
+
+        public static int GetMostUsedValue(int[] ArrayOfNumbers, out int MostUsedNumber)
+        {
+            int max_Countnumber = 0;
+            MostUsedNumber = 0;
+
+            for (int i = 0; i < ArrayOfNumbers.Length; i++)
+            {
+                int l_count = 0;
+                for (int j = 0; j < ArrayOfNumbers.Length; j++)
+                {
+                    if (ArrayOfNumbers[i] == ArrayOfNumbers[j])
+                    {
+                        l_count++;
+                    }
+                    if(ArrayOfNumbers[i] == 1 && ArrayOfNumbers[j] <= 6)
+                    {
+                        ArrayOfNumbers[i] = ArrayOfNumbers[i++] = (10 + ArrayOfNumbers[i++]);
+                    }
+                }
+
+                if (l_count > max_Countnumber)
+                {
+                    max_Countnumber = l_count;
+                    if (ArrayOfNumbers[i] != 0)
+                    {
+                        MostUsedNumber = ArrayOfNumbers[i];
+                    }
+                }
+            }
+
+            return max_Countnumber;
         }
     }
 }

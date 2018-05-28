@@ -473,6 +473,7 @@ namespace InMoov.Views
                 {
                     Debug.WriteLine("LED captured!");
                     ledCaptured = true;
+                }
                 //Search if captured Word is any of the given colors
                 foreach (string colorS in colorlist)
                 {
@@ -522,10 +523,6 @@ namespace InMoov.Views
 
                 if (ledCaptured == true && colorCaptured != null)
                 {
-                    numberCaptured++;
-                    helpTextBlock.Text = "Die LED" + numberCaptured.ToString() + " ist jetzt " + colorCaptured.ToString();
-                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
-                    App.neopixel.SetPixelColor((numberCaptured), color[0], color[1], color[2]);
                     newNum = GetMostUsedValue(numbers, out int exNum);
                     resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
                     exNum--;

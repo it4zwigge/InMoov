@@ -132,7 +132,7 @@ namespace InMoov
                     }
                     if (stop) { break; }
                 }
-                for (byte fade = 125; fade >= 0; fade -= 5)
+                for (byte fade = 125; fade > 0; fade -= 5)
                 {
                     for (byte i = 0; i < 16; i++)
                     {

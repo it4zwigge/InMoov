@@ -52,16 +52,21 @@ namespace InMoov.Views
         private StringBuilder dictatedTextBuilder;
         private bool isPopulatingLanguages = false;
         private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
-        private string textCaptured;
-        private int[] facedetect = new int[2];
-        private int[] numbers = new int[50];          //Numbers which are getting captured by speechrecognition
-        private bool ledCaptured;
-        private string colorCaptured;
-        private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
+        private string textCaptured;                    //Handles the captured Text
+        private int[] facedetect = new int[2];          //Handles the facedetection start/stop Commands
+        private int[] numbers = new int[50];            //Numbers which are getting captured by speechrecognition
+        private bool ledCaptured;                       //Handles if Word LED is captured
+        private string colorCaptured;                   //Handles which color is picked by user
+        //Handles the amount of colors the User can pick
+        private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb", "schwarz", "aus" };
+        //Handles the amount of Numbers the User can pick
         private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"};
+        //Handles Keywords the user can say to pick Facedetection
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
+        //Handles basic start/stop Keys
         private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
 
         public SpeechPage()
@@ -103,7 +108,7 @@ namespace InMoov.Views
             bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
             if (permissionGained)
             {
-                // Enable the recognition buttons.
+                //Initialize basic Speech tiles and Varialbes
 
                 Language speechLanguage = SpeechRecognizer.SystemSpeechLanguage;
                 string langTag = speechLanguage.LanguageTag;
@@ -258,7 +263,7 @@ namespace InMoov.Views
             SpeechRecognitionCompilationResult result = await speechRecognizer.CompileConstraintsAsync();
             if (result.Status != SpeechRecognitionResultStatus.Success)
             {
-                Debug.WriteLine("ErrorLine264");
+                //Empty if
             }
 
             // Handle continuous recognition events. Completed fires when various error states occur. ResultGenerated fires when
@@ -272,29 +277,16 @@ namespace InMoov.Views
             {
                 // Provide feedback to the user about the state of the recognizer.
                 speechRecognizer.StateChanged += SpeechRecognizer_StateChanged;
-                // Add a list constraint to the recognizer.
 
-                // RecognizeWithUIAsync allows developers to customize the prompts.
+                //Text before continuous recognize is enabled
                 string uiOptionsText = "Ich bin noch nicht fertig, tut mir leid :(";
                 speechRecognizer.UIOptions.ExampleText = uiOptionsText;
                 helpTextBlock.Text = "Hallo ich bin das InMoov Sprachprogramm\n\nIch bin noch nicht fertig, tut mir leid :( \nAber ich gebe mir mühe :)";
                 // Compile the constraint.
                 SpeechRecognitionCompilationResult compilationResult = await speechRecognizer.CompileConstraintsAsync();
 
-                // Check to make sure that the constraints were in a proper format and the recognizer was able to compile it.
-                if (compilationResult.Status != SpeechRecognitionResultStatus.Success)
-                {
-                    // Disable the recognition buttons.
 
-                    // Let the user know that the grammar didn't compile properly.
-                    resultTextBlock.Visibility = Visibility.Visible;
-                    resultTextBlock.Text = "Unable to compile grammar.";
-                }
-                else
-                {
-
-                    resultTextBlock.Visibility = Visibility.Collapsed;
-                }
+                resultTextBlock.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
             {
@@ -325,12 +317,7 @@ namespace InMoov.Views
             });
         }
 
-        /// <summary>
-        /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
-        /// it back on the screen. Uses the built-in speech recognition UI.
-        /// </summary>
-        /// <param name="sender">Button that triggered this event</param>
-        /// <param name="e">State information about the routed event</param>
+        //Initialize a new FacesPage
         FacesPage fp = new FacesPage();
         /// <summary>
         /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
@@ -345,14 +332,10 @@ namespace InMoov.Views
                 ledCaptured = false;
                 colorCaptured = null;
                 heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-                // Disable the UI while recognition is occurring, and provide feedback to the user about current state.
                 cbLanguageSelection.IsEnabled = false;
-                // Start recognition.
                 try
                 {
-                    // Save the recognition operation so we can cancel it (as it does not provide a blocking
-                    // UI, unlike RecognizeWithAsync()
-                    Debug.WriteLine("TEXT");
+                    // Start continuous Recognition Session
                     recognitionOperation = speechRecognizer.RecognizeAsync();
 
                     SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
@@ -379,6 +362,8 @@ namespace InMoov.Views
                 // Reset UI state.
                 cbLanguageSelection.IsEnabled = true;
             }
+            //If the toggle Switch is off, Recognizing will end if user dont speech
+            StopRecognicing();
         }
 
         /// <summary>
@@ -400,7 +385,6 @@ namespace InMoov.Views
                 {
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        Debug.WriteLine("HELLO");
                         helpTextBlock.Text = " Dictate";
                         cbLanguageSelection.IsEnabled = true;
                         helpTextBlock.Text = dictatedTextBuilder.ToString();
@@ -503,12 +487,20 @@ namespace InMoov.Views
                                 color[1] = 255;             //G
                                 color[2] = 0;               //B
                                 break;
+                            case "schwarz":
+                            case "aus":
+                                color[0] = 0;               //R
+                                color[1] = 0;               //G
+                                color[2] = 0;               //B
+                                break;
                             default:
                                 color[0] = color[1] = color[2] = 0;
                                 break;
                         }
                     }
                 }
+
+                //Get Number out of the recognized string
                 int newNum = 0;
                 foreach (string number in numberlist)
                 {
@@ -526,6 +518,7 @@ namespace InMoov.Views
                     }
                 }
 
+                //Change Color of the LED
                 if (ledCaptured == true && colorCaptured != null)
                 {
                     newNum = GetMostUsedValue(numbers, out int exNum);
@@ -540,8 +533,6 @@ namespace InMoov.Views
                     {
                         numbers[i] = 0;
                     }
-                    
-
                 }
                 #endregion
                 helpTextBlock.Text = textboxContent;
@@ -577,7 +568,7 @@ namespace InMoov.Views
             }
         }
 
-        private void StopRecognicing(object sender, RoutedEventArgs e)
+        private void StopRecognicing()
         {
             if (isListening == true && ToggleSpeech.IsOn == true)
             {
@@ -594,7 +585,12 @@ namespace InMoov.Views
             }
         }
 
-
+        /// <summary>
+        /// Function which gives the most used Value in an integer Array
+        /// </summary>
+        /// <param name="ArrayOfNumbers">Array in which you will search the most used number</param>
+        /// <param name="MostUsedNumber">The Most used number in the Array</param>
+        /// <returns>The number of times the most used number was used</returns>
         public static int GetMostUsedValue(int[] ArrayOfNumbers, out int MostUsedNumber)
         {
             int max_Countnumber = 0;

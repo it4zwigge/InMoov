@@ -21,6 +21,7 @@ namespace InMoov
         private IStream connection { get; set; }
         private RemoteDevice arduino { get; set; }
         public UwpFirmata firmata { get; private set; }
+        public string ImageUri { get; set; }
 
         public ICollection analog_pins { get; set; }
 
@@ -39,6 +40,7 @@ namespace InMoov
         {
             this.connection = new UsbSerial(device);
             this.arduino = new RemoteDevice(connection);
+            this.ImageUri = "ms-appx:///Assets/disconnected.png";
 
             arduino.DeviceReady += Arduino_DeviceReady;
             arduino.DeviceConnectionFailed += Arduino_DeviceConnectionFailed;
@@ -145,6 +147,7 @@ namespace InMoov
         private void Arduino_DeviceConnectionLost(string message)
             {
                 Debug.WriteLine("[" + this.name + "] Verbindung verloren : " + message);
+                App.Arduinos.Remove(this.id);
                 App.noDevice++;
                 App.readyDevices--;
             }
@@ -157,6 +160,7 @@ namespace InMoov
 
             private void Arduino_DeviceReady()
             {
+                this.ImageUri = "ms-appx:///Assets/connected.png";
                 this.analog_pins = this.arduino.DeviceHardwareProfile.AnalogPins.ToArray();
                 this.ready = true;
                 Debug.WriteLine("[" + this.name + "] erolgreich verbunden" + id);

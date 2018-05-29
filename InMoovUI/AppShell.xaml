@@ -131,7 +131,7 @@
         <SplitView x:Name="RootSplitView"
                    DisplayMode="Inline"
                    OpenPaneLength="320"
-                   PaneBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                   PaneBackground="{ThemeResource SystemControlAcrylicWindowBrush}"
                    PaneClosed="RootSplitView_PaneClosed"
                    LightDismissOverlayMode="On"
                    IsTabStop="False">
@@ -158,7 +158,8 @@
                                               ContainerContentChanging="NavMenuItemContainerContentChanging"
                                               ItemContainerStyle="{StaticResource NavMenuItemContainerStyle}"
                                               ItemTemplate="{StaticResource NavMenuItemTemplate}"
-                                              ItemInvoked="NavMenuList_ItemInvoked"/>
+                                              ItemInvoked="NavMenuList_ItemInvoked">
+                    </controls:NavMenuListView>
                     <Rectangle x:Name="NavPaneDivider"
                                Grid.Row="1"
                                Grid.ColumnSpan="3"

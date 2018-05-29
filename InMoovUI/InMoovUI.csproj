@@ -156,6 +156,8 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\connected.png" />
+    <Content Include="Assets\disconnected.png" />
     <Content Include="Assets\smalltile-sdk.png" />
     <Content Include="Assets\splash-sdk.png" />
     <Content Include="Assets\squaretile-sdk.png" />

@@ -263,7 +263,7 @@ namespace InMoov.Views
             SpeechRecognitionCompilationResult result = await speechRecognizer.CompileConstraintsAsync();
             if (result.Status != SpeechRecognitionResultStatus.Success)
             {
-                //Empty if
+                //Soll nicht ausgelößt werden :)
             }
 
             // Handle continuous recognition events. Completed fires when various error states occur. ResultGenerated fires when
@@ -313,7 +313,7 @@ namespace InMoov.Views
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-
+                //Hello, I am an Method
             });
         }
 
@@ -598,7 +598,7 @@ namespace InMoov.Views
 
             for (int i = 0; i < ArrayOfNumbers.Length; i++)
             {
-                int l_count = 0;
+                int l_count = 0;                //Zählt Anzahl des am meisten verwendeten Wertes
                 for (int j = 0; j < ArrayOfNumbers.Length; j++)
                 {
                     if (ArrayOfNumbers[i] == ArrayOfNumbers[j])
@@ -609,7 +609,9 @@ namespace InMoov.Views
                     {
                         for(int k = 25; k < ArrayOfNumbers.Length; k++)
                         {
-                            ArrayOfNumbers[k] = ArrayOfNumbers[i];
+                            //Füllt letzte 25 Stellen mit Zahl wenn 11 - 16 erkannt worden ist
+                            //Das ist nötig weil gute Erkennung ansonsten nicht möglich ist. 
+                            ArrayOfNumbers[k] = ArrayOfNumbers[i];              
                         }
                     }
                 }

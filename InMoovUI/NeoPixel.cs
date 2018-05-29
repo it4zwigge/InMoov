@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InMoov
@@ -53,12 +54,17 @@ namespace InMoov
         {
             Animation.stop = true;
             Task.Delay(100);
-            for (byte i = 0;i< 16; i++)
-            {
-                SetPixelColor(i, 0, 0, 0, 0);
-                Task.Delay(2);
-            }
+            clear();
             //Animation.ResetAnimation();
+        }
+
+        public void clear()
+        {
+            for (byte pixel = 0; pixel < 16; pixel++)
+            {
+                App.neopixel.SetPixelColor(pixel, 0, 0, 0);
+                Thread.Sleep(50);
+            }
         }
 
         public void SetPixelColor(byte index, byte r, byte g, byte b, byte gamma)
@@ -79,7 +85,7 @@ namespace InMoov
         Facedetection = 2,
         Error = 3,
         Listening = 4,
-        Succesfully = 5,       
+        Succesfully = 5,
     }
 
     public class Animation
@@ -102,22 +108,69 @@ namespace InMoov
                     break;
                 case AnimationID.Wait:
                     break;
+                case AnimationID.Listening:
+                    await Listening();
+                    break;
             }
         }
 
         private static async Task<bool> Error() // noch nicht fertig
         {
-            Random rnd = new Random();
             while (!stop)
             {
-                App.neopixel.SetPixelColor(byte.Parse((rnd.Next(0, 16)).ToString()), 0, 255, 0);
-                await Task.Delay(100);
-                if (rnd.Next(0, 2) == 1)
+                for (byte fade = 0; fade < 125; fade += 5)
                 {
-                    App.neopixel.SetPixelColor(byte.Parse((rnd.Next(0, 16)).ToString()), 0, 0, 0);
+                    for (byte i = 0; i < 16; i++)
+                    {
+                        if (!stop)
+                        {
+                            App.neopixel.SetPixelColor(i, fade, 0, 0);
+                            await Task.Delay(1);
+                        }
+                        else
+                            break;
+                    }
+                    if (stop) { break; }
+                }
+                for (byte fade = 125; fade > 0; fade -= 5)
+                {
+                    for (byte i = 0; i < 16; i++)
+                    {
+                        if (!stop)
+                        {
+                            App.neopixel.SetPixelColor(i, fade, 0, 0);
+                            await Task.Delay(1);
+                        }
+                        else
+                            break;
+                    }
+                    if (stop) { break; }
                 }
             }
             stop = false;
+            App.neopixel.clear();
+            return stop;
+        }
+
+        private static async Task<bool> Listening() // noch nicht fertig
+        {
+            while (!stop)
+            {
+                byte r = 0;
+                byte g = 0;
+                byte b = 255;
+
+                for (byte i = 0; i <= 16; i++)
+                {
+                    App.neopixel.SetPixelColor(i, r, g, b);
+                    await Task.Delay(100);
+
+                    App.neopixel.SetPixelColor(byte.Parse((i - 1).ToString()), 0, 0, 0);
+                    await Task.Delay(100);
+                }
+            }
+            stop = false;
+            App.neopixel.clear();
             return stop;
         }
 
@@ -137,6 +190,7 @@ namespace InMoov
                 }
             }
             stop = false;
+            App.neopixel.clear();
             return stop;
         }
     }

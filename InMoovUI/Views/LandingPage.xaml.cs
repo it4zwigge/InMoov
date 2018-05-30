@@ -47,6 +47,7 @@ namespace InMoov.Views
             }
         }
 
+
         private void AutoConnect()
         {
             Dictionary<string, UsbSerial> devices = new Dictionary<string, UsbSerial>();
@@ -67,7 +68,7 @@ namespace InMoov.Views
                     //store the result and populate the device list on the UI thread
                     var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
-                        Connections connections = new Connections();
+                        //Connections connections = new Connections();
 
                         var result = listTask.Result;
                         if (result == null || result.Count == 0)
@@ -79,7 +80,6 @@ namespace InMoov.Views
                         {
                             foreach (DeviceInformation device in result)
                             {
-                                connections.Add(new Connection(device.Name, device));
                                 App.Arduinos.Add(device.Id, new Arduino(device));
                                 devices.Add(device.Name, new UsbSerial(device));
                             }

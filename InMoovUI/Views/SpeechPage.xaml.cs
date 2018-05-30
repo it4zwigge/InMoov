@@ -12,6 +12,7 @@ using Windows.Foundation.Collections;
 using Windows.Globalization;
 using Windows.Graphics.Display;
 using Windows.Media.SpeechRecognition;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -51,16 +52,22 @@ namespace InMoov.Views
         private StringBuilder dictatedTextBuilder;
         private bool isPopulatingLanguages = false;
         private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
-        private string textCaptured;
-        private int[] facedetect = new int[2];
-        private bool ledCaptured;
-        private string colorCaptured;
-        private int numberCaptured = 99;
-        private List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb" };
-        private List<string> numberlist = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
-        private List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
-        private List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
-        private List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        private string textCaptured;                    //Handles the captured Text
+        private int[] facedetect = new int[2];          //Handles the facedetection start/stop Commands
+        private int[] numbers = new int[50];            //Numbers which are getting captured by speechrecognition
+        private bool ledCaptured;                       //Handles if Word LED is captured
+        private string colorCaptured;                   //Handles which color is picked by user
+        //Handles the amount of colors the User can pick
+        private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb", "schwarz", "aus" };
+        //Handles the amount of Numbers the User can pick
+        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"};
+        //Handles Keywords the user can say to pick Facedetection
+        private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
+        //Handles basic start/stop Keys
+        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
+        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        //Needed to give NeoPixel the RGBs of picked Color
+        private byte[] color = new byte[3];
 
         public SpeechPage()
         {
@@ -68,8 +75,9 @@ namespace InMoov.Views
             this.Loaded += SpeechPage_Loaded;
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
-        }
 
+            LedRingPage.InitializeNeoPixel();
+        }
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -100,7 +108,7 @@ namespace InMoov.Views
             bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
             if (permissionGained)
             {
-                // Enable the recognition buttons.
+                //Initialize basic Speech tiles and Varialbes
 
                 Language speechLanguage = SpeechRecognizer.SystemSpeechLanguage;
                 string langTag = speechLanguage.LanguageTag;
@@ -207,11 +215,6 @@ namespace InMoov.Views
 
                 resultTextBlock.Text = "";
 
-                speechRecognizer.ContinuousRecognitionSession.Completed -= ContinuousRecognitionSession_Completed;
-                speechRecognizer.ContinuousRecognitionSession.ResultGenerated -= ContinuousRecognitionSession_ResultGenerated;
-                speechRecognizer.HypothesisGenerated -= SpeechRecognizer_HypothesisGenerated;
-                speechRecognizer.StateChanged -= SpeechRecognizer_StateChanged;
-
                 this.speechRecognizer.Dispose();
                 this.speechRecognizer = null;
             }
@@ -260,7 +263,7 @@ namespace InMoov.Views
             SpeechRecognitionCompilationResult result = await speechRecognizer.CompileConstraintsAsync();
             if (result.Status != SpeechRecognitionResultStatus.Success)
             {
-                Debug.WriteLine("ErrorLine264");
+                //Soll nicht ausgelößt werden :)
             }
 
             // Handle continuous recognition events. Completed fires when various error states occur. ResultGenerated fires when
@@ -274,71 +277,16 @@ namespace InMoov.Views
             {
                 // Provide feedback to the user about the state of the recognizer.
                 speechRecognizer.StateChanged += SpeechRecognizer_StateChanged;
-                // Add a list constraint to the recognizer.
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("ListGrammarRobotName1", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("ListGrammarRobotName2", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("ListGrammarRobotName3", speechContext).ValueAsString
-                        }, "RobotName"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("ListGrammarGoToContosoStudio", speechContext).ValueAsString
-                        }, "GoToContosoStudio"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("ListGrammarShowMessage", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("ListGrammarOpenMessage", speechContext).ValueAsString
-                        }, "Message"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("ListGrammarSendEmail", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("ListGrammarCreateEmail", speechContext).ValueAsString
-                        }, "Email"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("ListGrammarCallNitaFarley", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("ListGrammarCallNita", speechContext).ValueAsString
-                        }, "CallNita"));
-                speechRecognizer.Constraints.Add(
-                    new SpeechRecognitionListConstraint(
-                        new List<string>()
-                        {
-                        speechResourceMap.GetValue("ListGrammarCallWayneSigmon", speechContext).ValueAsString,
-                        speechResourceMap.GetValue("ListGrammarCallWayne", speechContext).ValueAsString
-                        }, "CallWayne"));
 
-                // RecognizeWithUIAsync allows developers to customize the prompts.
+                //Text before continuous recognize is enabled
                 string uiOptionsText = "Ich bin noch nicht fertig, tut mir leid :(";
                 speechRecognizer.UIOptions.ExampleText = uiOptionsText;
                 helpTextBlock.Text = "Hallo ich bin das InMoov Sprachprogramm\n\nIch bin noch nicht fertig, tut mir leid :( \nAber ich gebe mir mühe :)";
                 // Compile the constraint.
                 SpeechRecognitionCompilationResult compilationResult = await speechRecognizer.CompileConstraintsAsync();
 
-                // Check to make sure that the constraints were in a proper format and the recognizer was able to compile it.
-                if (compilationResult.Status != SpeechRecognitionResultStatus.Success)
-                {
-                    // Disable the recognition buttons.
 
-                    // Let the user know that the grammar didn't compile properly.
-                    resultTextBlock.Visibility = Visibility.Visible;
-                    resultTextBlock.Text = "Unable to compile grammar.";
-                }
-                else
-                {
-
-                    resultTextBlock.Visibility = Visibility.Collapsed;
-                }
+                resultTextBlock.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
             {
@@ -365,16 +313,11 @@ namespace InMoov.Views
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-
+                //Hello, I am an Method
             });
         }
 
-        /// <summary>
-        /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
-        /// it back on the screen. Uses the built-in speech recognition UI.
-        /// </summary>
-        /// <param name="sender">Button that triggered this event</param>
-        /// <param name="e">State information about the routed event</param>
+        //Initialize a new FacesPage
         FacesPage fp = new FacesPage();
         /// <summary>
         /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
@@ -384,97 +327,22 @@ namespace InMoov.Views
         /// <param name="e">State information about the routed event</param>
         private async void RecognizeWithoutUIListConstraint_Click(object sender, RoutedEventArgs e)
         {
-            if(ToggleSpeech.IsOn)
+            while (ToggleSpeech.IsOn)
             {
                 ledCaptured = false;
                 colorCaptured = null;
-                numberCaptured = 99;
                 heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-                // Disable the UI while recognition is occurring, and provide feedback to the user about current state.
                 cbLanguageSelection.IsEnabled = false;
-
-                // Start recognition.
                 try
                 {
-                    // Save the recognition operation so we can cancel it (as it does not provide a blocking
-                    // UI, unlike RecognizeWithAsync()
+                    // Start continuous Recognition Session
                     recognitionOperation = speechRecognizer.RecognizeAsync();
 
                     SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
-
-                    // If successful, display the recognition result. A cancelled task should do nothing.
-                    if (speechRecognitionResult.Status == SpeechRecognitionResultStatus.Success)
-                    {
-                        string tag = "unknown";
-                        if (speechRecognitionResult.Constraint != null)
-                        {
-                            // Only attempt to retreive the tag if we didn't hit the garbage rule.
-                            tag = speechRecognitionResult.Constraint.Tag;
-                        }
-
-                        heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Visible;
-
-                        /*
-                         * +++++++++++++++NEU+++++++++++++++
-                         */
-
-                        if (tag == "RobotName")
-                        {
-                            resultTextBlock.Visibility = Visibility.Visible;
-                            heardYouSayTextBlock.Visibility = Visibility.Visible;
-                            heardYouSayTextBlock.Text = "Startwort erkannt!";
-                            if (isListening == false)
-                            {
-                                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
-                                // This prevents an exception from occurring.
-                                if (speechRecognizer.State == SpeechRecognizerState.Idle)
-                                {
-                                    cbLanguageSelection.IsEnabled = false;
-                                    try
-                                    {
-                                        isListening = true;
-                                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
-                                        {
-                                            // Show a UI link to the privacy settings.
-                                        }
-                                        else
-                                        {
-                                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
-                                            await messageDialog.ShowAsync();
-                                        }
-                                        isListening = false;
-                                        cbLanguageSelection.IsEnabled = true;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Salbuespen errorea: etiketa ez da detektatu");
-                            recognitionOperation = speechRecognizer.RecognizeAsync();
-                            heardYouSayTextBlock.Visibility = Visibility.Collapsed;
-                        }
-
-                        /*
-                         * +++++++++++++++++++++++++++++++++
-                         */
-                    }
-                    else
-                    {
-                        recognitionOperation = speechRecognizer.RecognizeAsync();
-                    }
                 }
                 catch (TaskCanceledException exception)
                 {
-                    // TaskCanceledException will be thrown if you exit the scenario while the recognizer is actively
-                    // processing speech. Since this happens here when we navigate out of the scenario, don't try to 
-                    // show a message dialog for this exception.
-                    System.Diagnostics.Debug.WriteLine("TaskCanceledException caught while recognition in progress (can be ignored):");
-                    System.Diagnostics.Debug.WriteLine(exception.ToString());
+                    Debug.Print(exception.ToString());
                 }
                 catch (Exception exception)
                 {
@@ -494,10 +362,8 @@ namespace InMoov.Views
                 // Reset UI state.
                 cbLanguageSelection.IsEnabled = true;
             }
-            else
-            {
-                Debug.WriteLine("Salbuespena: Aktibatuta ez piztuta");
-            }
+            //If the toggle Switch is off, Recognizing will end if user dont speech
+            StopRecognicing();
         }
 
         /// <summary>
@@ -508,6 +374,7 @@ namespace InMoov.Views
         /// <param name="args">The state of the recognizer</param>
         private async void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
         {
+            Debug.WriteLine("CRS_C");
             if (args.Status != SpeechRecognitionResultStatus.Success)
             {
                 // If TimeoutExceeded occurs, the user has been silent for too long. We can use this to 
@@ -543,13 +410,16 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
+            Debug.WriteLine("SR_HG");
             string hypothesis = args.Hypothesis.Text;
 
             // Update the textbox with the currently confirmed text, and the hypothesis combined.
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
+
+            int zel = 0;
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                Debug.WriteLine(textboxContent);
+                //Search after Face-Detection Phrases/Words
                 #region Gesichtserkennung
                 foreach (string facedet in facelist)
                 {
@@ -572,54 +442,100 @@ namespace InMoov.Views
                         facedetect[1] = 2;
                     }
                 }
-                if(facedetect[0] == 1 && facedetect[1] == 1)
+                if (facedetect[0] == 1 && facedetect[1] == 1)
                 {
                     fp.StarteWebcam();
                 }
-                else if(facedetect[0] == 1 && facedetect[1] == 2)
+                else if (facedetect[0] == 1 && facedetect[1] == 2)
                 {
                     fp.StopWebcam();
                 }
                 #endregion
+                //LED Search-Algorithm
                 #region LED
-                if ((textboxContent.Contains("LED")||textboxContent.Contains("led")) && ledCaptured != true)
+                if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
                 {
-                    Debug.WriteLine("LED harrapatua!");
+                    Debug.WriteLine("LED captured!");
                     ledCaptured = true;
                 }
-                if (colorCaptured == null)
+                //Search if captured Word is any of the given colors
+                foreach (string colorS in colorlist)
                 {
-                    foreach (string color in colorlist)
+                    if (textboxContent.Contains(colorS))
                     {
-                        if (textboxContent.Contains(color))
+                        Debug.WriteLine("Color captured: " + colorS);
+                        colorCaptured = colorS;
+                        switch (colorCaptured)
                         {
-                            Debug.WriteLine("koloreak harrapatu dituzte!");
-                            Debug.WriteLine(color);
-                            colorCaptured = color;
+                            case "rot":
+                                color[0] = 255;             //R
+                                color[1] = 0;               //G
+                                color[2] = 0;               //B
+                                break;
+                            case "blau":
+                                color[0] = 0;               //R
+                                color[1] = 0;               //G
+                                color[2] = 255;             //B
+                                break;
+                            case "grün":
+                                color[0] = 0;               //R
+                                color[1] = 255;             //G
+                                color[2] = 0;               //B
+                                break;
+                            case "gelb":
+                                color[0] = 255;             //R
+                                color[1] = 255;             //G
+                                color[2] = 0;               //B
+                                break;
+                            case "schwarz":
+                            case "aus":
+                                color[0] = 0;               //R
+                                color[1] = 0;               //G
+                                color[2] = 0;               //B
+                                break;
+                            default:
+                                color[0] = color[1] = color[2] = 0;
+                                break;
                         }
                     }
                 }
-                if (numberCaptured == 99)
+
+                //Get Number out of the recognized string
+                int newNum = 0;
+                foreach (string number in numberlist)
                 {
-                    foreach (string number in numberlist)
+                    if (textboxContent.Contains(number))
                     {
-                        if (textboxContent.Contains(number))
-                        {
-                            Debug.WriteLine("kopurua harrapatua!");
-                            Debug.WriteLine(number);
-                            int.TryParse(number, out numberCaptured);
-                        }
+                        int.TryParse(number, out newNum);
+                        numbers[zel] = newNum;
+                        zel++;
+                    }
+                    else if (textboxContent.Contains("eins"))
+                    {
+                        Debug.WriteLine(1);
+                        numbers[zel] = 1;
+                        zel++;
                     }
                 }
-                if (ledCaptured == true && colorCaptured != null && numberCaptured != 99)
+
+                //Change Color of the LED
+                if (ledCaptured == true && colorCaptured != null)
                 {
-                    helpTextBlock.Text = $"Die LED {numberCaptured} ist jetzt {colorCaptured}"; 
+                    newNum = GetMostUsedValue(numbers, out int exNum);
+                    resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
+                    exNum--;
+                    byte.TryParse(exNum.ToString(), out byte NexNum);
+                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
+                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+                    ledCaptured = false;
+                    zel = 0;
+                    for(int i = 0; i < numbers.Length; i++)
+                    {
+                        numbers[i] = 0;
+                    }
                 }
                 #endregion
-                else
-                    helpTextBlock.Text = textboxContent;
-
-                Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {numberCaptured}");
+                helpTextBlock.Text = textboxContent;
             });
         }
 
@@ -632,18 +548,13 @@ namespace InMoov.Views
         /// <param name="args">Details about the recognized speech</param>
         private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
         {
+            System.Diagnostics.Debug.WriteLine("CRS_RG");
             // We may choose to discard content that has low confidence, as that could indicate that we're picking up
             // noise via the microphone, or someone could be talking out of earshot.
             if (args.Result.Confidence == SpeechRecognitionConfidence.Medium ||
                 args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
                 dictatedTextBuilder.Append(args.Result.Text + " ");
-
-                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-
-                    helpTextBlock.Text = dictatedTextBuilder.ToString();
-                });
             }
             else
             {
@@ -652,22 +563,14 @@ namespace InMoov.Views
                 // Here, just remove any hypothesis text by resetting it to the last known good.
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    helpTextBlock.Text = dictatedTextBuilder.ToString();
                     string discardedText = args.Result.Text;
-                    if (!string.IsNullOrEmpty(discardedText))
-                    {
-                        discardedText = discardedText.Length <= 25 ? discardedText : (discardedText.Substring(0, 25) + "...");
-
-                        heardYouSayTextBlock.Text = "Discarded due to low/rejected Confidence: " + discardedText;
-                        heardYouSayTextBlock.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    }
                 });
             }
         }
 
-        private void StopRecognicing(object sender, RoutedEventArgs e)
+        private void StopRecognicing()
         {
-            if(isListening == true && ToggleSpeech.IsOn == true)
+            if (isListening == true && ToggleSpeech.IsOn == true)
             {
                 ToggleSpeech.IsOn = false;
                 isListening = false;
@@ -678,8 +581,52 @@ namespace InMoov.Views
             }
             else
             {
-                Debug.WriteLine("Salbuespen errorea: aitortu ez hasi");
+                //AUSNAHMEFEHLER!!!
             }
+        }
+
+        /// <summary>
+        /// Function which gives the most used Value in an integer Array
+        /// </summary>
+        /// <param name="ArrayOfNumbers">Array in which you will search the most used number</param>
+        /// <param name="MostUsedNumber">The Most used number in the Array</param>
+        /// <returns>The number of times the most used number was used</returns>
+        public static int GetMostUsedValue(int[] ArrayOfNumbers, out int MostUsedNumber)
+        {
+            int max_Countnumber = 0;
+            MostUsedNumber = 0;
+
+            for (int i = 0; i < ArrayOfNumbers.Length; i++)
+            {
+                int l_count = 0;                //Zählt Anzahl des am meisten verwendeten Wertes
+                for (int j = 0; j < ArrayOfNumbers.Length; j++)
+                {
+                    if (ArrayOfNumbers[i] == ArrayOfNumbers[j])
+                    {
+                        l_count++;
+                    }
+                    if(ArrayOfNumbers[i] >= 10 && i < 25)
+                    {
+                        for(int k = 25; k < ArrayOfNumbers.Length; k++)
+                        {
+                            //Füllt letzte 25 Stellen mit Zahl wenn 11 - 16 erkannt worden ist
+                            //Das ist nötig weil gute Erkennung ansonsten nicht möglich ist. 
+                            ArrayOfNumbers[k] = ArrayOfNumbers[i];              
+                        }
+                    }
+                }
+
+                if (l_count > max_Countnumber)
+                {
+                    max_Countnumber = l_count;
+                    if (ArrayOfNumbers[i] != 0)
+                    {
+                        MostUsedNumber = ArrayOfNumbers[i];
+                    }
+                }
+            }
+
+            return max_Countnumber;
         }
     }
 }

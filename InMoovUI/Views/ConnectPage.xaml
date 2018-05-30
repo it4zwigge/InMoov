@@ -5,6 +5,7 @@
     xmlns:ctl="using:InMoov.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:InMoov"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -38,6 +39,7 @@
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <AppBarButton Icon="Edit" Label="Edit"/>
             <AppBarButton Icon="Delete" Label="Delete"/>
@@ -91,26 +93,34 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Row="1" Margin="10,0,10,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <ListBox x:Name="ConnectionList" DisplayMemberPath="DisplayName" />
-                <Grid Name="NetworkConnectionGrid" HorizontalAlignment="Stretch"  Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Name="NetworkHostNameTextBox" Grid.Column="0" HorizontalAlignment="Stretch" PlaceholderText="IP or HostName" />
-                    <TextBox Name="NetworkPortTextBox" Grid.Column="1" HorizontalAlignment="Stretch" PlaceholderText="Port" />
-                </Grid>
+                <TextBlock Text="Gefundene Arduinos:" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <Border Height="1" Width="auto" Background="White"/>
+                <ListView x:Name="devicesList">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:Arduino">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{x:Bind ImageUri}" Visibility="Visible" Width="80" Height="50"></Image>
+                                        <TextBlock Text="{x:Bind name}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Border Height="1" Width="auto" Background="White"/>
+                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" >
+                    <Button x:Uid="Verbinden" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
+                    <Button x:Uid="Aktuallisieren" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
+                </StackPanel>
+                <TextBlock Text="wenn sie ien neuen Arduino angeschlossen haben, drücken sie auf Refresh um nach neuen Arduinos zu suchen und diese zu automatisch zu verbinden.&#x0a;Sollte einer der Arduinos nicht verbunden sein, so können sie über den Connect Button diesen Manuell Verbinden"></TextBlock>
             </StackPanel>
 
             <TextBlock Grid.Row="2" Margin="10,0,0,0"
                     x:Name="ConnectMessage" FontSize="14" Width="Auto" VerticalAlignment="Bottom"/>
 
-            <StackPanel Grid.Row="3" Margin="10" Orientation="Horizontal" FlowDirection="RightToLeft" >
-                <Button x:Uid="Connect" Margin="0,0,10,0" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
-                <Button x:Uid="Cancel" Margin="0,0,10,0" x:Name="CancelButton" Click="CancelButton_Click" IsEnabled="False">Cancel</Button>
-                <Button x:Uid="RefreshBtn" Margin="0,0,10,0" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
-            </StackPanel>
-            <!--<TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Your App Content"/>-->
+
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

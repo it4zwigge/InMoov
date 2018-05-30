@@ -65,7 +65,14 @@
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
             <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Your App Content"/>
+            <Grid>
+                <Button x:Name="Neopixel_Reset" Content="Reset" HorizontalAlignment="Left" Margin="49,304,0,0" VerticalAlignment="Top" Height="101" Width="217" Click="Neopixel_Reset_Click"/>
+                <Button x:Name="Error" Content="Error Animation" HorizontalAlignment="Left" Margin="49,169,0,0" VerticalAlignment="Top" Width="217" Height="101" Click="Error_Click"/>
+                <Button x:Name="Facedetection" Content="Facedetection Animation" HorizontalAlignment="Left" Margin="49,39,0,0" VerticalAlignment="Top" Height="101" Width="217" Click="Facedetection_Click"/>
+            </Grid>
         </Grid>
+
+
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <AppBarButton Icon="Edit" Label="Edit"/>

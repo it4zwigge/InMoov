@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using InMoov;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace InMoov.Views
 {
@@ -46,16 +47,12 @@ namespace InMoov.Views
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
         {
-            Views.LedRingPage.InitializeNeoPixel();   // initialisiert die NeoPixel LED im Bauch        
+            App.neopixel.SetAnimation(AnimationID.Facedetection);
+            Task.Delay(10000);
+            App.neopixel.StopAnimation();
         }
 
-
         #region UI events
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ConnectPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -75,10 +72,6 @@ namespace InMoov.Views
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -87,86 +80,69 @@ namespace InMoov.Views
             App.Telemetry.TrackPageView("Connection_Page");
             timePageNavigatedTo = DateTime.UtcNow;
 
-            if (ConnectionList.ItemsSource == null)
+            if (devicesList.ItemsSource == null)
             {
                 ConnectMessage.Text = "Select an item to connect to.";
                 RefreshDeviceList();
             }
         }
 
-        /// <summary>
-        /// Called if the Refresh button is pressed
-        /// </summary>
-        /// <param name="sender">The object invoking the event</param>
-        /// <param name="e">Arguments relating to the event</param>
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshDeviceList();
+            this.Frame.Navigate(this.GetType());
         }
 
-        /// <summary>
-        /// Called if the Cancel button is pressed
-        /// </summary>
-        /// <param name="sender">The object invoking the event</param>
-        /// <param name="e">Arguments relating to the event</param>
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            OnConnectionCancelled();
-        }
-
-        /// <summary>
-        /// Called if the Connect button is pressed
-        /// </summary>
-        /// <param name="sender">The object invoking the event</param>
-        /// <param name="e">Arguments relating to the event</param>
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            //disable the buttons and set a timer in case the connection times out
             SetUiEnabled(false);
 
-            DeviceInformation device = null;
-            if (ConnectionList.SelectedItem != null)
-            {
-                var selectedConnection = ConnectionList.SelectedItem as Connection;
-                device = selectedConnection.Source as DeviceInformation;
-            }
+            Arduino device = null;
+            //DeviceInformation device = null;
 
-            // Connection properties dictionary, used only for telemetry data
-            var properties = new Dictionary<string, string>
+            if (devicesList.SelectedItem != null)
             {
-                { "Device_Name", device.Name },
-                { "Device_ID", device.Id },
-                { "Device_Kind", device.Kind.ToString() }
-            };
-            App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
-            foreach (string key in App.Arduinos.Keys)
-            {
-                if (key == device.Id)
+                var selectedConnection = devicesList.SelectedItem as Arduino;
+                device = selectedConnection;
+
+                var properties = new Dictionary<string, string>
                 {
-                    App.Arduinos.Remove(device.Id);
-                    break;
+                    { "Device_Name", device.name },
+                    { "Device_ID", device.id },
+                    { "Device_Kind", device.kind.ToString() }
+                };
+
+                App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
+
+                foreach (string key in App.Arduinos.Keys)
+                {
+                    if (key == device.id)
+                    {
+                        device = null;
+                        ConnectMessage.Text = "Der Arduino ist bereits verbunden";
+                        break;
+                    }
                 }
+                if (device != null)
+                {
+                    App.Arduinos.Add(device.id, device);
+                }
+
+                this.Frame.Navigate(this.GetType());
             }
-            App.Arduinos.Add(device.Id, new Arduino(device));
+            else
+                ConnectMessage.Text = "Wählen sie einen Arduino aus!";
         }
         #endregion UI events
 
         #region Helper
-        /// <summary>
-        /// 
-        /// </summary>
+
         private void RefreshDeviceList()
         {
-            Dictionary<string, UsbSerial> devices = new Dictionary<string, UsbSerial>();
-
-            //invoke the listAvailableDevicesAsync method of the correct Serial class. Since it is Async, we will wrap it in a Task and add a llambda to execute when finished
             Task<DeviceInformationCollection> task = null;
 
-            ConnectionList.Visibility = Visibility.Visible;
-            NetworkConnectionGrid.Visibility = Visibility.Collapsed;
-            BaudRateStack.Visibility = Visibility.Visible;
+            devicesList.Visibility = Visibility.Visible;
 
-            //create a cancellation token which can be used to cancel a task
             cancelTokenSource = new CancellationTokenSource();
             cancelTokenSource.Token.Register(() => OnConnectionCancelled());
 
@@ -180,6 +156,7 @@ namespace InMoov.Views
                     //store the result and populate the device list on the UI thread
                     var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
+                        //ObservableCollection<Connection> connections = new ObservableCollection<Connection>();
                         Connections connections = new Connections();
 
                         var result = listTask.Result;
@@ -191,32 +168,33 @@ namespace InMoov.Views
                         {
                             foreach (DeviceInformation device in result)
                             {
-                                connections.Add(new Connection(device.Name, device));
-                                //devices.Add(device.Name, new UsbSerial(device));
+                                bool vorhanden = false;
+                                foreach (Arduino arduino in App.Arduinos.Values.ToList())
+                                {
+                                    if (arduino.name == device.Name)
+                                    {
+                                        vorhanden = true;
+                                    }
+                                }
+                                if (vorhanden == false)
+                                {
+                                    App.Arduinos.Add(device.Id, new Arduino(device));
+                                }
                             }
                             ConnectMessage.Text = "Wählen sie einen Arduino aus.";
-
-                            ConnectionList.ItemsSource = connections;  // Anzeige der Geräte als Liste
+                            devicesList.ItemsSource = App.Arduinos.Values;
                         }
                     }));
                 });
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enabled"></param>
         private void SetUiEnabled(bool enabled)
         {
             RefreshButton.IsEnabled = enabled;
             ConnectButton.IsEnabled = enabled;
-            CancelButton.IsEnabled = !enabled;
         }
 
-        /// <summary>
-        /// This function is invoked if a cancellation is invoked for any reason on the connection task
-        /// </summary>
         private void OnConnectionCancelled()
         {
             ConnectMessage.Text = "Connection attempt cancelled.";

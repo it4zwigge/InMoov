@@ -21,6 +21,7 @@ namespace InMoov
         private IStream connection { get; set; }
         private RemoteDevice arduino { get; set; }
         public UwpFirmata firmata { get; private set; }
+        public string ImageUri { get; set; }
 
         public ICollection analog_pins { get; set; }
 
@@ -35,12 +36,11 @@ namespace InMoov
         private static byte SABERTOOTH_MOTOR_STOP_ZURUECK = 0x45;
         private static byte SABERTOOTH_MOTOR_DREHUNG_RECHTS = 0x46;
 
-        DispatcherTimer timeout;
-
         public Arduino(DeviceInformation device)
         {
             this.connection = new UsbSerial(device);
             this.arduino = new RemoteDevice(connection);
+            this.ImageUri = "ms-appx:///Assets/disconnected.png";
 
             arduino.DeviceReady += Arduino_DeviceReady;
             arduino.DeviceConnectionFailed += Arduino_DeviceConnectionFailed;
@@ -53,7 +53,7 @@ namespace InMoov
             this.firmata.FirmataConnectionFailed += Firmata_FirmataConnectionFailed;
             this.firmata.FirmataConnectionLost += Firmata_FirmataConnectionLost;
 
-            this.connection.begin(57600, SerialConfig.SERIAL_8N1);
+            this.connection.begin(115200, SerialConfig.SERIAL_8N1);
 
             this.ready = false;
             this.name = device.Name;
@@ -90,6 +90,8 @@ namespace InMoov
         {
             this.arduino.analogWrite(pin, value);
         }
+
+        #region InMoov Firmata
 
         public void STMotor_Vor(byte speed)
         {
@@ -137,8 +139,6 @@ namespace InMoov
             firmata.sendSysex(SABERTOOTH_MOTOR_DREHUNG_RECHTS, message.AsBuffer());
         }
 
-        #region InMoov Firmata
-
         #endregion
 
         #region Events
@@ -147,6 +147,7 @@ namespace InMoov
         private void Arduino_DeviceConnectionLost(string message)
             {
                 Debug.WriteLine("[" + this.name + "] Verbindung verloren : " + message);
+                App.Arduinos.Remove(this.id);
                 App.noDevice++;
                 App.readyDevices--;
             }
@@ -159,6 +160,7 @@ namespace InMoov
 
             private void Arduino_DeviceReady()
             {
+                this.ImageUri = "ms-appx:///Assets/connected.png";
                 this.analog_pins = this.arduino.DeviceHardwareProfile.AnalogPins.ToArray();
                 this.ready = true;
                 Debug.WriteLine("[" + this.name + "] erolgreich verbunden" + id);
@@ -184,54 +186,5 @@ namespace InMoov
             }
             #endregion
         #endregion
-    }
-
-    public class NeoPixel
-    {
-        UwpFirmata firmata;
-        byte pin;
-        byte leds;
-
-        static byte NEOPIXEL = 0x72;
-        static byte NEOPIXEL_REGISTER = 0x74;
-
-        public NeoPixel(UwpFirmata firmata, byte pin, byte led_count)
-        {
-            this.firmata = firmata;
-            this.pin = pin;
-            this.leds = led_count;
-
-            NeoPixelRegister(this.pin, this.leds);
-        }
-
-        private void NeoPixelRegister(byte pin, byte count)
-        {
-            byte[] message = new byte[2];
-            message[0] = (byte)(pin);
-            message[1] = (byte)(count);
-            firmata.sendSysex(NEOPIXEL_REGISTER, message.AsBuffer());
-        }
-
-        public void SetPixelColor(byte index, byte r, byte g, byte b)
-        {
-            byte[] message = new byte[4];
-            message[0] = (byte)(index);
-            message[1] = (byte)(r);
-            message[2] = (byte)(g);
-            message[3] = (byte)(b);
-            firmata.sendSysex(NEOPIXEL, message.AsBuffer());
-        }
-        public void SetPixelColor(byte index, byte r, byte g, byte b, byte gamma)
-        {
-            byte[] message = new byte[5];
-            message[0] = (byte)(index);
-            message[1] = (byte)(r);
-            message[2] = (byte)(g);
-            message[3] = (byte)(b);
-            message[3] = (byte)(gamma);
-            firmata.sendSysex(NEOPIXEL, message.AsBuffer());
-        }
-
-
     }
 }

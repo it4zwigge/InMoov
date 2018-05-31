@@ -220,12 +220,6 @@ namespace InMoov.Views
         public string facedetected = "";
         private async void FaceDetectM(VideoFrame frame)
         {
-            App.neopixel.SetAnimation(AnimationID.Facedetection);
-            //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            //{
-            //     _faceTimer.Stop();
-            //});
-
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
             {
@@ -306,12 +300,6 @@ namespace InMoov.Views
             {
                 Debug.WriteLine("Try again!");
             }
-
-            //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            //{
-            //    _faceTimer.Start();
-            //});
-            App.neopixel.StopAnimation();
         }
 
         private async Task<bool> CheckIfGroupExistsAsync()

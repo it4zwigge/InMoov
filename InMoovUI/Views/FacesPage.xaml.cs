@@ -251,8 +251,8 @@ namespace InMoov.Views
                             results = await faceServiceClient.IdentifyAsync(personGroupId, faces.Select(f => f.FaceId).ToArray());      //Personen zu Gesichtern von API holen
                         }
 
-                        #region XML                         
-                        if (results != null)
+                        #region XML                                                                                                     //For working xml: The XML-File has to copied to the AppX path in the bin-folder                    
+                        if (results != null)                                                                                            //Filename for the xml-file: "XMLFile1.xml"
                         {
                             var result = results[0];
                             if (result.Candidates.Length > 0)

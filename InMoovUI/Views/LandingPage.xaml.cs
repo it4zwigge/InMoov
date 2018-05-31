@@ -37,14 +37,7 @@ namespace InMoov.Views
 
         private void LandingPage_Loading(FrameworkElement sender, object args)
         {
-            AutoConnect();
-            if (App.readyDevices == 3)
-            {
-                foreach (Arduino arduino in App.Arduinos.Values)
-                {
-                    arduino.digitalWrite(13, Microsoft.Maker.RemoteWiring.PinState.HIGH);
-                }
-            }
+            //AutoConnect();
         }
 
 

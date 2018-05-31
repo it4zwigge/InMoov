@@ -13,8 +13,6 @@ namespace InMoov
         byte pin;
         byte leds;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         static byte NEOPIXEL = 0x72;
         static byte NEOPIXEL_REGISTER = 0x74;
 

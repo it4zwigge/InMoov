@@ -13,6 +13,7 @@ using System.Collections;
 using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Controls;
 
 namespace InMoov
 {
@@ -53,12 +54,15 @@ namespace InMoov
             this.firmata.FirmataConnectionFailed += Firmata_FirmataConnectionFailed;
             this.firmata.FirmataConnectionLost += Firmata_FirmataConnectionLost;
 
-            this.connection.begin(115200, SerialConfig.SERIAL_8N1);
-
             this.ready = false;
             this.name = device.Name;
             this.id = device.Id;
             this.kind = device.Kind.ToString();
+        }
+
+        public void startConnection()
+        {
+            this.connection.begin(57600, SerialConfig.SERIAL_8N1);
         }
 
         public void setPinMode(byte pin, PinMode pinMode)
@@ -144,26 +148,30 @@ namespace InMoov
         #region Events
 
         #region arduino
-        private void Arduino_DeviceConnectionLost(string message)
+            private void Arduino_DeviceConnectionLost(string message)
             {
                 Debug.WriteLine("[" + this.name + "] Verbindung verloren : " + message);
+                Views.ConnectPage.playSound("Assets/sounds/disconnected.wav");
                 App.Arduinos.Remove(this.id);
-                App.noDevice++;
                 App.readyDevices--;
+                App.noDevice++;
             }
 
             private void Arduino_DeviceConnectionFailed(string message)
             {
                 Debug.WriteLine("[" + this.name + "] konnte nicht verbinden : " + message);
+                Views.ConnectPage.playSound("Assets/sounds/disconnected.wav");
+                App.readyDevices--;
                 App.noDevice++;
             }
 
             private void Arduino_DeviceReady()
             {
+                //this.analog_pins = this.arduino.DeviceHardwareProfile.AnalogPins.ToArray();
                 this.ImageUri = "ms-appx:///Assets/connected.png";
-                this.analog_pins = this.arduino.DeviceHardwareProfile.AnalogPins.ToArray();
-                this.ready = true;
                 Debug.WriteLine("[" + this.name + "] erolgreich verbunden" + id);
+                Views.ConnectPage.playSound("Assets/sounds/connected.wav");
+                this.ready = true;
                 App.readyDevices++;
                 App.ArduinosReady();
             }

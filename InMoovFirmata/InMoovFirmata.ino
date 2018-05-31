@@ -719,7 +719,7 @@ void setup()
   Sabertooth1.begin(9600); //Sabertooth1 Baudstart
   Sabertooth2.begin(9600); //Sabertooth1 Baudstart
 
-	Firmata.begin(115200);
+	Firmata.begin(57600);
 	systemResetCallback();  // reset to default config
 }
 
@@ -736,9 +736,9 @@ void loop()
 
 	/* SERIALREAD - processing incoming messagse as soon as possible, while still
 	* checking digital inputs.  */
-	while (Firmata.available())
+	  while (Firmata.available())
 		Firmata.processInput();
-
+   
 	/* SEND FTDI WRITE BUFFER - make sure that the FTDI buffer doesn't go over
 	* 60 bytes. use a timer to sending an event character every 4 ms to
 	* trigger the buffer to dump. */

@@ -23,12 +23,11 @@ using Windows.UI.Xaml.Navigation;
 using InMoov;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using Windows.Media.Playback;
+using Windows.Media.Core;
 
 namespace InMoov.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ConnectPage : Page
     {
         DispatcherTimer timeout;
@@ -47,9 +46,7 @@ namespace InMoov.Views
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
         {
-            App.neopixel.SetAnimation(AnimationID.Facedetection);
-            Task.Delay(10000);
-            App.neopixel.StopAnimation();
+            playSound("Assets/sounds/startup.mp3");
         }
 
         #region UI events
@@ -72,6 +69,12 @@ namespace InMoov.Views
             }
         }
 
+        public static void playSound(string path)
+        {
+            MediaPlayer sound = new MediaPlayer();
+            sound.Source = MediaSource.CreateFromUri(new Uri("ms-appx:///" + path)); 
+            sound.Play();
+        }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -83,55 +86,55 @@ namespace InMoov.Views
             if (devicesList.ItemsSource == null)
             {
                 ConnectMessage.Text = "Select an item to connect to.";
-                RefreshDeviceList();
+                //RefreshDeviceList();
+                Aktuallisieren();
             }
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshDeviceList();
+            Aktuallisieren();
+            //RefreshDeviceList();
             this.Frame.Navigate(this.GetType());
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            SetUiEnabled(false);
+            Verbinden();
+            //Arduino device = null;
 
-            Arduino device = null;
-            //DeviceInformation device = null;
+            //if (devicesList.SelectedItem != null)
+            //{
+            //    var selectedConnection = devicesList.SelectedItem as Arduino;
+            //    device = selectedConnection;
 
-            if (devicesList.SelectedItem != null)
-            {
-                var selectedConnection = devicesList.SelectedItem as Arduino;
-                device = selectedConnection;
+            //    var properties = new Dictionary<string, string>
+            //    {
+            //        { "Device_Name", device.name },
+            //        { "Device_ID", device.id },
+            //        { "Device_Kind", device.kind.ToString() }
+            //    };
 
-                var properties = new Dictionary<string, string>
-                {
-                    { "Device_Name", device.name },
-                    { "Device_ID", device.id },
-                    { "Device_Kind", device.kind.ToString() }
-                };
+            //    App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
 
-                App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
+            //    foreach (string key in App.Arduinos.Keys)
+            //    {
+            //        if (key == device.id)
+            //        {
+            //            device = null;
+            //            ConnectMessage.Text = "Der Arduino ist bereits verbunden";
+            //            break;
+            //        }
+            //    }
+            //    if (device != null)
+            //    {
+            //        App.Arduinos.Add(device.id, device);
+            //    }
 
-                foreach (string key in App.Arduinos.Keys)
-                {
-                    if (key == device.id)
-                    {
-                        device = null;
-                        ConnectMessage.Text = "Der Arduino ist bereits verbunden";
-                        break;
-                    }
-                }
-                if (device != null)
-                {
-                    App.Arduinos.Add(device.id, device);
-                }
-
-                this.Frame.Navigate(this.GetType());
-            }
-            else
-                ConnectMessage.Text = "Wählen sie einen Arduino aus!";
+            //    this.Frame.Navigate(this.GetType());
+            //}
+            //else
+            //    ConnectMessage.Text = "Wählen sie einen Arduino aus!";
         }
         #endregion UI events
 
@@ -144,7 +147,6 @@ namespace InMoov.Views
             devicesList.Visibility = Visibility.Visible;
 
             cancelTokenSource = new CancellationTokenSource();
-            cancelTokenSource.Token.Register(() => OnConnectionCancelled());
 
             task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
 
@@ -189,29 +191,66 @@ namespace InMoov.Views
             }
         }
 
-        private void SetUiEnabled(bool enabled)
-        {
-            RefreshButton.IsEnabled = enabled;
-            ConnectButton.IsEnabled = enabled;
-        }
-
-        private void OnConnectionCancelled()
-        {
-            ConnectMessage.Text = "Connection attempt cancelled.";
-            App.Telemetry.TrackRequest("Connection_Cancelled_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
-
-
-            if (cancelTokenSource != null)
-            {
-                cancelTokenSource.Dispose();
-            }
-
-            App.Connection = null;
-            App.Arduino = null;
-            cancelTokenSource = null;
-
-            SetUiEnabled(true);
-        }
         #endregion Helper
+
+
+        private void Verbinden()
+        {
+            if (devicesList.SelectedItem != null)
+            {
+                var selc = devicesList.SelectedItem as Arduino;
+                selc.startConnection();
+                //this.Frame.Navigate(this.GetType());
+            }
+        }
+
+        private void Aktuallisieren()
+        {
+            Task<DeviceInformationCollection> task = null;
+
+            devicesList.Visibility = Visibility.Visible;
+            cancelTokenSource = new CancellationTokenSource();
+            task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
+
+            if (task != null)
+            {
+                //store the returned DeviceInformation items when the task completes
+                task.ContinueWith(listTask =>
+                {
+                    //store the result and populate the device list on the UI thread
+                    var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
+                    {
+                        //ObservableCollection<Connection> connections = new ObservableCollection<Connection>();
+
+                        var result = listTask.Result;
+                        if (result == null || result.Count == 0)
+                        {
+                            ConnectMessage.Text = "[Info] Keine Geräte Gefunden!";
+                        }
+                        else
+                        {
+                            foreach (DeviceInformation device in result)
+                            {
+                                bool vorhanden = false;
+                                foreach (Arduino arduino in App.Arduinos.Values.ToList())
+                                {
+                                    if (arduino.name == device.Name)
+                                    {
+                                        vorhanden = true;
+                                    }
+                                }
+                                if (vorhanden == false)
+                                {
+                                    App.Arduinos.Add(device.Id, new Arduino(device));
+                                }
+                            }
+                            ConnectMessage.Text = "Wählen sie einen Arduino aus.";
+                            devicesList.ItemsSource = App.Arduinos.Values;
+                            task = null;
+                        }
+                    }));
+                });
+            }
+        }
     }
 }

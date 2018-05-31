@@ -53,8 +53,7 @@ namespace InMoov
             {
                 foreach (Arduino arduino in App.Arduinos.Values)
                 {
-                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082" || arduino.id.Substring(26, 20) == "95530343634351901162")
-                        
+                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082" || arduino.id.Substring(26, 20) == "95530343634351901162" || arduino.id.Substring(26, 20) == "955303430353518062E0")   
                     {
                         App.Leonardo = arduino;
                         Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
@@ -71,7 +70,6 @@ namespace InMoov
                         Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
 
                     }
-
                 }
                 //Alles zugeteilt, Roboter kann aufwachen.
                 ReadyDevices();
@@ -81,7 +79,14 @@ namespace InMoov
         }
         public static async void ReadyDevices()
         {
-            await PairDevices();
+            try
+            {
+                await PairDevices();
+            }
+            catch
+            {
+                Debug.WriteLine("Arduinos sind nicht instanziert");
+            }
         }
 
         private static async Task<bool> PairDevices()
@@ -96,8 +101,10 @@ namespace InMoov
                 }
                 if (ARechts != null && ALinks != null && Leonardo != null)
                 {
+                    succeeded = true;
                     //InitializeBodyParts();
                 }
+                succeeded = true;
             }
             return succeeded;
         }
@@ -117,7 +124,7 @@ namespace InMoov
                     neopixel.SetPixelColor(pixel, 100, 0, 0);
                     await Task.Delay(100);
                 }
-                if (readyDevices == 3)
+                if (readyDevices > 1)
                 {
                     await Task.Delay(2000);
                     for (byte i = 0; i < 16; i++)

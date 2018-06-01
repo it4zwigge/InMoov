@@ -64,8 +64,8 @@ namespace InMoov.Views
         //Handles Keywords the user can say to pick Facedetection
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         //Handles basic start/stop Keys
-        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
-        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne", "benutze" };
+        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
 
@@ -78,6 +78,7 @@ namespace InMoov.Views
 
             LedRingPage.InitializeNeoPixel();
         }
+
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;

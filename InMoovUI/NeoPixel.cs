@@ -103,6 +103,7 @@ namespace InMoov
                     await Facedetection();
                     break;
                 case AnimationID.Succesfully:
+                    await Succesfully();
                     break;
                 case AnimationID.Wait:
                     break;
@@ -141,6 +142,44 @@ namespace InMoov
                         }
                         else
                             break;
+                    }
+                    if (stop) { break; }
+                }
+            }
+            stop = false;
+            App.neopixel.clear();
+            return stop;
+        }
+
+        private static async Task<bool> Succesfully() // noch nicht fertig
+        {
+            while (!stop)
+            {
+                for (byte fade = 0; fade < 100; fade += 5)
+                {
+                    for (byte i = 0; i < 16; i++)
+                    {
+                        //if (!stop)
+                        //{
+                            App.neopixel.SetPixelColor(i, 0, 0, fade);
+                            await Task.Delay(1);
+                        //}
+                        //else
+                        //    break;
+                    }
+                    if (stop) { break; }
+                }
+                for (byte fade = 100; fade > 0; fade -= 5)
+                {
+                    for (byte i = 0; i < 16; i++)
+                    {
+                        //if (!stop)
+                        //{
+                            App.neopixel.SetPixelColor(i, 0, 0, fade);
+                            await Task.Delay(1);
+                        //}
+                        //else
+                        //    break;
                     }
                     if (stop) { break; }
                 }

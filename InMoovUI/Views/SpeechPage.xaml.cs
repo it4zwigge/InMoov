@@ -76,7 +76,7 @@ namespace InMoov.Views
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
 
-            LedRingPage.InitializeNeoPixel();
+            //LedRingPage.InitializeNeoPixel();
         }
 
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)

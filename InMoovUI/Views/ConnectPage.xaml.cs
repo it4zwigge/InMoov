@@ -44,9 +44,14 @@ namespace InMoov.Views
         }
 
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
-        public static void Startup()
+        public static async Task<bool> Startup()
         {
-            playSound("Assets/sounds/startup.mp3");
+            bool var = true;
+            playSound("Assets/sounds/startup1.mp3");
+            App.neopixel.SetAnimation(AnimationID.Succesfully);
+            await Task.Delay(9000);
+            App.neopixel.StopAnimation();
+            return true;
         }
 
         #region UI events
@@ -231,6 +236,17 @@ namespace InMoov.Views
                         {
                             foreach (DeviceInformation device in result)
                             {
+                                if (result.ToList().Count < App.Arduinos.Values.Count)
+                                {
+                                    foreach (Arduino arduino in App.Arduinos.Values.ToList())
+                                    {
+                                        if (arduino.ready == false && arduino.id != device.Id)
+                                        {
+                                            App.Arduinos.Remove(arduino.id);
+                                        }
+                                    }
+                                }
+
                                 bool vorhanden = false;
                                 foreach (Arduino arduino in App.Arduinos.Values.ToList())
                                 {
@@ -238,6 +254,7 @@ namespace InMoov.Views
                                     {
                                         vorhanden = true;
                                     }
+
                                 }
                                 if (vorhanden == false)
                                 {

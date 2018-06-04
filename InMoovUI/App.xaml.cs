@@ -96,15 +96,9 @@ namespace InMoov
             {
                 if (Leonardo.ready == true)
                 {
-                    succeeded = true;
                     Views.LedRingPage.InitializeNeoPixel();
-                }
-                if (ARechts != null && ALinks != null && Leonardo != null)
-                {
                     succeeded = true;
-                    //InitializeBodyParts();
                 }
-                succeeded = true;
             }
             return succeeded;
         }
@@ -124,7 +118,7 @@ namespace InMoov
                     neopixel.SetPixelColor(pixel, 100, 0, 0);
                     await Task.Delay(100);
                 }
-                if (readyDevices > 1)
+                if (readyDevices == 3)
                 {
                     await Task.Delay(2000);
                     for (byte i = 0; i < 16; i++)
@@ -132,10 +126,9 @@ namespace InMoov
                         neopixel.SetPixelColor(i, 0, 0, 0);
                         await Task.Delay(100);
                     }
-                    Views.ConnectPage.Startup();
+                    await Views.ConnectPage.Startup();
                     succeeded = true;
-                }
-            }
+                }}
             return succeeded;
         }
 

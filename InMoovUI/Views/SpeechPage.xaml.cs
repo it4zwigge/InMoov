@@ -64,8 +64,8 @@ namespace InMoov.Views
         //Handles Keywords the user can say to pick Facedetection
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         //Handles basic start/stop Keys
-        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
-        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne", "benutze" };
+        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
 
@@ -76,8 +76,9 @@ namespace InMoov.Views
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
 
-            LedRingPage.InitializeNeoPixel();
+            //LedRingPage.InitializeNeoPixel();
         }
+
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -243,7 +244,7 @@ namespace InMoov.Views
         {
             if (speechRecognizer != null)
             {
-                // cleanup prior to re-initializing this scenario.
+                //Clean old Eventhandlers if possible
                 speechRecognizer.StateChanged -= SpeechRecognizer_StateChanged;
                 speechRecognizer.ContinuousRecognitionSession.Completed -= ContinuousRecognitionSession_Completed;
                 speechRecognizer.ContinuousRecognitionSession.ResultGenerated -= ContinuousRecognitionSession_ResultGenerated;
@@ -253,6 +254,7 @@ namespace InMoov.Views
                 this.speechRecognizer = null;
             }
 
+            //Initialize new Speechrecognizer
             this.speechRecognizer = new SpeechRecognizer(recognizerLanguage);
 
             // Provide feedback to the user about the state of the recognizer. This can be used to provide visual feedback in the form
@@ -261,14 +263,8 @@ namespace InMoov.Views
             var dictationConstraint = new SpeechRecognitionTopicConstraint(SpeechRecognitionScenario.Dictation, "dictation");
             speechRecognizer.Constraints.Add(dictationConstraint);
             SpeechRecognitionCompilationResult result = await speechRecognizer.CompileConstraintsAsync();
-            if (result.Status != SpeechRecognitionResultStatus.Success)
-            {
-                //Soll nicht ausgelößt werden :)
-            }
 
-            // Handle continuous recognition events. Completed fires when various error states occur. ResultGenerated fires when
-            // some recognized phrases occur, or the garbage rule is hit. HypothesisGenerated fires during recognition, and
-            // allows us to provide incremental feedback based on what the user's currently saying.
+            //Create Continuous-Dictation Handler
             speechRecognizer.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
             speechRecognizer.HypothesisGenerated += SpeechRecognizer_HypothesisGenerated;
             speechRecognizer.ContinuousRecognitionSession.Completed += ContinuousRecognitionSession_Completed;
@@ -374,13 +370,10 @@ namespace InMoov.Views
         /// <param name="args">The state of the recognizer</param>
         private async void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
         {
+            //Normalerweise nicht in Benutzung
             Debug.WriteLine("CRS_C");
             if (args.Status != SpeechRecognitionResultStatus.Success)
             {
-                // If TimeoutExceeded occurs, the user has been silent for too long. We can use this to 
-                // cancel recognition if the user in dictation mode and walks away from their device, etc.
-                // In a global-command type scenario, this timeout won't apply automatically.
-                // With dictation (no grammar in place) modes, the default timeout is 20 seconds.
                 if (args.Status == SpeechRecognitionResultStatus.TimeoutExceeded)
                 {
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -413,7 +406,7 @@ namespace InMoov.Views
             Debug.WriteLine("SR_HG");
             string hypothesis = args.Hypothesis.Text;
 
-            // Update the textbox with the currently confirmed text, and the hypothesis combined.
+            //Create the Text
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
 
             int zel = 0;
@@ -442,10 +435,12 @@ namespace InMoov.Views
                         facedetect[1] = 2;
                     }
                 }
+                //Start Facedetect
                 if (facedetect[0] == 1 && facedetect[1] == 1)
                 {
                     fp.StarteWebcam();
                 }
+                //End Facedetect
                 else if (facedetect[0] == 1 && facedetect[1] == 2)
                 {
                     fp.StopWebcam();
@@ -467,26 +462,31 @@ namespace InMoov.Views
                         colorCaptured = colorS;
                         switch (colorCaptured)
                         {
+                            //Set RGB-Colors to red
                             case "rot":
                                 color[0] = 255;             //R
                                 color[1] = 0;               //G
                                 color[2] = 0;               //B
                                 break;
+                            //Set RGB-Colors to blau
                             case "blau":
                                 color[0] = 0;               //R
                                 color[1] = 0;               //G
                                 color[2] = 255;             //B
                                 break;
+                            //Set RGB-Colors to green
                             case "grün":
                                 color[0] = 0;               //R
                                 color[1] = 255;             //G
                                 color[2] = 0;               //B
                                 break;
+                            //Set RGB-Colors to yellow
                             case "gelb":
                                 color[0] = 255;             //R
                                 color[1] = 255;             //G
                                 color[2] = 0;               //B
                                 break;
+                            //Set RGB-Colors to off/black
                             case "schwarz":
                             case "aus":
                                 color[0] = 0;               //R
@@ -521,14 +521,17 @@ namespace InMoov.Views
                 //Change Color of the LED
                 if (ledCaptured == true && colorCaptured != null)
                 {
-                    newNum = GetMostUsedValue(numbers, out int exNum);
+                    newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
                     resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
                     exNum--;
-                    byte.TryParse(exNum.ToString(), out byte NexNum);
+                    byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
                     App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+
+                    //Reset Variables
                     ledCaptured = false;
                     zel = 0;
+                    facedetect[0] = facedetect[1] = 0;
                     for(int i = 0; i < numbers.Length; i++)
                     {
                         numbers[i] = 0;
@@ -548,9 +551,8 @@ namespace InMoov.Views
         /// <param name="args">Details about the recognized speech</param>
         private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
         {
+            //Normalerweise nicht ausgelößt
             System.Diagnostics.Debug.WriteLine("CRS_RG");
-            // We may choose to discard content that has low confidence, as that could indicate that we're picking up
-            // noise via the microphone, or someone could be talking out of earshot.
             if (args.Result.Confidence == SpeechRecognitionConfidence.Medium ||
                 args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
@@ -558,9 +560,6 @@ namespace InMoov.Views
             }
             else
             {
-                // In some scenarios, a developer may choose to ignore giving the user feedback in this case, if speech
-                // is not the primary input mechanism for the application.
-                // Here, just remove any hypothesis text by resetting it to the last known good.
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     string discardedText = args.Result.Text;
@@ -581,7 +580,7 @@ namespace InMoov.Views
             }
             else
             {
-                //AUSNAHMEFEHLER!!!
+                //sollte nicht passieren
             }
         }
 
@@ -593,12 +592,12 @@ namespace InMoov.Views
         /// <returns>The number of times the most used number was used</returns>
         public static int GetMostUsedValue(int[] ArrayOfNumbers, out int MostUsedNumber)
         {
-            int max_Countnumber = 0;
+            int max_Countnumber = 0;        //Zähler wie oft der Wert im Array benutzt wurde
             MostUsedNumber = 0;
 
             for (int i = 0; i < ArrayOfNumbers.Length; i++)
             {
-                int l_count = 0;                //Zählt Anzahl des am meisten verwendeten Wertes
+                int l_count = 0;                //Der meist verwendete Wertes
                 for (int j = 0; j < ArrayOfNumbers.Length; j++)
                 {
                     if (ArrayOfNumbers[i] == ArrayOfNumbers[j])

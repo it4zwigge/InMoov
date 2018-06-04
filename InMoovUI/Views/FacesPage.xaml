@@ -39,24 +39,21 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ctl:PageHeader x:Name="pageTitleContainer" Visibility="Collapsed">
-            <ctl:PageHeader.HeaderContent>
-                <TextBlock x:Name="AltHeaderTextBlock" Text="" Style="{StaticResource PageTitleTextBlockStyle}"/>
-            </ctl:PageHeader.HeaderContent>
-        </ctl:PageHeader>
+
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
             <CaptureElement Name="captureEL" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,169,0,0" VerticalAlignment="Top"/>
-            <TextBlock Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="412,44,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="247" RenderTransformOrigin="0.502,0.778" Height="34"/>
-            <TextBlock Name="FaceBirthday_TextBlock" Text="Gesicht Geburtsdatum" Margin="904,44,0,918" />
-            <TextBlock Name="FaceFirstName_TextBlock" Text="Gesicht Vorname" Margin="685,44,552,929" />
-            <TextBlock Name="FaceSurename_TextBlock" Text="Gesicht Nachname" Margin="685,80,555,893" />
-            <TextBlock Name="Doku_Box" Text="" FontFamily="VW Head Office"/>
-            <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="218,0,0,0" VerticalAlignment="Top" Width="376" FontFamily="VW Head Office" Height="34">
+            <TextBlock Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="469,120,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="182" RenderTransformOrigin="0.502,0.778" Height="34"/>
+            <TextBlock Name="FaceBirthday_TextBlock" Text="Gesicht Geburtsdatum" Margin="10,319,1238,643" FontFamily="VW Head Office" />
+            <TextBlock Name="FaceFirstName_TextBlock" Text="Gesicht Vorname" Margin="10,247,1161,724" FontFamily="VW Head Office" />
+            <TextBlock Name="FaceSurename_TextBlock" Text="Gesicht Nachname" Margin="10,282,1230,684" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="VW Head Office" />
+            <TextBlock Name="Doku_Box" Text="" FontFamily="Segoe UI" Margin="0,865,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="7,70,0,0" VerticalAlignment="Top" Width="317" FontFamily="Segoe UI" Height="34">
             </HyperlinkButton>
-            <ToggleSwitch Name="ToogleFace" Header="FaceDetect" HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.503,0.433" Width="234" Height="90"/>
-            <ToggleSwitch Name="TooglePreview" Header="Vorschau an/aus" HorizontalAlignment="Left" Margin="250,39,0,0" VerticalAlignment="Top" Width="147" Height="90"/>
+            <ToggleSwitch Name="ToogleFace" Header="FaceDetect" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.503,0.433" Width="100" Height="90" FontFamily="VW Head Office" FontWeight="Normal"/>
+            <ToggleSwitch Name="TooglePreview" Header="Vorschau an/aus" HorizontalAlignment="Left" Margin="237,120,0,0" VerticalAlignment="Top" Width="147" Height="90" FontFamily="VW Head Office"/>
             <TextBlock Name="Exceptions" Text="" Margin="857,80,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBlock>
+            <TextBlock HorizontalAlignment="Left" Margin="130,10,0,0" Text="Gesichtserkennung" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="36"/>
         </Grid>
 
     </Grid>

@@ -338,7 +338,7 @@ namespace InMoov.Views
                 }
                 catch (TaskCanceledException exception)
                 {
-                    Debug.Print(exception.ToString());
+                    Debug.WriteLine(exception.ToString());
                 }
                 catch (Exception exception)
                 {

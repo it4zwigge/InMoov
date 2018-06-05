@@ -39,11 +39,25 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ctl:PageHeader x:Name="pageTitleContainer" Visibility="Collapsed">
-            <ctl:PageHeader.HeaderContent>
-                <TextBlock x:Name="AltHeaderTextBlock" Text="" Style="{StaticResource PageTitleTextBlockStyle}"/>
-            </ctl:PageHeader.HeaderContent>
-        </ctl:PageHeader>
+        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <AppBarButton Icon="Edit" Label="Edit"/>
+            <AppBarButton Icon="Delete" Label="Delete"/>
+            <AppBarSeparator/>
+            <AppBarToggleButton Icon="Sort" Label="Sort"/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Menu Item 1"/>
+                <AppBarButton Label="Menu Item 2"/>
+                <AppBarButton Label="Menu Item 3"/>
+            </CommandBar.SecondaryCommands>
+            <CommandBar.Content>
+                <ctl:PageHeader>
+                    <ctl:PageHeader.HeaderContent>
+                        <TextBlock x:Name="HeaderTextBlock" Text="Gesichtserkennung" Style="{StaticResource PageTitleTextBlockStyle}"/>
+                    </ctl:PageHeader.HeaderContent>
+                </ctl:PageHeader>
+            </CommandBar.Content>
+        </CommandBar>
+
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
             <CaptureElement Name="captureEL" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,169,0,0" VerticalAlignment="Top"/>

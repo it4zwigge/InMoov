@@ -41,7 +41,7 @@
 
         <c:PageHeader x:Name="pageHeader">
             <c:PageHeader.HeaderContent>
-                <TextBlock x:Name="title" Style="{StaticResource PageTitleTextBlockStyle}" Text="App Overview"/>
+                <TextBlock x:Name="title"  Style="{StaticResource PageTitleTextBlockStyle}" Text="App Overview"/>
             </c:PageHeader.HeaderContent>
         </c:PageHeader>
 

@@ -69,14 +69,15 @@ namespace InMoov.Views
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
 
+        //Initialize a new FacesPage
+        FacesPage fp = new FacesPage();
+
         public SpeechPage()
         {
             this.InitializeComponent();
             this.Loaded += SpeechPage_Loaded;
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
-
-            //LedRingPage.InitializeNeoPixel();
         }
 
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
@@ -109,129 +110,12 @@ namespace InMoov.Views
             bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
             if (permissionGained)
             {
-                //Initialize basic Speech tiles and Varialbes
-
-                Language speechLanguage = SpeechRecognizer.SystemSpeechLanguage;
-                string langTag = speechLanguage.LanguageTag;
-                speechContext = ResourceContext.GetForCurrentView();
-                speechContext.Languages = new string[] { langTag };
-
-                speechResourceMap = ResourceManager.Current.MainResourceMap.GetSubtree("LocalizationSpeechResources");
-
-                PopulateLanguageDropdown();
-                await InitializeRecognizer(SpeechRecognizer.SystemSpeechLanguage);
+                await InitializeRecognizer();
             }
             else
             {
                 resultTextBlock.Visibility = Visibility.Visible;
                 resultTextBlock.Text = "Permission to access capture resources was not given by the user; please set the application setting in Settings->Privacy->Microphone.";
-                cbLanguageSelection.IsEnabled = false;
-            }
-        }
-
-        /// <summary>
-        /// Look up the supported languages for this speech recognition scenario, 
-        /// that are installed on this machine, and populate a dropdown with a list.
-        /// </summary>
-        private void PopulateLanguageDropdown()
-        {
-            // disable the callback so we don't accidentally trigger initialization of the recognizer
-            // while initialization is already in progress.
-            isPopulatingLanguages = true;
-
-            Language defaultLanguage = SpeechRecognizer.SystemSpeechLanguage;
-            IEnumerable<Language> supportedLanguages = SpeechRecognizer.SupportedGrammarLanguages;
-            foreach (Language lang in supportedLanguages)
-            {
-                ComboBoxItem item = new ComboBoxItem();
-                item.Tag = lang;
-                item.Content = lang.DisplayName;
-
-                cbLanguageSelection.Items.Add(item);
-                if (lang.LanguageTag == defaultLanguage.LanguageTag)
-                {
-                    item.IsSelected = true;
-                    cbLanguageSelection.SelectedItem = item;
-                }
-            }
-            isPopulatingLanguages = false;
-        }
-
-        /// <summary>
-        /// When a user changes the speech recognition language, trigger re-initialization of the 
-        /// speech engine with that language, and change any speech-specific UI assets.
-        /// </summary>
-        /// <param name="sender">Ignored</param>
-        /// <param name="e">Ignored</param>
-        private async void cbLanguageSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (isPopulatingLanguages)
-            {
-                return;
-            }
-
-            ComboBoxItem item = (ComboBoxItem)(cbLanguageSelection.SelectedItem);
-            Language newLanguage = (Language)item.Tag;
-            if (speechRecognizer != null)
-            {
-                if (speechRecognizer.CurrentLanguage == newLanguage)
-                {
-                    return;
-                }
-            }
-
-            // trigger cleanup and re-initialization of speech.
-            try
-            {
-                // update the context for resource lookup
-                speechContext.Languages = new string[] { newLanguage.LanguageTag };
-
-                await InitializeRecognizer(newLanguage);
-            }
-            catch (Exception exception)
-            {
-                var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
-                await messageDialog.ShowAsync();
-            }
-        }
-
-        /// <summary>
-        /// Ensure that we clean up any state tracking event handlers created in OnNavigatedTo to prevent leaks,
-        /// dipose the speech recognizer, and clean up to ensure the scenario is not still attempting to recognize
-        /// speech while not in view.
-        /// </summary>
-        /// <param name="e">Details about the navigation event</param>
-        protected async override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            base.OnNavigatedFrom(e);
-            if (this.speechRecognizer != null)
-            {
-                if (isListening)
-                {
-                    await this.speechRecognizer.ContinuousRecognitionSession.CancelAsync();
-                    isListening = false;
-                    resultTextBlock.Text = " Dictate";
-                    cbLanguageSelection.IsEnabled = true;
-                }
-
-                resultTextBlock.Text = "";
-
-                this.speechRecognizer.Dispose();
-                this.speechRecognizer = null;
-            }
-            // Prompt the user for permission to access the microphone. This request will only happen
-            // once, it will not re-prompt if the user rejects the permission.
-            bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
-            if (permissionGained)
-            {
-
-                PopulateLanguageDropdown();
-                await InitializeRecognizer(SpeechRecognizer.SystemSpeechLanguage);
-            }
-            else
-            {
-                this.resultTextBlock.Text = "Permission to access capture resources was not given by the user, reset the application setting in Settings->Privacy->Microphone.";
-                cbLanguageSelection.IsEnabled = false;
             }
         }
 
@@ -240,7 +124,7 @@ namespace InMoov.Views
         /// </summary>
         /// <param name="recognizerLanguage">Language to use for the speech recognizer</param>
         /// <returns>Awaitable task.</returns>
-        private async Task InitializeRecognizer(Language recognizerLanguage)
+        private async Task InitializeRecognizer()
         {
             if (speechRecognizer != null)
             {
@@ -255,7 +139,7 @@ namespace InMoov.Views
             }
 
             //Initialize new Speechrecognizer
-            this.speechRecognizer = new SpeechRecognizer(recognizerLanguage);
+            this.speechRecognizer = new SpeechRecognizer(SpeechRecognizer.SystemSpeechLanguage);
 
             // Provide feedback to the user about the state of the recognizer. This can be used to provide visual feedback in the form
             // of an audio indicator to help the user understand whether they're being heard.
@@ -283,6 +167,8 @@ namespace InMoov.Views
 
 
                 resultTextBlock.Visibility = Visibility.Collapsed;
+
+                RecognizeWithoutUIListConstraint_Toggle(this, new RoutedEventArgs());
             }
             catch (Exception ex)
             {
@@ -313,53 +199,77 @@ namespace InMoov.Views
             });
         }
 
-        //Initialize a new FacesPage
-        FacesPage fp = new FacesPage();
         /// <summary>
-        /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
-        /// it back on the screen. Uses developer-provided UI for user feedback.
+        /// Begin recognition, or finish the recognition session. 
         /// </summary>
-        /// <param name="sender">Button that triggered this event</param>
-        /// <param name="e">State information about the routed event</param>
-        private async void RecognizeWithoutUIListConstraint_Click(object sender, RoutedEventArgs e)
+        /// <param name="sender">The button that generated this event</param>
+        /// <param name="e">Unused event details</param>
+        public async void RecognizeWithoutUIListConstraint_Toggle(object sender, RoutedEventArgs e)
         {
-            while (ToggleSpeech.IsOn)
+            //btnContinuousRecognize.IsEnabled = false;
+            if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                ledCaptured = false;
-                colorCaptured = null;
-                heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-                cbLanguageSelection.IsEnabled = false;
-                try
+                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                // This prevents an exception from occurring.
+                if (speechRecognizer.State == SpeechRecognizerState.Idle)
                 {
-                    // Start continuous Recognition Session
-                    recognitionOperation = speechRecognizer.RecognizeAsync();
+                    //DictationButtonText.Text = " Stop Dictation";
+                    //cbLanguageSelection.IsEnabled = false;
+                    //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
+                    //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
-                    SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
-                }
-                catch (TaskCanceledException exception)
-                {
-                    Debug.Print(exception.ToString());
-                }
-                catch (Exception exception)
-                {
-                    // Handle the speech privacy policy error.
-                    if ((uint)exception.HResult == HResultPrivacyStatementDeclined)
+                    try
                     {
-                        resultTextBlock.Visibility = Visibility.Visible;
-                        resultTextBlock.Text = "The privacy statement was declined.";
+                        isListening = true;
+                        System.Diagnostics.Debug.WriteLine("HELLO");
+                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
                     }
-                    else
+                    catch (Exception ex)
+                    {
+                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                        {
+                            // Show a UI link to the privacy settings.
+                            //hlOpenPrivacySettings.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                            await messageDialog.ShowAsync();
+                        }
+
+                        isListening = false;
+                        //DictationButtonText.Text = " Dictate";
+                        //cbLanguageSelection.IsEnabled = true;
+
+                    }
+                }
+            }
+            else
+            {
+                isListening = false;
+                //DictationButtonText.Text = " Dictate";
+                //cbLanguageSelection.IsEnabled = true;
+
+                if (speechRecognizer.State != SpeechRecognizerState.Idle)
+                {
+                    // Cancelling recognition prevents any currently recognized speech from
+                    // generating a ResultGenerated event. StopAsync() will allow the final session to 
+                    // complete.
+                    try
+                    {
+                        await speechRecognizer.ContinuousRecognitionSession.StopAsync();
+
+                        // Ensure we don't leave any hypothesis text behind
+                        resultTextBlock.Text = dictatedTextBuilder.ToString();
+                    }
+                    catch (Exception exception)
                     {
                         var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
                         await messageDialog.ShowAsync();
                     }
                 }
-
-                // Reset UI state.
-                cbLanguageSelection.IsEnabled = true;
             }
-            //If the toggle Switch is off, Recognizing will end if user dont speech
-            StopRecognicing();
+            //btnContinuousRecognize.IsEnabled = true;
         }
 
         /// <summary>
@@ -379,7 +289,7 @@ namespace InMoov.Views
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         helpTextBlock.Text = " Dictate";
-                        cbLanguageSelection.IsEnabled = true;
+                        //cbLanguageSelection.IsEnabled = true;
                         helpTextBlock.Text = dictatedTextBuilder.ToString();
                         isListening = false;
                     });
@@ -389,7 +299,7 @@ namespace InMoov.Views
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         helpTextBlock.Text = " Dictate";
-                        cbLanguageSelection.IsEnabled = true;
+                        //cbLanguageSelection.IsEnabled = true;
                         isListening = false;
                     });
                 }

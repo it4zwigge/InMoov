@@ -70,13 +70,13 @@
             </StackPanel>
             <ScrollViewer Grid.Row="1" VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                    <!--<StackPanel Orientation="Horizontal">
                         <TextBlock Text="Language: " Margin="20,40,0,0" VerticalAlignment="Center"/>
                         <ComboBox x:Name="cbLanguageSelection" SelectionChanged="cbLanguageSelection_SelectionChanged" Margin="15,40,0,0" Width="200"/>
-                    </StackPanel>
+                    </StackPanel>-->
                     <StackPanel Orientation="Horizontal" >
                         <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
-                        <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Click" Margin="10,25,0,0"/>
+                        <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" Margin="10,25,0,0"/>
                     </StackPanel>
                     <TextBlock x:Name="helpTextBlock" Margin="0,50,0,0" Text="Inmoov Speech Recognition" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
                     <TextBlock x:Name="heardYouSayTextBlock" Margin="0,14.5,0,0" Text="Heard you say" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource SubheaderTextBlockStyle}"/>

@@ -101,6 +101,7 @@ namespace InMoov
                     await Facedetection();
                     break;
                 case AnimationID.Ready:
+                    await Ready();
                     break;
                 case AnimationID.Wait:
                     break;

@@ -360,6 +360,7 @@ namespace InMoov.Views
                 #region LED
                 if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
                 {
+                    Debug.WriteLine(textboxContent);
                     Debug.WriteLine("LED captured!");
                     ledCaptured = true;
                 }
@@ -368,6 +369,7 @@ namespace InMoov.Views
                 {
                     if (textboxContent.Contains(colorS))
                     {
+                        Debug.WriteLine(textboxContent + colorS);
                         Debug.WriteLine("Color captured: " + colorS);
                         colorCaptured = colorS;
                         switch (colorCaptured)
@@ -438,14 +440,19 @@ namespace InMoov.Views
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
                     App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
 
+
+                    textboxContent = "LED " + exNum + colorCaptured;
+                    helpTextBlock.Text = textboxContent;
                     //Reset Variables
                     ledCaptured = false;
+                    colorCaptured = null;
                     zel = 0;
                     facedetect[0] = facedetect[1] = 0;
                     for(int i = 0; i < numbers.Length; i++)
                     {
                         numbers[i] = 0;
                     }
+                    helpTextBlock.Text = textboxContent = hypothesis = "";
                 }
                 #endregion
                 helpTextBlock.Text = textboxContent;

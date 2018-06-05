@@ -40,7 +40,7 @@ namespace InMoov.Views
         {
             App.neopixel.clear();
             App.neopixel.SetAnimation(AnimationID.Ready);
-            playSound("Assets/sounds/startup.mp3");
+            playSound("Assets/sounds/startup1.mp3");
         }
 
         #region UI events
@@ -248,22 +248,7 @@ namespace InMoov.Views
             }
             try
             {
-                bool succeeded = false;
-                while (!succeeded)
-                {
-                    await Task.Delay(50);
-                    if (App.Leonardo.ready == true)
-                    {
-                        Views.LedRingPage.InitializeNeoPixel();
-                        await Views.LedRingPage.turnConnected();
-                    }
-                    if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
-                    {
-                        succeeded = true;
-                        Startup();
-                    }
-                }
-                //await PairDevices();
+               await PairDevices();
             }
             catch
             {
@@ -271,24 +256,24 @@ namespace InMoov.Views
             }
 
         }
-        
-        //private static async Task<bool> PairDevices()
-        //{
-        //    bool succeeded = false;
-        //    while (!succeeded)
-        //    {
-        //        if (App.Leonardo.ready == true)
-        //        {
-        //            //Views.LedRingPage.InitializeNeoPixel();
-        //            //await Views.LedRingPage.turnConnected();
-        //        }
-        //        if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
-        //        {
-        //            succeeded = true;
-        //            Startup();
-        //        }
-        //    }
-        //    return succeeded;
-        //}
+
+        private static async Task<bool> PairDevices()
+        {
+            bool succeeded = false;
+            while (!succeeded)
+            {
+                if (App.Leonardo.ready == true)
+                {
+                    Views.LedRingPage.InitializeNeoPixel();
+                    await Views.LedRingPage.turnConnected();
+                }
+                //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
+                //{
+                //    succeeded = true;
+                //    Startup();
+                //}
+            }
+            return succeeded;
+        }
     }
 }

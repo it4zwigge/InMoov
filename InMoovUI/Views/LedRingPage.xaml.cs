@@ -34,36 +34,56 @@ namespace InMoov.Views
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
-            //move commandbar to page bottom on small screens
             if (diagonal < 7)
             {
                 topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
                 bottombar.Visibility = Visibility.Visible;
             }
             else
             {
                 topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
             }
         }
 
+        // wenn der Leonardo verbunden ist wird diese Methode einmalig aufgerufen um den Ledring frühzeitig ansteuern zu können und diesen anzulegen
         public static void InitializeNeoPixel()
         {
             App.neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16);
-            ReadyNeopixel();
-            //Animation.StartAnimation("error");
+            App.neopixel.clear();
         }
 
-        public static async void ReadyNeopixel()
+        public static async Task<bool> turnConnected()
         {
-            for(byte i = 0; i <=16; i++)
+            bool succeeded = false;
+            byte readyDevices;
+            while (!succeeded)
             {
-                App.neopixel.SetPixelColor(i ,0, 0, 0);
-                Task.Delay(5).Wait();
+                readyDevices = 0;
+                foreach (Arduino arduino in App.Arduinos.Values)
+                {
+                    if (arduino.ready == true)
+                    {
+                        readyDevices++;
+                    }
+                }
+                for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
+                {
+                    App.neopixel.SetPixelColor(pixel, 0, 100, 0);
+                    await Task.Delay(62);
+                }
+                for (byte pixel = byte.Parse((readyDevices * 6).ToString()); pixel < 16; pixel++)
+                {
+                    App.neopixel.SetPixelColor(pixel, 100, 0, 0);
+                    await Task.Delay(62);
+                }
+                if (readyDevices > 1)
+                {
+                    Views.ConnectPage.Startup();
+                    succeeded = true;
+                }
             }
-            await App.turnConnected();
+            return succeeded;
         }
 
         private void Neopixel_Reset_Click(object sender, RoutedEventArgs e)

@@ -47,17 +47,11 @@ namespace InMoov.Views
 
         private bool isListening;
         private SpeechRecognizer speechRecognizer;
-        private ResourceContext speechContext;
-        private ResourceMap speechResourceMap;
         private StringBuilder dictatedTextBuilder;
-        private bool isPopulatingLanguages = false;
-        private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
-        private string textCaptured;                    //Handles the captured Text
         private int[] facedetect = new int[2];          //Handles the facedetection start/stop Commands
         private int[] numbers = new int[50];            //Numbers which are getting captured by speechrecognition
         private bool ledCaptured;                       //Handles if Word LED is captured
         private string colorCaptured;                   //Handles which color is picked by user
-        private List<string> ListX = new List<string>();
         //Handles the amount of colors the User can pick
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb", "schwarz", "aus" };
         //Handles the amount of Numbers the User can pick
@@ -443,7 +437,7 @@ namespace InMoov.Views
                     //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
 
 
-                    textboxContent = "LED " + exNum + colorCaptured;
+                    textboxContent = "LED " + exNum + " " + colorCaptured;
                     helpTextBlock.Text = textboxContent;
                     //Reset Variables
                     ledCaptured = false;

@@ -39,8 +39,10 @@ namespace InMoov.Views
         public static void Startup()
         {
             App.neopixel.clear();
+            playSound("Assets/sounds/startup.mp3");
             App.neopixel.SetAnimation(AnimationID.Ready);
-            playSound("Assets/sounds/startup1.mp3");
+            Thread.Sleep(9000);
+            App.neopixel.StopAnimation();
         }
 
         #region UI events
@@ -157,7 +159,7 @@ namespace InMoov.Views
         }
 
 
-        public void Aktuallisieren(bool Autocoonect = false)
+        public void Aktuallisieren()
         {
             //initialisiert den kommenden Vorgang
             Task<DeviceInformationCollection> task = null;
@@ -197,13 +199,6 @@ namespace InMoov.Views
                                 }
                             }
                             devicesList.ItemsSource = App.Arduinos.Values; //zeige alle items aus der App.Arduinos liste (Dictonary)
-                            //if (Autoconnect == true && App.Arduinos != null) // sollte er Automatisch verbinden sollen und geräte vorhanden sein, so soll er alle arduinos verbinden
-                            //{
-                            //    foreach (Arduino arduino in App.Arduinos.Values)
-                            //    {
-                            //        arduino.connect();
-                            //    }
-                            //}
                             task = null; // lösche speicher
                         }
                     }));
@@ -211,7 +206,7 @@ namespace InMoov.Views
             }
         }
 
-        public static async void ArduinosReady()
+        public static async void sortArduinos()
         {
             foreach (Arduino arduino in App.Arduinos.Values)
              {
@@ -235,34 +230,25 @@ namespace InMoov.Views
                         break;
                 }
             }
+        }
+        public static async void checkDevices()
+        {
             try
             {
-               await PairDevices();
-            }
-            catch
-            {
-                Debug.WriteLine("Arduinos sind nicht instanziert");
-            }
-
-        }
-
-        private static async Task<bool> PairDevices()
-        {
-            bool succeeded = false;
-            while (!succeeded)
-            {
-                if (App.Leonardo.ready == true)
+                if (App.Leonardo.ready == true && App.neopixel == null)
                 {
                     Views.LedRingPage.InitializeNeoPixel();
                     await Views.LedRingPage.turnConnected();
                 }
-                //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
-                //{
-                //    succeeded = true;
-                //    Startup();
-                //}
             }
-            return succeeded;
+            catch
+            {
+
+            }
+            //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
+            //{
+            //    Startup();
+            //}
         }
     }
 }

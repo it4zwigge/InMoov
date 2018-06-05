@@ -161,7 +161,6 @@
     <Content Include="Assets\connected.png" />
     <Content Include="Assets\disconnected.png" />
     <Content Include="Assets\smalltile-sdk.png" />
-    <Content Include="Assets\sounds\startup1.mp3" />
     <Content Include="Assets\sounds\startup.mp3" />
     <Content Include="Assets\splash-sdk.png" />
     <Content Include="Assets\squaretile-sdk.png" />

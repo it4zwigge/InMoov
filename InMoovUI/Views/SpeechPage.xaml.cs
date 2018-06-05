@@ -47,12 +47,7 @@ namespace InMoov.Views
 
         private bool isListening;
         private SpeechRecognizer speechRecognizer;
-        private ResourceContext speechContext;
-        private ResourceMap speechResourceMap;
         private StringBuilder dictatedTextBuilder;
-        private bool isPopulatingLanguages = false;
-        private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
-        private string textCaptured;                    //Handles the captured Text
         private int[] facedetect = new int[2];          //Handles the facedetection start/stop Commands
         private int[] numbers = new int[50];            //Numbers which are getting captured by speechrecognition
         private bool ledCaptured;                       //Handles if Word LED is captured
@@ -313,11 +308,12 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
+
             Debug.WriteLine("SR_HG");
-            string hypothesis = args.Hypothesis.Text;
+            Debug.WriteLine(args.Hypothesis.Text);
 
             //Create the Text
-            string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
+            string textboxContent = dictatedTextBuilder.ToString() + " " + args.Hypothesis.Text + " ...";
 
             int zel = 0;
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -438,24 +434,27 @@ namespace InMoov.Views
                     exNum--;
                     byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+                    //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
 
 
-                    textboxContent = "LED " + exNum + colorCaptured;
+                    textboxContent = "LED " + exNum + " " + colorCaptured;
                     helpTextBlock.Text = textboxContent;
                     //Reset Variables
                     ledCaptured = false;
                     colorCaptured = null;
                     zel = 0;
                     facedetect[0] = facedetect[1] = 0;
-                    for(int i = 0; i < numbers.Length; i++)
+                    for (int i = 0; i < numbers.Length; i++)
                     {
                         numbers[i] = 0;
                     }
-                    helpTextBlock.Text = textboxContent = hypothesis = "";
+                    dictatedTextBuilder.Clear();
                 }
                 #endregion
-                helpTextBlock.Text = textboxContent;
+                else
+                {
+                    helpTextBlock.Text = textboxContent;
+                }
             });
         }
 

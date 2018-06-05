@@ -73,13 +73,14 @@
                         <TextBlock Text="Language: " Margin="20,40,0,0" VerticalAlignment="Center"/>
                         <ComboBox x:Name="cbLanguageSelection" SelectionChanged="cbLanguageSelection_SelectionChanged" Margin="15,40,0,0" Width="200"/>
                     </StackPanel>-->
-                        <TextBlock Text="Spracherkennung: " Margin="0,35,0,0" SelectionChanged="TextBlock_SelectionChanged"/>
+                        <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
             <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" Margin="10,25,0,0"/>
             <!--<TextBlock x:Name="helpTextBlock" Margin="0,50,0,0" Text="Inmoov Speech Recognition" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
                     <TextBlock x:Name="heardYouSayTextBlock" Margin="0,14.5,0,0" Text="Heard you say" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource SubheaderTextBlockStyle}"/>-->
                     <TextBlock x:Name="resultTextBlock" Margin="0,14.5,0,0" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
                 </StackPanel>
-            <!--</ScrollViewer>-->
+        <MediaElement x:Name="media" AutoPlay="False" MediaEnded="media_MediaEnded"/>
+        <!--</ScrollViewer>-->
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <AppBarButton Icon="Edit" Label="Edit"/>

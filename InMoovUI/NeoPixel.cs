@@ -61,7 +61,7 @@ namespace InMoov
             for (byte pixel = 0; pixel < 16; pixel++)
             {
                 App.neopixel.SetPixelColor(pixel, 0, 0, 0);
-                Thread.Sleep(50);
+                //Thread.Sleep(50);
             }
         }
 

@@ -38,38 +38,18 @@
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-            <CommandBar.Content>
-                <ctl:PageHeader>
-                    <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-                    </ctl:PageHeader.HeaderContent>
-                </ctl:PageHeader>
-            </CommandBar.Content>
-        </CommandBar>
-
-        <!--<ctl:PageHeader x:Name="pageTitleContainer" Visibility="Collapsed">
-            <ctl:PageHeader.HeaderContent>
-                <TextBlock x:Name="AltHeaderTextBlock" Text="Commandbar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-            </ctl:PageHeader.HeaderContent>
-        </ctl:PageHeader>-->
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Your App Content"/>
-            <Button x:Name="Vor_Button" Content="Vor" HorizontalAlignment="Left" Height="170" Margin="594,242,0,0" VerticalAlignment="Top" Width="254"/>
-            <Button x:Name="Stop_Button" Content="Stop" HorizontalAlignment="Left" Height="170" Margin="594,445,0,0" VerticalAlignment="Top" Width="254" Click="Stop_Button_Click"/>
-            <Button x:Name="Rueckwaerts_Button" Content="Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,242,0,0" VerticalAlignment="Top" Width="254" Click="Rueckwaerts_Button_Click"/>
-            <Button x:Name="Stop_R_Button" Content="Stop Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,445,0,0" VerticalAlignment="Top" Width="254" Click="Stop_R_Button_Click"/>
-            <Button x:Name="Drehung_Button" Content="Drehung" HorizontalAlignment="Left" Height="170" Margin="10,346,0,0" VerticalAlignment="Top" Width="254" Click="Drehung_Button_Click" />
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text=""/>
+            <Button x:Name="Vor_Button" Content="Vor" HorizontalAlignment="Left" Height="170" Margin="594,120,0,0" VerticalAlignment="Top" Width="254" FontFamily="VW Head Office"/>
+            <Button x:Name="Stop_Button" Content="Stop" HorizontalAlignment="Left" Height="170" Margin="594,327,0,0" VerticalAlignment="Top" Width="254" Click="Stop_Button_Click" FontFamily="VW Head Office"/>
+            <Button x:Name="Rueckwaerts_Button" Content="Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,120,0,0" VerticalAlignment="Top" Width="254" Click="Rueckwaerts_Button_Click" FontFamily="VW Head Office"/>
+            <Button x:Name="Stop_R_Button" Content="Stop Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,327,0,0" VerticalAlignment="Top" Width="254" Click="Stop_R_Button_Click" FontFamily="VW Head Office"/>
+            <Button x:Name="Drehung_Button" Content="Drehung" HorizontalAlignment="Left" Height="170" Margin="10,222,0,0" VerticalAlignment="Top" Width="254" Click="Drehung_Button_Click" FontFamily="VW Head Office" />
+            <TextBlock HorizontalAlignment="Left" Height="60" Margin="130,10,0,0" Text="Fahrwerkssteuerung" TextWrapping="Wrap" VerticalAlignment="Top" Width="386" FontSize="36" FontFamily="VW Head Office"/>
+            <HyperlinkButton HorizontalAlignment="Left" Height="35" Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2033" Margin="7,70,0,0" VerticalAlignment="Top" Width="280" FontSize="13"  FocusVisualPrimaryBrush="{x:Null}" FontFamily="VW Head Office"/>
+            <TextBlock HorizontalAlignment="Left" Height="170" Margin="10,550,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." VerticalAlignment="Top" Width="890" FontSize="15" FontFamily="VW Head Office"/>
+
         </Grid>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

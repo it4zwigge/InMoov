@@ -83,17 +83,15 @@ namespace InMoov
         Facedetection = 2,
         Error = 3,
         Listening = 4,
-        Succesfully = 5,
+        Ready = 5,
     }
 
     public class Animation
     {
-        public static AnimationID aniID = 0;
         public static bool stop = false;
 
         public static async void SetAnimation(AnimationID animationID)
         {
-            aniID = animationID;
             switch (animationID)
             {
                 case AnimationID.Error:
@@ -102,7 +100,7 @@ namespace InMoov
                 case AnimationID.Facedetection:
                     await Facedetection();
                     break;
-                case AnimationID.Succesfully:
+                case AnimationID.Ready:
                     break;
                 case AnimationID.Wait:
                     break;
@@ -116,34 +114,81 @@ namespace InMoov
         {
             while (!stop)
             {
-                for (byte fade = 0; fade < 125; fade += 5)
+                try
                 {
-                    for (byte i = 0; i < 16; i++)
+                    for (byte fade = 0; fade < 125; fade += 5)
                     {
-                        if (!stop)
+                        for (byte i = 0; i < 16; i++)
                         {
-                            App.neopixel.SetPixelColor(i, fade, 0, 0);
-                            await Task.Delay(1);
+                            if (!stop)
+                            {
+                                App.neopixel.SetPixelColor(i, fade, 0, 0);
+                                await Task.Delay(1);
+                            }
+                            else
+                                break;
                         }
-                        else
-                            break;
+                        if (stop) { break; }
                     }
-                    if (stop) { break; }
+                    for (byte fade = 125; fade > 0; fade -= 5)
+                    {
+                        for (byte i = 0; i < 16; i++)
+                        {
+                            if (!stop)
+                            {
+                                App.neopixel.SetPixelColor(i, fade, 0, 0);
+                                await Task.Delay(1);
+                            }
+                            else
+                                break;
+                        }
+                        if (stop) { break; }
+                    }
                 }
-                for (byte fade = 125; fade > 0; fade -= 5)
+                catch
+                { stop = true; }
+            }
+            stop = false;
+            App.neopixel.clear();
+            return stop;
+        }
+
+        private static async Task<bool> Ready() // noch nicht fertig
+        {
+            while (!stop)
+            {
+                try
                 {
-                    for (byte i = 0; i < 16; i++)
+                    for (byte fade = 0; fade < 125; fade += 5)
                     {
-                        if (!stop)
+                        for (byte i = 0; i < 16; i++)
                         {
-                            App.neopixel.SetPixelColor(i, fade, 0, 0);
-                            await Task.Delay(1);
+                            if (!stop)
+                            {
+                                App.neopixel.SetPixelColor(i, 0, 0, fade);
+                                await Task.Delay(1);
+                            }
+                            else
+                                break;
                         }
-                        else
-                            break;
+                        if (stop) { break; }
                     }
-                    if (stop) { break; }
+                    for (byte fade = 125; fade > 0; fade -= 5)
+                    {
+                        for (byte i = 0; i < 16; i++)
+                        {
+                            if (!stop)
+                            {
+                                App.neopixel.SetPixelColor(i, 0, 0, fade);
+                                await Task.Delay(1);
+                            }
+                            else
+                                break;
+                        }
+                        if (stop) { break; }
+                    }
                 }
+                catch { stop = true; }
             }
             stop = false;
             App.neopixel.clear();
@@ -154,17 +199,24 @@ namespace InMoov
         {
             while (!stop)
             {
-                byte r = 0;
-                byte g = 0;
-                byte b = 255;
-
-                for (byte i = 0; i <= 16; i++)
+                try
                 {
-                    App.neopixel.SetPixelColor(i, r, g, b);
-                    await Task.Delay(100);
+                    byte r = 0;
+                    byte g = 0;
+                    byte b = 255;
 
-                    App.neopixel.SetPixelColor(byte.Parse((i - 1).ToString()), 0, 0, 0);
-                    await Task.Delay(100);
+                    for (byte i = 0; i <= 16; i++)
+                    {
+                        App.neopixel.SetPixelColor(i, r, g, b);
+                        await Task.Delay(100);
+
+                        App.neopixel.SetPixelColor(byte.Parse((i - 1).ToString()), 0, 0, 0);
+                        await Task.Delay(100);
+                    }
+                }
+                catch
+                {
+                    stop = true;
                 }
             }
             stop = false;
@@ -176,6 +228,8 @@ namespace InMoov
         {
             while (!stop)
             {
+                try
+                {
                 for (byte pixel = 0; pixel < 16; pixel++)
                 {
                     App.neopixel.SetPixelColor(pixel, 255, 50, 0);
@@ -186,6 +240,8 @@ namespace InMoov
                     App.neopixel.SetPixelColor(pixel, 0, 0, 0);
                     await Task.Delay(50);
                 }
+                }
+                catch { stop = true; }
             }
             stop = false;
             App.neopixel.clear();

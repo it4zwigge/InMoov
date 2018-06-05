@@ -1,30 +1,17 @@
 ﻿using Communication;
-using Microsoft.Maker.RemoteWiring;
 using Microsoft.Maker.Serial;
-using Microsoft.Maker.Firmata;
 using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using InMoov;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using Windows.Media.Playback;
-using Windows.Media.Core;
 
 namespace InMoov.Views
 {
@@ -38,14 +25,21 @@ namespace InMoov.Views
         public ConnectPage()
         {
             this.InitializeComponent();
-
+            devicesList.ItemClick += DevicesList_ItemClick;
             this.Loaded += ConnectPage_Loaded;
             App.Telemetry.TrackEvent("ConnectPage_Launched");
+        }
+
+        private void DevicesList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            ConnectButton.Visibility = Visibility.Visible;
         }
 
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
         {
+            App.neopixel.clear();
+            App.neopixel.SetAnimation(AnimationID.Ready);
             playSound("Assets/sounds/startup.mp3");
         }
 
@@ -54,87 +48,50 @@ namespace InMoov.Views
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
-            //move commandbar to page bottom on small screens
             if (diagonal < 7)
             {
                 topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
                 bottombar.Visibility = Visibility.Visible;
             }
             else
             {
                 topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
             }
         }
 
+        //spiele verschiedene sounds zb. connected oder connection lost
         public static void playSound(string path)
         {
             MediaPlayer sound = new MediaPlayer();
             sound.Source = MediaSource.CreateFromUri(new Uri("ms-appx:///" + path)); 
             sound.Play();
         }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            // Telemetry
             App.Telemetry.TrackPageView("Connection_Page");
             timePageNavigatedTo = DateTime.UtcNow;
 
             if (devicesList.ItemsSource == null)
             {
-                ConnectMessage.Text = "Select an item to connect to.";
-                //RefreshDeviceList();
+                ConnectMessage.Text = "Wählen sie einen Arduino aus.";
                 Aktuallisieren();
             }
         }
 
+        //Aktuallisiere Seite bei click auf refresh button
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             Aktuallisieren();
-            //RefreshDeviceList();
             this.Frame.Navigate(this.GetType());
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             Verbinden();
-            //Arduino device = null;
-
-            //if (devicesList.SelectedItem != null)
-            //{
-            //    var selectedConnection = devicesList.SelectedItem as Arduino;
-            //    device = selectedConnection;
-
-            //    var properties = new Dictionary<string, string>
-            //    {
-            //        { "Device_Name", device.name },
-            //        { "Device_ID", device.id },
-            //        { "Device_Kind", device.kind.ToString() }
-            //    };
-
-            //    App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
-
-            //    foreach (string key in App.Arduinos.Keys)
-            //    {
-            //        if (key == device.id)
-            //        {
-            //            device = null;
-            //            ConnectMessage.Text = "Der Arduino ist bereits verbunden";
-            //            break;
-            //        }
-            //    }
-            //    if (device != null)
-            //    {
-            //        App.Arduinos.Add(device.id, device);
-            //    }
-
-            //    this.Frame.Navigate(this.GetType());
-            //}
-            //else
-            //    ConnectMessage.Text = "Wählen sie einen Arduino aus!";
         }
         #endregion UI events
 
@@ -194,63 +151,144 @@ namespace InMoov.Views
         #endregion Helper
 
 
-        private void Verbinden()
+        // startet die Verbindung mit dem ausgewählten arduino bei Knopdruck
+        private async Task <bool> Verbinden()
         {
+            var selc = devicesList.SelectedItem as Arduino;
             if (devicesList.SelectedItem != null)
             {
-                var selc = devicesList.SelectedItem as Arduino;
-                selc.startConnection();
-                //this.Frame.Navigate(this.GetType());
+                selc.connect();
+                while (selc.ready == false)
+                {
+                    await Task.Delay(100);
+                }
+                this.Frame.Navigate(this.GetType());
             }
+            return selc.ready;
         }
 
-        private void Aktuallisieren()
-        {
-            Task<DeviceInformationCollection> task = null;
 
+        public void Aktuallisieren(bool Autocoonect = false)
+        {
+            //initialisiert den kommenden Vorgang
+            Task<DeviceInformationCollection> task = null;
             devicesList.Visibility = Visibility.Visible;
             cancelTokenSource = new CancellationTokenSource();
             task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
 
             if (task != null)
             {
-                //store the returned DeviceInformation items when the task completes
+                //speichert alle gefunden items vom Typ Deviceinformation wenn der Task fertig ist
                 task.ContinueWith(listTask =>
                 {
-                    //store the result and populate the device list on the UI thread
+                    //speichert die ergebnisse "result" und füllt die Geräte Liste im UI-Thread
                     var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
-                        //ObservableCollection<Connection> connections = new ObservableCollection<Connection>();
-
                         var result = listTask.Result;
+                        //Prüfe ob überhaupt geräte gefunden wurden
                         if (result == null || result.Count == 0)
                         {
                             ConnectMessage.Text = "[Info] Keine Geräte Gefunden!";
                         }
                         else
                         {
-                            foreach (DeviceInformation device in result)
+                            foreach (DeviceInformation device in result) // Hier der algorythmus zum filtern von vorhandenen geräten
                             {
                                 bool vorhanden = false;
                                 foreach (Arduino arduino in App.Arduinos.Values.ToList())
                                 {
-                                    if (arduino.name == device.Name)
+                                    if (arduino.name == device.Name) // sollte ein name übereinstimmen dann ist dieses gerät schon vorhanden
                                     {
                                         vorhanden = true;
                                     }
                                 }
                                 if (vorhanden == false)
                                 {
-                                    App.Arduinos.Add(device.Id, new Arduino(device));
+                                    App.Arduinos.Add(device.Id, new Arduino(device)); //solte das Gerät nicht vorhanden sein, soll dieses zu liste hinzugefügt werden
                                 }
                             }
-                            ConnectMessage.Text = "Wählen sie einen Arduino aus.";
-                            devicesList.ItemsSource = App.Arduinos.Values;
-                            task = null;
+                            devicesList.ItemsSource = App.Arduinos.Values; //zeige alle items aus der App.Arduinos liste (Dictonary)
+                            //if (Autoconnect == true && App.Arduinos != null) // sollte er Automatisch verbinden sollen und geräte vorhanden sein, so soll er alle arduinos verbinden
+                            //{
+                            //    foreach (Arduino arduino in App.Arduinos.Values)
+                            //    {
+                            //        arduino.connect();
+                            //    }
+                            //}
+                            task = null; // lösche speicher
                         }
                     }));
                 });
             }
         }
+
+        public static async void ArduinosReady()
+        {
+            foreach (Arduino arduino in App.Arduinos.Values)
+             {
+                switch (arduino.id.Substring(26, 20))
+                {
+                    case "756303137363513071D1":
+                    case "55639303834351D0F191":
+                    case "85539313931351C09082":
+                    case "95530343634351901162":
+                    case "955303430353518062E0":
+                        App.Leonardo = arduino;
+                        Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
+                        break;
+                    case "75533353038351313212":
+                        App.ARechts = arduino;
+                        Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
+                        break;
+                    case "85531303231351812120":
+                        App.ALinks = arduino;
+                        Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
+                        break;
+                }
+            }
+            try
+            {
+                bool succeeded = false;
+                while (!succeeded)
+                {
+                    await Task.Delay(50);
+                    if (App.Leonardo.ready == true)
+                    {
+                        Views.LedRingPage.InitializeNeoPixel();
+                        await Views.LedRingPage.turnConnected();
+                    }
+                    if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
+                    {
+                        succeeded = true;
+                        Startup();
+                    }
+                }
+                //await PairDevices();
+            }
+            catch
+            {
+                Debug.WriteLine("Arduinos sind nicht instanziert");
+            }
+
+        }
+        
+        //private static async Task<bool> PairDevices()
+        //{
+        //    bool succeeded = false;
+        //    while (!succeeded)
+        //    {
+        //        if (App.Leonardo.ready == true)
+        //        {
+        //            //Views.LedRingPage.InitializeNeoPixel();
+        //            //await Views.LedRingPage.turnConnected();
+        //        }
+        //        if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
+        //        {
+        //            succeeded = true;
+        //            Startup();
+        //        }
+        //    }
+        //    return succeeded;
+        //}
     }
 }

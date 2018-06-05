@@ -35,8 +35,8 @@ namespace InMoov
     /// </summary>
     sealed partial class App : Application
     {
-        public static int readyDevices = 0;
-        public static int noDevice = 0;
+
+        //public static int readyDevices = 0;
 
         public static Dictionary<string, Arduino> Arduinos = new Dictionary<string, Arduino>();
         public static Dictionary<string, BodyPart> BodyParts = new Dictionary<string, BodyPart>();
@@ -47,103 +47,103 @@ namespace InMoov
 
         public static NeoPixel neopixel { get; set; }
 
-        public static bool ArduinosReady()
-        {
-            if (readyDevices == App.Arduinos.Values.Count)
-            {
-                foreach (Arduino arduino in App.Arduinos.Values)
-                {
-                    if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082" || arduino.id.Substring(26, 20) == "95530343634351901162" || arduino.id.Substring(26, 20) == "955303430353518062E0")   
-                    {
-                        App.Leonardo = arduino;
-                        Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
-                    }
-                    else if (arduino.id.Substring(26, 20) == "75533353038351313212")
-                    {
-                        App.ARechts = arduino;
-                        Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
+        //public static bool ArduinosReady()
+        //{
+        //    if (readyDevices == App.Arduinos.Values.Count)
+        //    {
+        //        foreach (Arduino arduino in App.Arduinos.Values)
+        //        {
+        //            if (arduino.id.Substring(26,20) == "756303137363513071D1" || arduino.id.Substring(26, 20) == "55639303834351D0F191" || arduino.id.Substring(26, 20) == "85539313931351C09082" || arduino.id.Substring(26, 20) == "95530343634351901162" || arduino.id.Substring(26, 20) == "955303430353518062E0")   
+        //            {
+        //                App.Leonardo = arduino;
+        //                Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
+        //            }
+        //            else if (arduino.id.Substring(26, 20) == "75533353038351313212")
+        //            {
+        //                App.ARechts = arduino;
+        //                Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
 
-                    }
-                    else if (arduino.id.Substring(26, 20) == "85531303231351812120")
-                    {
-                        App.ALinks = arduino;
-                        Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
+        //            }
+        //            else if (arduino.id.Substring(26, 20) == "85531303231351812120")
+        //            {
+        //                App.ALinks = arduino;
+        //                Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
 
-                    }
-                }
-                //Alles zugeteilt, Roboter kann aufwachen.
-                ReadyDevices();
-                return true;
-            }
-            else return false;
-        }
-        public static async void ReadyDevices()
-        {
-            try
-            {
-                await PairDevices();
-            }
-            catch
-            {
-                Debug.WriteLine("Arduinos sind nicht instanziert");
-            }
-        }
+        //            }
+        //        }
+        //        //Alles zugeteilt, Roboter kann aufwachen.
+        //        ReadyDevices();
+        //        return true;
+        //    }
+        //    else return false;
+        //}
+        //public static async void ReadyDevices()
+        //{
+        //    try
+        //    {
+        //        await PairDevices();
+        //    }
+        //    catch
+        //    {
+        //        Debug.WriteLine("Arduinos sind nicht instanziert");
+        //    }
+        //}
 
-        private static async Task<bool> PairDevices()
-        {
-            bool succeeded = false;
-            while (!succeeded)
-            {
-                if (Leonardo.ready == true)
-                {
-                    succeeded = true;
-                    Views.LedRingPage.InitializeNeoPixel();
-                }
-                if (ARechts != null && ALinks != null && Leonardo != null)
-                {
-                    succeeded = true;
-                    //InitializeBodyParts();
-                }
-                succeeded = true;
-            }
-            return succeeded;
-        }
+        //private static async Task<bool> PairDevices()
+        //{
+        //    bool succeeded = false;
+        //    while (!succeeded)
+        //    {
+        //        if (Leonardo.ready == true)
+        //        {
+        //            succeeded = true;
+        //            Views.LedRingPage.InitializeNeoPixel();
+        //        }
+        //        if (ARechts != null && ALinks != null && Leonardo != null)
+        //        {
+        //            succeeded = true;
+        //            //InitializeBodyParts();
+        //        }
+        //        succeeded = true;
+        //    }
+        //    return succeeded;
+        //}
 
-        public static async Task<bool> turnConnected()
-        {
-            bool succeeded = false;
-            while (!succeeded)
-            {
-                for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
-                {
-                    neopixel.SetPixelColor(pixel, 0, 100, 0);
-                    await Task.Delay(100);
-                }
-                for (byte pixel = byte.Parse((readyDevices * 6).ToString()); pixel < 16; pixel++)
-                {
-                    neopixel.SetPixelColor(pixel, 100, 0, 0);
-                    await Task.Delay(100);
-                }
-                if (readyDevices > 1)
-                {
-                    await Task.Delay(2000);
-                    for (byte i = 0; i < 16; i++)
-                    {
-                        neopixel.SetPixelColor(i, 0, 0, 0);
-                        await Task.Delay(100);
-                    }
-                    Views.ConnectPage.Startup();
-                    succeeded = true;
-                }
-            }
-            return succeeded;
-        }
+        //public static async Task<bool> turnConnected()
+        //{
+        //    bool succeeded = false;
+        //    while (!succeeded)
+        //    {
+        //        for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
+        //        {
+        //            neopixel.SetPixelColor(pixel, 0, 100, 0);
+        //            await Task.Delay(100);
+        //        }
+        //        for (byte pixel = byte.Parse((readyDevices * 6).ToString()); pixel < 16; pixel++)
+        //        {
+        //            neopixel.SetPixelColor(pixel, 100, 0, 0);
+        //            await Task.Delay(100);
+        //        }
+        //        if (readyDevices > 1)
+        //        {
+        //            await Task.Delay(2000);
+        //            for (byte i = 0; i < 16; i++)
+        //            {
+        //                neopixel.SetPixelColor(i, 0, 0, 0);
+        //                await Task.Delay(100);
+        //            }
+        //            Views.ConnectPage.Startup();
+        //            succeeded = true;
+        //        }
+        //    }
+        //    return succeeded;
+        //}
 
-        public static void InitializeBodyParts()
-        {
-            BodyParts.Add("Rechten Arm", new BodyPart(ARechts, 8, 0, 70, 0));
-            BodyParts.Add("Linken Arm", new BodyPart(ALinks, 8, 0, 70, 0));
-        }
+        //public static void InitializeBodyParts()
+        //{
+        //    BodyParts.Add("Rechten Arm", new BodyPart(ARechts, 8, 0, 70, 0));
+        //    BodyParts.Add("Linken Arm", new BodyPart(ALinks, 8, 0, 70, 0));
+        //}
 
         public static IStream Connection
         {

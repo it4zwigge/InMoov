@@ -77,7 +77,7 @@ namespace InMoov.Views
                     App.neopixel.SetPixelColor(pixel, 100, 0, 0);
                     await Task.Delay(62);
                 }
-                if (readyDevices > 1)
+                if (readyDevices == 3)
                 {
                     Views.ConnectPage.Startup();
                     succeeded = true;

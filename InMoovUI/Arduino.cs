@@ -169,7 +169,8 @@ namespace InMoov
                 Debug.WriteLine("[" + this.name + "] erolgreich verbunden" + id);
                 Views.ConnectPage.playSound("Assets/sounds/connected.wav");
                 this.ready = true;
-                Views.ConnectPage.ArduinosReady();
+                Views.ConnectPage.sortArduinos();
+                Views.ConnectPage.checkDevices();
             }
             #endregion
 

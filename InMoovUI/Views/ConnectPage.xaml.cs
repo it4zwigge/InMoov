@@ -39,8 +39,10 @@ namespace InMoov.Views
         public static void Startup()
         {
             App.neopixel.clear();
-            App.neopixel.SetAnimation(AnimationID.Ready);
             playSound("Assets/sounds/startup.mp3");
+            App.neopixel.SetAnimation(AnimationID.Ready);
+            Thread.Sleep(9000);
+            App.neopixel.StopAnimation();
         }
 
         #region UI events
@@ -168,7 +170,7 @@ namespace InMoov.Views
         }
 
 
-        public void Aktuallisieren(bool Autocoonect = false)
+        public void Aktuallisieren()
         {
             //initialisiert den kommenden Vorgang
             Task<DeviceInformationCollection> task = null;
@@ -208,13 +210,6 @@ namespace InMoov.Views
                                 }
                             }
                             devicesList.ItemsSource = App.Arduinos.Values; //zeige alle items aus der App.Arduinos liste (Dictonary)
-                            //if (Autoconnect == true && App.Arduinos != null) // sollte er Automatisch verbinden sollen und geräte vorhanden sein, so soll er alle arduinos verbinden
-                            //{
-                            //    foreach (Arduino arduino in App.Arduinos.Values)
-                            //    {
-                            //        arduino.connect();
-                            //    }
-                            //}
                             task = null; // lösche speicher
                         }
                     }));
@@ -222,16 +217,16 @@ namespace InMoov.Views
             }
         }
 
-        public static async void ArduinosReady()
+        public static async void sortArduinos()
         {
             foreach (Arduino arduino in App.Arduinos.Values)
              {
                 switch (arduino.id.Substring(26, 20))
                 {
-                    case "756303137363513071D1":
-                    case "55639303834351D0F191":
-                    case "85539313931351C09082":
-                    case "95530343634351901162":
+                    //case "756303137363513071D1":
+                    //case "55639303834351D0F191":
+                    //case "85539313931351C09082":
+                    //case "95530343634351901162":
                     case "955303430353518062E0":
                         App.Leonardo = arduino;
                         Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
@@ -246,49 +241,18 @@ namespace InMoov.Views
                         break;
                 }
             }
-            try
-            {
-                bool succeeded = false;
-                while (!succeeded)
-                {
-                    await Task.Delay(50);
-                    if (App.Leonardo.ready == true)
-                    {
-                        Views.LedRingPage.InitializeNeoPixel();
-                        await Views.LedRingPage.turnConnected();
-                    }
-                    if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
-                    {
-                        succeeded = true;
-                        Startup();
-                    }
-                }
-                //await PairDevices();
-            }
-            catch
-            {
-                Debug.WriteLine("Arduinos sind nicht instanziert");
-            }
-
         }
-        
-        //private static async Task<bool> PairDevices()
-        //{
-        //    bool succeeded = false;
-        //    while (!succeeded)
-        //    {
-        //        if (App.Leonardo.ready == true)
-        //        {
-        //            //Views.LedRingPage.InitializeNeoPixel();
-        //            //await Views.LedRingPage.turnConnected();
-        //        }
-        //        if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
-        //        {
-        //            succeeded = true;
-        //            Startup();
-        //        }
-        //    }
-        //    return succeeded;
-        //}
+        public static async void checkDevices()
+        {
+            if (App.Leonardo.ready == true && App.neopixel == null)
+            {
+                Views.LedRingPage.InitializeNeoPixel();
+                await Views.LedRingPage.turnConnected();
+            }
+            //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
+            //{
+            //    Startup();
+            //}
+        }
     }
 }

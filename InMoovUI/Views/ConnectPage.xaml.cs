@@ -223,10 +223,10 @@ namespace InMoov.Views
              {
                 switch (arduino.id.Substring(26, 20))
                 {
-                    //case "756303137363513071D1":
-                    //case "55639303834351D0F191":
-                    //case "85539313931351C09082":
-                    //case "95530343634351901162":
+                    case "756303137363513071D1":
+                    case "55639303834351D0F191":
+                    case "85539313931351C09082":
+                    case "95530343634351901162":
                     case "955303430353518062E0":
                         App.Leonardo = arduino;
                         Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
@@ -244,10 +244,17 @@ namespace InMoov.Views
         }
         public static async void checkDevices()
         {
-            if (App.Leonardo.ready == true && App.neopixel == null)
+            try
             {
-                Views.LedRingPage.InitializeNeoPixel();
-                await Views.LedRingPage.turnConnected();
+                if (App.Leonardo.ready == true && App.neopixel == null)
+                {
+                    Views.LedRingPage.InitializeNeoPixel();
+                    await Views.LedRingPage.turnConnected();
+                }
+            }
+            catch
+            {
+
             }
             //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
             //{

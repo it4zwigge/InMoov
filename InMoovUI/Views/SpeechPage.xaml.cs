@@ -64,10 +64,13 @@ namespace InMoov.Views
         //Handles Keywords the user can say to pick Facedetection
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         //Handles basic start/stop Keys
-        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne" };
-        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen" };
+        private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne", "benutze" };
+        private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
+
+        //Initialize a new FacesPage
+        FacesPage fp = new FacesPage();
 
         public SpeechPage()
         {
@@ -75,9 +78,8 @@ namespace InMoov.Views
             this.Loaded += SpeechPage_Loaded;
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
-
-            LedRingPage.InitializeNeoPixel();
         }
+
         private void SpeechPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -108,129 +110,12 @@ namespace InMoov.Views
             bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
             if (permissionGained)
             {
-                //Initialize basic Speech tiles and Varialbes
-
-                Language speechLanguage = SpeechRecognizer.SystemSpeechLanguage;
-                string langTag = speechLanguage.LanguageTag;
-                speechContext = ResourceContext.GetForCurrentView();
-                speechContext.Languages = new string[] { langTag };
-
-                speechResourceMap = ResourceManager.Current.MainResourceMap.GetSubtree("LocalizationSpeechResources");
-
-                PopulateLanguageDropdown();
-                await InitializeRecognizer(SpeechRecognizer.SystemSpeechLanguage);
+                await InitializeRecognizer();
             }
             else
             {
                 resultTextBlock.Visibility = Visibility.Visible;
                 resultTextBlock.Text = "Permission to access capture resources was not given by the user; please set the application setting in Settings->Privacy->Microphone.";
-                cbLanguageSelection.IsEnabled = false;
-            }
-        }
-
-        /// <summary>
-        /// Look up the supported languages for this speech recognition scenario, 
-        /// that are installed on this machine, and populate a dropdown with a list.
-        /// </summary>
-        private void PopulateLanguageDropdown()
-        {
-            // disable the callback so we don't accidentally trigger initialization of the recognizer
-            // while initialization is already in progress.
-            isPopulatingLanguages = true;
-
-            Language defaultLanguage = SpeechRecognizer.SystemSpeechLanguage;
-            IEnumerable<Language> supportedLanguages = SpeechRecognizer.SupportedGrammarLanguages;
-            foreach (Language lang in supportedLanguages)
-            {
-                ComboBoxItem item = new ComboBoxItem();
-                item.Tag = lang;
-                item.Content = lang.DisplayName;
-
-                cbLanguageSelection.Items.Add(item);
-                if (lang.LanguageTag == defaultLanguage.LanguageTag)
-                {
-                    item.IsSelected = true;
-                    cbLanguageSelection.SelectedItem = item;
-                }
-            }
-            isPopulatingLanguages = false;
-        }
-
-        /// <summary>
-        /// When a user changes the speech recognition language, trigger re-initialization of the 
-        /// speech engine with that language, and change any speech-specific UI assets.
-        /// </summary>
-        /// <param name="sender">Ignored</param>
-        /// <param name="e">Ignored</param>
-        private async void cbLanguageSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (isPopulatingLanguages)
-            {
-                return;
-            }
-
-            ComboBoxItem item = (ComboBoxItem)(cbLanguageSelection.SelectedItem);
-            Language newLanguage = (Language)item.Tag;
-            if (speechRecognizer != null)
-            {
-                if (speechRecognizer.CurrentLanguage == newLanguage)
-                {
-                    return;
-                }
-            }
-
-            // trigger cleanup and re-initialization of speech.
-            try
-            {
-                // update the context for resource lookup
-                speechContext.Languages = new string[] { newLanguage.LanguageTag };
-
-                await InitializeRecognizer(newLanguage);
-            }
-            catch (Exception exception)
-            {
-                var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
-                await messageDialog.ShowAsync();
-            }
-        }
-
-        /// <summary>
-        /// Ensure that we clean up any state tracking event handlers created in OnNavigatedTo to prevent leaks,
-        /// dipose the speech recognizer, and clean up to ensure the scenario is not still attempting to recognize
-        /// speech while not in view.
-        /// </summary>
-        /// <param name="e">Details about the navigation event</param>
-        protected async override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            base.OnNavigatedFrom(e);
-            if (this.speechRecognizer != null)
-            {
-                if (isListening)
-                {
-                    await this.speechRecognizer.ContinuousRecognitionSession.CancelAsync();
-                    isListening = false;
-                    resultTextBlock.Text = " Dictate";
-                    cbLanguageSelection.IsEnabled = true;
-                }
-
-                resultTextBlock.Text = "";
-
-                this.speechRecognizer.Dispose();
-                this.speechRecognizer = null;
-            }
-            // Prompt the user for permission to access the microphone. This request will only happen
-            // once, it will not re-prompt if the user rejects the permission.
-            bool permissionGained = await AudioCapturePermissions.RequestMicrophonePermission();
-            if (permissionGained)
-            {
-
-                PopulateLanguageDropdown();
-                await InitializeRecognizer(SpeechRecognizer.SystemSpeechLanguage);
-            }
-            else
-            {
-                this.resultTextBlock.Text = "Permission to access capture resources was not given by the user, reset the application setting in Settings->Privacy->Microphone.";
-                cbLanguageSelection.IsEnabled = false;
             }
         }
 
@@ -239,11 +124,11 @@ namespace InMoov.Views
         /// </summary>
         /// <param name="recognizerLanguage">Language to use for the speech recognizer</param>
         /// <returns>Awaitable task.</returns>
-        private async Task InitializeRecognizer(Language recognizerLanguage)
+        private async Task InitializeRecognizer()
         {
             if (speechRecognizer != null)
             {
-                // cleanup prior to re-initializing this scenario.
+                //Clean old Eventhandlers if possible
                 speechRecognizer.StateChanged -= SpeechRecognizer_StateChanged;
                 speechRecognizer.ContinuousRecognitionSession.Completed -= ContinuousRecognitionSession_Completed;
                 speechRecognizer.ContinuousRecognitionSession.ResultGenerated -= ContinuousRecognitionSession_ResultGenerated;
@@ -253,7 +138,8 @@ namespace InMoov.Views
                 this.speechRecognizer = null;
             }
 
-            this.speechRecognizer = new SpeechRecognizer(recognizerLanguage);
+            //Initialize new Speechrecognizer
+            this.speechRecognizer = new SpeechRecognizer(SpeechRecognizer.SystemSpeechLanguage);
 
             // Provide feedback to the user about the state of the recognizer. This can be used to provide visual feedback in the form
             // of an audio indicator to help the user understand whether they're being heard.
@@ -261,14 +147,8 @@ namespace InMoov.Views
             var dictationConstraint = new SpeechRecognitionTopicConstraint(SpeechRecognitionScenario.Dictation, "dictation");
             speechRecognizer.Constraints.Add(dictationConstraint);
             SpeechRecognitionCompilationResult result = await speechRecognizer.CompileConstraintsAsync();
-            if (result.Status != SpeechRecognitionResultStatus.Success)
-            {
-                //Soll nicht ausgelößt werden :)
-            }
 
-            // Handle continuous recognition events. Completed fires when various error states occur. ResultGenerated fires when
-            // some recognized phrases occur, or the garbage rule is hit. HypothesisGenerated fires during recognition, and
-            // allows us to provide incremental feedback based on what the user's currently saying.
+            //Create Continuous-Dictation Handler
             speechRecognizer.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
             speechRecognizer.HypothesisGenerated += SpeechRecognizer_HypothesisGenerated;
             speechRecognizer.ContinuousRecognitionSession.Completed += ContinuousRecognitionSession_Completed;
@@ -287,6 +167,8 @@ namespace InMoov.Views
 
 
                 resultTextBlock.Visibility = Visibility.Collapsed;
+
+                RecognizeWithoutUIListConstraint_Toggle(this, new RoutedEventArgs());
             }
             catch (Exception ex)
             {
@@ -317,53 +199,77 @@ namespace InMoov.Views
             });
         }
 
-        //Initialize a new FacesPage
-        FacesPage fp = new FacesPage();
         /// <summary>
-        /// Uses the recognizer constructed earlier to listen for speech from the user before displaying 
-        /// it back on the screen. Uses developer-provided UI for user feedback.
+        /// Begin recognition, or finish the recognition session. 
         /// </summary>
-        /// <param name="sender">Button that triggered this event</param>
-        /// <param name="e">State information about the routed event</param>
-        private async void RecognizeWithoutUIListConstraint_Click(object sender, RoutedEventArgs e)
+        /// <param name="sender">The button that generated this event</param>
+        /// <param name="e">Unused event details</param>
+        public async void RecognizeWithoutUIListConstraint_Toggle(object sender, RoutedEventArgs e)
         {
-            while (ToggleSpeech.IsOn)
+            //btnContinuousRecognize.IsEnabled = false;
+            if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                ledCaptured = false;
-                colorCaptured = null;
-                heardYouSayTextBlock.Visibility = resultTextBlock.Visibility = Visibility.Collapsed;
-                cbLanguageSelection.IsEnabled = false;
-                try
+                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                // This prevents an exception from occurring.
+                if (speechRecognizer.State == SpeechRecognizerState.Idle)
                 {
-                    // Start continuous Recognition Session
-                    recognitionOperation = speechRecognizer.RecognizeAsync();
+                    //DictationButtonText.Text = " Stop Dictation";
+                    //cbLanguageSelection.IsEnabled = false;
+                    //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
+                    //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
-                    SpeechRecognitionResult speechRecognitionResult = await recognitionOperation;
-                }
-                catch (TaskCanceledException exception)
-                {
-                    Debug.Print(exception.ToString());
-                }
-                catch (Exception exception)
-                {
-                    // Handle the speech privacy policy error.
-                    if ((uint)exception.HResult == HResultPrivacyStatementDeclined)
+                    try
                     {
-                        resultTextBlock.Visibility = Visibility.Visible;
-                        resultTextBlock.Text = "The privacy statement was declined.";
+                        isListening = true;
+                        System.Diagnostics.Debug.WriteLine("HELLO");
+                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
                     }
-                    else
+                    catch (Exception ex)
+                    {
+                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                        {
+                            // Show a UI link to the privacy settings.
+                            //hlOpenPrivacySettings.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                            await messageDialog.ShowAsync();
+                        }
+
+                        isListening = false;
+                        //DictationButtonText.Text = " Dictate";
+                        //cbLanguageSelection.IsEnabled = true;
+
+                    }
+                }
+            }
+            else
+            {
+                isListening = false;
+                //DictationButtonText.Text = " Dictate";
+                //cbLanguageSelection.IsEnabled = true;
+
+                if (speechRecognizer.State != SpeechRecognizerState.Idle)
+                {
+                    // Cancelling recognition prevents any currently recognized speech from
+                    // generating a ResultGenerated event. StopAsync() will allow the final session to 
+                    // complete.
+                    try
+                    {
+                        await speechRecognizer.ContinuousRecognitionSession.StopAsync();
+
+                        // Ensure we don't leave any hypothesis text behind
+                        resultTextBlock.Text = dictatedTextBuilder.ToString();
+                    }
+                    catch (Exception exception)
                     {
                         var messageDialog = new Windows.UI.Popups.MessageDialog(exception.Message, "Exception");
                         await messageDialog.ShowAsync();
                     }
                 }
-
-                // Reset UI state.
-                cbLanguageSelection.IsEnabled = true;
             }
-            //If the toggle Switch is off, Recognizing will end if user dont speech
-            StopRecognicing();
+            //btnContinuousRecognize.IsEnabled = true;
         }
 
         /// <summary>
@@ -374,19 +280,16 @@ namespace InMoov.Views
         /// <param name="args">The state of the recognizer</param>
         private async void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
         {
+            //Normalerweise nicht in Benutzung
             Debug.WriteLine("CRS_C");
             if (args.Status != SpeechRecognitionResultStatus.Success)
             {
-                // If TimeoutExceeded occurs, the user has been silent for too long. We can use this to 
-                // cancel recognition if the user in dictation mode and walks away from their device, etc.
-                // In a global-command type scenario, this timeout won't apply automatically.
-                // With dictation (no grammar in place) modes, the default timeout is 20 seconds.
                 if (args.Status == SpeechRecognitionResultStatus.TimeoutExceeded)
                 {
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         helpTextBlock.Text = " Dictate";
-                        cbLanguageSelection.IsEnabled = true;
+                        //cbLanguageSelection.IsEnabled = true;
                         helpTextBlock.Text = dictatedTextBuilder.ToString();
                         isListening = false;
                     });
@@ -396,7 +299,7 @@ namespace InMoov.Views
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         helpTextBlock.Text = " Dictate";
-                        cbLanguageSelection.IsEnabled = true;
+                        //cbLanguageSelection.IsEnabled = true;
                         isListening = false;
                     });
                 }
@@ -413,7 +316,7 @@ namespace InMoov.Views
             Debug.WriteLine("SR_HG");
             string hypothesis = args.Hypothesis.Text;
 
-            // Update the textbox with the currently confirmed text, and the hypothesis combined.
+            //Create the Text
             string textboxContent = dictatedTextBuilder.ToString() + " " + hypothesis + " ...";
 
             int zel = 0;
@@ -442,10 +345,12 @@ namespace InMoov.Views
                         facedetect[1] = 2;
                     }
                 }
+                //Start Facedetect
                 if (facedetect[0] == 1 && facedetect[1] == 1)
                 {
                     fp.StarteWebcam();
                 }
+                //End Facedetect
                 else if (facedetect[0] == 1 && facedetect[1] == 2)
                 {
                     fp.StopWebcam();
@@ -467,26 +372,31 @@ namespace InMoov.Views
                         colorCaptured = colorS;
                         switch (colorCaptured)
                         {
+                            //Set RGB-Colors to red
                             case "rot":
                                 color[0] = 255;             //R
                                 color[1] = 0;               //G
                                 color[2] = 0;               //B
                                 break;
+                            //Set RGB-Colors to blau
                             case "blau":
                                 color[0] = 0;               //R
                                 color[1] = 0;               //G
                                 color[2] = 255;             //B
                                 break;
+                            //Set RGB-Colors to green
                             case "grün":
                                 color[0] = 0;               //R
                                 color[1] = 255;             //G
                                 color[2] = 0;               //B
                                 break;
+                            //Set RGB-Colors to yellow
                             case "gelb":
                                 color[0] = 255;             //R
                                 color[1] = 255;             //G
                                 color[2] = 0;               //B
                                 break;
+                            //Set RGB-Colors to off/black
                             case "schwarz":
                             case "aus":
                                 color[0] = 0;               //R
@@ -521,14 +431,17 @@ namespace InMoov.Views
                 //Change Color of the LED
                 if (ledCaptured == true && colorCaptured != null)
                 {
-                    newNum = GetMostUsedValue(numbers, out int exNum);
+                    newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
                     resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
                     exNum--;
-                    byte.TryParse(exNum.ToString(), out byte NexNum);
+                    byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
                     App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+
+                    //Reset Variables
                     ledCaptured = false;
                     zel = 0;
+                    facedetect[0] = facedetect[1] = 0;
                     for(int i = 0; i < numbers.Length; i++)
                     {
                         numbers[i] = 0;
@@ -548,9 +461,8 @@ namespace InMoov.Views
         /// <param name="args">Details about the recognized speech</param>
         private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
         {
+            //Normalerweise nicht ausgelößt
             System.Diagnostics.Debug.WriteLine("CRS_RG");
-            // We may choose to discard content that has low confidence, as that could indicate that we're picking up
-            // noise via the microphone, or someone could be talking out of earshot.
             if (args.Result.Confidence == SpeechRecognitionConfidence.Medium ||
                 args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
@@ -558,9 +470,6 @@ namespace InMoov.Views
             }
             else
             {
-                // In some scenarios, a developer may choose to ignore giving the user feedback in this case, if speech
-                // is not the primary input mechanism for the application.
-                // Here, just remove any hypothesis text by resetting it to the last known good.
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     string discardedText = args.Result.Text;
@@ -581,7 +490,7 @@ namespace InMoov.Views
             }
             else
             {
-                //AUSNAHMEFEHLER!!!
+                //sollte nicht passieren
             }
         }
 
@@ -593,12 +502,12 @@ namespace InMoov.Views
         /// <returns>The number of times the most used number was used</returns>
         public static int GetMostUsedValue(int[] ArrayOfNumbers, out int MostUsedNumber)
         {
-            int max_Countnumber = 0;
+            int max_Countnumber = 0;        //Zähler wie oft der Wert im Array benutzt wurde
             MostUsedNumber = 0;
 
             for (int i = 0; i < ArrayOfNumbers.Length; i++)
             {
-                int l_count = 0;                //Zählt Anzahl des am meisten verwendeten Wertes
+                int l_count = 0;                //Der meist verwendete Wertes
                 for (int j = 0; j < ArrayOfNumbers.Length; j++)
                 {
                     if (ArrayOfNumbers[i] == ArrayOfNumbers[j])

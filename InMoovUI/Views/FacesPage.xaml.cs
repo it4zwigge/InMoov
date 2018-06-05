@@ -45,12 +45,12 @@ namespace InMoov.Views
         private ThreadPoolTimer frameProcessingTimer;
         public bool status = false;                                                                                                 //Beschreibt ob Erkennung an oderr aus
         public XML_Data xML_Data;
-
+        DispatcherTimer _faceTimer = new DispatcherTimer();
+        public string nameface_voice = null;
 
         DisplayRequest displayRequest = new DisplayRequest();
         public FacesPage()
-        {
-                
+        {  
             this.InitializeComponent();
             this.Loaded += FacesPage_Loaded;
             ToogleFace.Toggled += ToogleFace_Toggled;
@@ -106,21 +106,8 @@ namespace InMoov.Views
         private void FacesPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
-
-            //if (diagonal < 7)
-            //{
-            //    topbar.Visibility = Visibility.Collapsed;
-            //    bottombar.Visibility = Visibility.Visible;
-            //}
-            //else
-            //{
-            //    topbar.Visibility = Visibility.Visible;
-            //    bottombar.Visibility = Visibility.Collapsed;
-            //}
         }
 
-        DispatcherTimer _faceTimer = new DispatcherTimer();
-        public string nameface_voice = null;
         private async void _faceTimer_Tick(object sender, object e)
         {
             FaceName_TextBlock.Text = facedetected;
@@ -129,15 +116,7 @@ namespace InMoov.Views
             nameface_voice = FaceName_TextBlock.Text;
             if (FaceName_TextBlock.Text == "") { }
             else { await Task.Delay(5000); }
-        }
-
-        private void Stop_faceTimer()
-        {
-         
-        }
-       
-
-
+        }  
 
         public async void StarteWebcam()
         {
@@ -231,6 +210,7 @@ namespace InMoov.Views
                         var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inputStream);     //Encoder für PNG
                         encoder.SetSoftwareBitmap(converted);                                                       //Quelle für Daten
                         await encoder.FlushAsync();                                                                 //Daten umwandeln
+                       
 
                         //StopWebcam();
 
@@ -250,51 +230,51 @@ namespace InMoov.Views
                             results = await faceServiceClient.IdentifyAsync(personGroupId, faces.Select(f => f.FaceId).ToArray());      //Personen zu Gesichtern von API holen
                         }
 
-                        //    #region XML {                        
-                        //    if (results != null)
-                        //    {
-                        //        var result = results[0];
-                        //        if (result.Candidates.Length > 0)
+                        #region XML                                                                                                     //For working xml: The XML-File has to copied to the AppX path in the bin-folder                    
+                        if (results != null)                                                                                            //Filename for the xml-file: "XMLFile1.xml"
+                        {
+                            var result = results[0];
+                            if (result.Candidates.Length > 0)
+                            {
+                                xML_Data = new XML_Data();
+                                facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
+                            }
+                        }
+                        #endregion XML
+
+                        #region CloudNames 
+                        //for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
                         //        {
-                        //            xML_Data = new XML_Data();
-                        //            facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
+                        //            var face = faces[i];
+
+                        //            var photoFace = new PhotoFace()                                                                             //Koordinaten zum Gesicht im Bild
+                        //            {
+                        //                Rect = face.FaceRectangle,
+                        //                Identified = false
+                        //            };
+
+
+                        //            if (results != null)
+                        //            {
+                        //                var result = results[i];
+                        //                if (result.Candidates.Length > 0)
+                        //                {
+                        //                    photoFace.PersonId = result.Candidates[0].PersonId;
+                        //                    photoFace.Name = _personList.Where(p => p.PersonId == result.Candidates[0].PersonId).FirstOrDefault()?.Name;    //Verknüpfen des Namens
+                        //                    photoFace.Identified = true;
+                        //                    facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
+                        //                                                                                                                                    //Debug.WriteLine(photoFace.Name.ToString());
+
+                        //                    //xML_Data = new XML_Data();
+                        //                    //facedetected = xML_Data.GetVorName(photoFace.PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
+
+                        //                }
+                        //            }
 
                         //        }
-                        //    }
-                        //    }
-                        //#endregion XML
-
-                        for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
-                        {
-                            var face = faces[i];
-
-                            var photoFace = new PhotoFace()                                                                             //Koordinaten zum Gesicht im Bild
-                            {
-                                Rect = face.FaceRectangle,
-                                Identified = false
-                            };
-
-
-                            if (results != null)
-                            {
-                                var result = results[i];
-                                if (result.Candidates.Length > 0)
-                                {
-                                    photoFace.PersonId = result.Candidates[0].PersonId;
-                                    photoFace.Name = _personList.Where(p => p.PersonId == result.Candidates[0].PersonId).FirstOrDefault()?.Name;    //Verknüpfen des Namens
-                                    photoFace.Identified = true;
-                                    facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
-                                                                                                                                                    //Debug.WriteLine(photoFace.Name.ToString());
-
-                                    //xML_Data = new XML_Data();
-                                    //facedetected = xML_Data.GetVorName(photoFace.PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
-
-                                }
-                            }
-
-                        }
+                            #endregion CloudNames
                     }
-                    }
+                }
             }
             catch
             {

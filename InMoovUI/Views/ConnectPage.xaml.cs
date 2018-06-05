@@ -49,17 +49,6 @@ namespace InMoov.Views
         private void ConnectPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
-
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
         }
 
         //spiele verschiedene sounds zb. connected oder connection lost

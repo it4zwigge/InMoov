@@ -5,9 +5,9 @@
     xmlns:ctl="using:InMoov.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" FontFamily="Segoe UI">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" FocusVisualPrimaryBrush="#FFB93232" BorderBrush="Black" HorizontalAlignment="Left" Margin="29,0,0,0" VerticalAlignment="Center">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -34,11 +34,11 @@
         </VisualStateManager.VisualStateGroups>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition />
+            <RowDefinition Height="Auto" MinHeight="1000"/>
+            <RowDefinition Height="0*" />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" HorizontalAlignment="Center" Height="0" Margin="0,0,0,0" VerticalAlignment="Top" Width="0">
             <AppBarButton Icon="Edit" Label="Edit"/>
             <AppBarButton Icon="Delete" Label="Delete"/>
             <AppBarSeparator/>
@@ -48,13 +48,7 @@
                 <AppBarButton Label="Menu Item 2"/>
                 <AppBarButton Label="Menu Item 3"/>
             </CommandBar.SecondaryCommands>
-            <CommandBar.Content>
-                <ctl:PageHeader>
-                    <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-                    </ctl:PageHeader.HeaderContent>
-                </ctl:PageHeader>
-            </CommandBar.Content>
+
         </CommandBar>
 
         <!--<ctl:PageHeader x:Name="pageTitleContainer" Visibility="Collapsed">
@@ -63,27 +57,15 @@
             </ctl:PageHeader.HeaderContent>
         </ctl:PageHeader>-->
 
-        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Your App Content"/>
-            <Grid>
-                <Button x:Name="Neopixel_Reset" Content="Reset" HorizontalAlignment="Left" Margin="49,304,0,0" VerticalAlignment="Top" Height="101" Width="217" Click="Neopixel_Reset_Click"/>
-                <Button x:Name="Error" Content="Error Animation" HorizontalAlignment="Left" Margin="49,169,0,0" VerticalAlignment="Top" Width="217" Height="101" Click="Error_Click"/>
-                <Button x:Name="Facedetection" Content="Facedetection Animation" HorizontalAlignment="Left" Margin="49,39,0,0" VerticalAlignment="Top" Height="101" Width="217" Click="Facedetection_Click"/>
-            </Grid>
-        </Grid>
 
+        <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="" Height="32" Margin="0,0,0,0" Width="185"/>
 
+        <Button x:Name="Neopixel_Reset" Content="Reset" HorizontalAlignment="Stretch" Margin="436,120,855,0" VerticalAlignment="Top" Height="101" Click="Neopixel_Reset_Click" FontFamily="VW Head Office"/>
+        <Button x:Name="Error" Content="Error Animation" HorizontalAlignment="Stretch" Margin="225,120,1066,0" VerticalAlignment="Top" Height="101" Click="Error_Click" FontFamily="VW Head Office"/>
+        <Button x:Name="Facedetection" Content="Facedetection Animation" HorizontalAlignment="Stretch" Margin="15,120,1276,0" VerticalAlignment="Top" Height="101" Click="Facedetection_Click" FontFamily="VW Head Office"/>
+        <TextBlock HorizontalAlignment="Left" Height="50" Margin="135,10,0,0" Text="LED Ring" VerticalAlignment="Top" Width="171" FontSize="36" FontFamily="VW Head Office"/>
+        <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Height="34" Margin="15,67,0,0" VerticalAlignment="Top" Width="281" FontFamily="VW Head Office" FontSize="13"/>
+        <TextBlock HorizontalAlignment="Left" Height="185" Margin="10,284,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." TextWrapping="Wrap" VerticalAlignment="Top" Width="880" FontFamily="VW Head Office"/>
 
-        <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
     </Grid>
 </Page>

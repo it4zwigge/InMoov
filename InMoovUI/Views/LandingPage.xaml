@@ -39,32 +39,27 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <c:PageHeader x:Name="pageHeader">
-            <c:PageHeader.HeaderContent>
-                <TextBlock x:Name="title"  Style="{StaticResource PageTitleTextBlockStyle}" Text="App Overview"/>
-            </c:PageHeader.HeaderContent>
-        </c:PageHeader>
-
         <ScrollViewer Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" IsTabStop="True" Margin="12,4,0,0">
             <StackPanel x:Name="ContentContainer" Margin="12,0,24,0">
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}">Top-Level Navigation</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,4">This sample demonstrates a universal Windows app with top-level navigation.</TextBlock>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" FontSize="30" Margin="0,12,0,4">Projekt InMoov</TextBlock>
 
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4">Overview</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,4">The root of the app is an AppShell of type Page instead of a Frame.
-                    It uses a SplitView to present both the top-level navigation menu and a Frame for navigating between pages in the app.  The AppShell also
-                    provides basic keyboarding behavior for unhandled key presses.  The navigation menu is implemented using a customized ListView and
-                    to enable the expected keyboarding experience.  The "hamburger" button for the app is floating in the top corner of the app at a
-                    higher z-order.  To enable content on individual pages to be aware of the floating "hamburger" the app uses a PageHeader control
-                    that is aware of the "hamburger".
-                </TextBlock>
-
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4">Things to see:</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,8"> 1) App.xaml - The startup sequence using AppShell as the root element instead of a Frame.</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,8"> 2) AppShell.xaml - The "chrome" of the app.</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,8"> 3) PageHeader.xaml - Control to wrap an item on a Page to avoid visual overlap with the floating hamburger.</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,8"> 4) Styles.xaml - Styles including one for a hamburger button.</TextBlock>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,8"> 5) NavMenuListView class - A customized ListView to show the navigation items and handle keyboarding.</TextBlock>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,18,0,4">Was ist dieses InMoov?</TextBlock>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Height="150" Margin="0,0,0,4">Das Projekt InMoov ist ein OpenSource-Projekt eines humanoiden 
+                    Roboters, welcher vom gesammten Informatikteam des Volkswagen Bildungsinstituts programmiert wird. Der Roboter besteht aus selbstgedruckten 
+                    Teilen, 28 Servomotoren und einem Mecanum-Fahrgestell. Gesteuert wird er mittels mehrerer Arduino's. Er besitzt mehrere Besonderheiten, wie eine 
+                    Gesichts, sowie Spracherkennung, eine Skelletierung, welche die genauen Bewegung des menschlichen Charakters nach ahmt. Aufgrund des Mecanum Fahrgestelles 
+                    ist er in der Lage, in alle Richtungen zu fahren, auch ohne sich drehen zu müssen.</TextBlock>
+                
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 1)  Spracherkennung bereit -</TextBlock>
+                <TextBlock Name="spracherkennungcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 2)  Gesichtserkennung bereit -</TextBlock>
+                <TextBlock Name="gesichtserkennungcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 3)  Arduino's verbunden -</TextBlock>
+                <TextBlock Name="arduinocheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 4) Fahrbereit -</TextBlock>
+                <TextBlock Name="fahrbereitcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 5) Skelletierung bereit -</TextBlock>
+                <TextBlock Name="skelletierungcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

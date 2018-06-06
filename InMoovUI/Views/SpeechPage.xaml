@@ -38,8 +38,12 @@
         <StackPanel x:Name="Y">
             <TextBlock Text="Spracherkennung" Margin="130,10,0,0" FontSize="36" FontFamily="VW Head Office" HorizontalAlignment="Left" VerticalAlignment="Center" Width="1505"/>
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1948" HorizontalAlignment="Stretch" Margin="-30,20,1250,0" VerticalAlignment="Top" Height="34" FontFamily="VW Head Office" FontSize="13"/>
-            <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" Margin="0,100,1316,0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="143" FontFamily="Segoe UI" Height="45"/>
-            <TextBlock x:Name="resultTextBlock" Height="200" Width="500" HorizontalAlignment="Left" Margin="150,-140,0,0" VerticalAlignment="Top"></TextBlock>
+            <ToggleSwitch x:Name="ToggleSpeech" HorizontalAlignment="Left" Margin="0,0,0,0" UseLayoutRounding="False" VerticalAlignment="Center" d:LayoutRounding="Auto">
+                <ToggleSwitch.RenderTransform>
+                    <CompositeTransform SkewY="-0.182" TranslateY="-0.389"/>
+                </ToggleSwitch.RenderTransform>
+            </ToggleSwitch>
+            <TextBlock x:Name="resultTextBlock" Height="216" HorizontalAlignment="Stretch" Margin="150,-100,850,0" VerticalAlignment="Top"/>
             <TextBlock Margin="20,25,249,0" VerticalAlignment="Top" FontFamily="VW Head Office" FontSize="15" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." Height="253"/>
 
         </StackPanel>

@@ -314,6 +314,7 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
+            App.ALinks.servoWrite(26, 30);
             Debug.WriteLine("SR_HG");
             Debug.WriteLine(args.Hypothesis.Text);
             if (uebergabeText == null)
@@ -461,35 +462,35 @@ namespace InMoov.Views
 
                 //Change Color of the LED
                 if (ledCaptured == true && colorCaptured != null)
-                    {
-                        newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
+                {
+                    newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
                     resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
-                        byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
+                    byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
                     NexNum--;
-                        Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
+                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
 
 
                     textboxContent = "LED " + exNum + " " + colorCaptured;
-                        uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
-                        resultTextBlock.Text = textboxContent;
+                    uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
+                    resultTextBlock.Text = textboxContent;
                     //Reset Variables
                     ledCaptured = false;
-                        colorCaptured = null;
-                        zel = 0;
-                        facedetect[0] = facedetect[1] = 0;
-                        for (int i = 0; i < numbers.Length; i++)
-                        {
-                            numbers[i] = 0;
-                        }
-                        Speak(uebergabeText);
-                        dictatedTextBuilder.Clear();
+                    colorCaptured = null;
+                    zel = 0;
+                    facedetect[0] = facedetect[1] = 0;
+                    for (int i = 0; i < numbers.Length; i++)
+                    {
+                        numbers[i] = 0;
                     }
-                    else
-                        resultTextBlock.Text = textboxContent;
+                    Speak(uebergabeText);
+                    dictatedTextBuilder.Clear();
+                }
+            else
+                resultTextBlock.Text = textboxContent;
 
-                    #endregion
-                });
+                #endregion
+            });
             }
         }
 
@@ -587,7 +588,8 @@ namespace InMoov.Views
                     {
                         if (i == 0)
                         {
-
+                            App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);
                             i = 1;
                             // Create a stream from the text. This will be played using a media element.
                             SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
@@ -619,6 +621,7 @@ namespace InMoov.Views
         }
         void media_MediaEnded(object sender, RoutedEventArgs e)
         {
+            App.ALinks.servoWrite(26, 60);
             media.AutoPlay = false;
             media.Stop();
             uebergabeText = null;

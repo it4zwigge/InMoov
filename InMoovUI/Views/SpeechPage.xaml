@@ -57,10 +57,10 @@
 
         </StackPanel>
         <StackPanel x:Name="Y">
-                        <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
+            <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
             <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" Margin="10,25,0,0"/>            
-                    <TextBlock x:Name="resultTextBlock" Margin="0,14.5,0,0" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
-                </StackPanel>
+            <TextBlock x:Name="resultTextBlock" Margin="0,14.5,0,0" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
+        </StackPanel>
         <MediaElement x:Name="media" AutoPlay="False" MediaEnded="media_MediaEnded"/>
        
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

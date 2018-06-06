@@ -63,7 +63,11 @@ namespace InMoov.Views
         private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne", "benutze" };
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
         //TimeList which handles the timephrases!
-        List<string> timeList = new List<string>() { "Welche Uhrzeit ist gerade", "welche uhrzeit ist gerade", "welche uhrzeit ist grade", "welche Uhrzeit ist grade", "wie spät ist es" };
+        private static List<string> timeList = new List<string>() { "Welche Uhrzeit ist gerade", "welche uhrzeit ist gerade", "welche uhrzeit ist grade", "welche Uhrzeit ist grade", "wie spät ist es" };
+        //Hellophrases
+        private static List<string> helloList = new List<string>() { "Hallo Roboter", "Hallo InMove", "Hallo Robi" };
+        //good bye phrases
+        private static List<string> byeList = new List<string>() { "Tschüss Roboter", "Tschüss InMove", "Tschüss Robi", "Auf Wiedersehen Roboter", "Auf Wiedersehen InMove", "Auf Wiedersehen Robi" };
 
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
@@ -314,7 +318,8 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
-            App.ALinks.servoWrite(26, 0);
+            int hour = DateTime.Now.Hour;
+            int minute = DateTime.Now.Minute;
             Debug.WriteLine("SR_HG");
             Debug.WriteLine(args.Hypothesis.Text);
             if (uebergabeText == null)
@@ -326,14 +331,48 @@ namespace InMoov.Views
                 int zel = 0;
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
+                    foreach (string hello in helloList)
+                    {
+                        if(textboxContent.Contains(hello))
+                        {
+                            if(hour < 9)
+                            {
+                                Speak("Guten Morgen, schön sie zu sehen");
+                            }
+                            else if (hour < 12 || hour >= 13)
+                            {
+                                Speak("Hallo, schön sie zu sehen");
+                            }
+                            else if (hour < 13)
+                            {
+                                Speak("Guten Mittag, schön sie zu sehen");
+                            }
+                        }
+                    }
+                    foreach(string bye in byeList)
+                    {
+                        if(textboxContent.Contains(bye))
+                        {
+                            if (hour < 9)
+                            {
+                                Speak("Auf Wwiedersehen!");
+                            }
+                            else if (hour < 12 || hour >= 13)
+                            {
+                                Speak("Ich wünsche guten 'Appetit");
+                            }
+                            else if (hour < 13)
+                            {
+                                Speak("Schönen Nachmittag noch");
+                            }
+                        }
+                    }
                     //Function for Clockoutput
                     #region Uhrzeit
                     foreach (string time in timeList)
                     {
                         if (textboxContent.Contains(time))
                         {
-                            int hour = DateTime.Now.Hour;
-                            int minute = DateTime.Now.Minute;
                             uebergabeText = "Es ist " + hour.ToString() + " Uhr " + minute.ToString();
                             Speak(uebergabeText);
                             if ((hour == 10 && minute >= 55) || (hour == 11 && minute <= 5) || (hour == 13 && minute >= 55) || (hour == 14 && minute <= 5))
@@ -569,7 +608,7 @@ namespace InMoov.Views
         /// </summary>
         /// <param name="sender">Button that triggered this event</param>
         /// <param name="e">State information about the routed event</param>
-        private async void Speak(string Text)
+        public async void Speak(string Text)
         {
             int i = 0;
             Debug.WriteLine("Media");

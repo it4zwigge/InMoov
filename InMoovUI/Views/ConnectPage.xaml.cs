@@ -223,10 +223,10 @@ namespace InMoov.Views
              {
                 switch (arduino.id.Substring(26, 20))
                 {
-                    case "756303137363513071D1":
-                    case "55639303834351D0F191":
-                    case "85539313931351C09082":
-                    case "95530343634351901162":
+                    //case "756303137363513071D1":
+                    //case "55639303834351D0F191":
+                    //case "85539313931351C09082":
+                    //case "95530343634351901162":
                     case "955303430353518062E0":
                         App.Leonardo = arduino;
                         Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");

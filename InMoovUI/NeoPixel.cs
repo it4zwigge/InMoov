@@ -174,14 +174,14 @@ namespace InMoov
                         }
                         if (stop) { break; }
                     }
-                    for (byte fade = 125; fade > 0; fade -= 5)
+                    for (byte fade = 125; fade > 0; fade -= 10)
                     {
                         for (byte i = 0; i < 16; i++)
                         {
                             if (!stop)
                             {
                                 App.neopixel.SetPixelColor(i, 0, 0, fade);
-                                await Task.Delay(1);
+                                await Task.Delay(01);
                             }
                             else
                                 break;

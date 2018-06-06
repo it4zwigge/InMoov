@@ -34,18 +34,18 @@ namespace InMoov.Views
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
             //move commandbar to page bottom on small screens
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
+            //if (diagonal < 7)
+            //{
+            //    topbar.Visibility = Visibility.Collapsed;
+            //    //pageTitleContainer.Visibility = Visibility.Visible;
+            //    bottombar.Visibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    topbar.Visibility = Visibility.Visible;
+            //    //pageTitleContainer.Visibility = Visibility.Collapsed;
+            //    bottombar.Visibility = Visibility.Collapsed;
+            //}
         }
     }
 }

@@ -46,9 +46,9 @@
             <Button x:Name="Rueckwaerts_Button" Content="Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,120,0,0" VerticalAlignment="Top" Width="254" Click="Rueckwaerts_Button_Click" FontFamily="VW Head Office"/>
             <Button x:Name="Stop_R_Button" Content="Stop Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,327,0,0" VerticalAlignment="Top" Width="254" Click="Stop_R_Button_Click" FontFamily="VW Head Office"/>
             <Button x:Name="Drehung_Button" Content="Drehung" HorizontalAlignment="Left" Height="170" Margin="10,222,0,0" VerticalAlignment="Top" Width="254" Click="Drehung_Button_Click" FontFamily="VW Head Office" />
-            <TextBlock HorizontalAlignment="Left" Height="60" Margin="130,10,0,0" Text="Fahrwerkssteuerung" TextWrapping="Wrap" VerticalAlignment="Top" Width="386" FontSize="36" FontFamily="VW Head Office"/>
-            <HyperlinkButton HorizontalAlignment="Left" Height="35" Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2033" Margin="7,70,0,0" VerticalAlignment="Top" Width="280" FontSize="13"  FocusVisualPrimaryBrush="{x:Null}" FontFamily="VW Head Office"/>
-            <TextBlock HorizontalAlignment="Left" Height="170" Margin="10,550,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." VerticalAlignment="Top" Width="890" FontSize="15" FontFamily="VW Head Office"/>
+            <TextBlock HorizontalAlignment="Left" Height="60" Margin="5,10,0,0" Text="Fahrwerkssteuerung" TextWrapping="Wrap" VerticalAlignment="Top" Width="386" FontSize="36" FontFamily="VW Head Office"/>
+            <HyperlinkButton HorizontalAlignment="Left" Height="35" Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2033" Margin="-10,70,0,0" VerticalAlignment="Top" Width="280" FontSize="13"  FocusVisualPrimaryBrush="{x:Null}" FontFamily="VW Head Office"/>
+            <TextBlock HorizontalAlignment="Left" Height="170" Margin="5,550,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." VerticalAlignment="Top" Width="890" FontSize="15" FontFamily="VW Head Office"/>
 
         </Grid>
 

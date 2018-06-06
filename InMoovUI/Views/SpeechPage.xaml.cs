@@ -540,7 +540,7 @@ namespace InMoov.Views
         /// <param name="e">State information about the routed event</param>
         private async void Speak(string Text)
         {
-            speechRecognizer.ContinuousRecognitionSession.PauseAsync();
+            speechRecognizer.ContinuousRecognitionSession.StopAsync();
             // If the media is playing, the user has pressed the button to stop the playback.
             if (media.CurrentState == MediaElementState.Playing)
             {
@@ -561,8 +561,6 @@ namespace InMoov.Views
                         media.AutoPlay = true;
                         media.SetSource(synthesisStream, synthesisStream.ContentType);
                         media.Play();
-                        uebergabeText = null;
-                        speechRecognizer.ContinuousRecognitionSession.Resume();
                     }
                     catch (System.IO.FileNotFoundException)
                     {
@@ -583,7 +581,8 @@ namespace InMoov.Views
         }
         void media_MediaEnded(object sender, RoutedEventArgs e)
         {
-            //Speak(null);
+            uebergabeText = null;
+            speechRecognizer.ContinuousRecognitionSession.StartAsync();
         }
     }
 }

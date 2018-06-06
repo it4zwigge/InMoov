@@ -325,6 +325,8 @@ namespace InMoov.Views
                 int zel = 0;
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
+                    //Function for Clockoutput
+                    #region Uhrzeit
                     foreach (string time in timeList)
                     {
                         if (textboxContent.Contains(time))
@@ -335,14 +337,23 @@ namespace InMoov.Views
                             Speak(uebergabeText);
                             if ((hour == 10 && minute >= 55) || (hour == 11 && minute <= 5) || (hour == 13 && minute >= 55) || (hour == 14 && minute <= 5))
                             {
-                                Speak(uebergabeText + " Zeit für die Sozi");
+                                Speak(uebergabeText + ", Zeit für die Sozi");
+                            }
+                            else if((hour == 8 && minute >= 57) || (hour == 9 && minute <= 20))
+                            {
+                                Speak(uebergabeText + ", Zeit fürs Frühstück");
+                            }
+                            else if ((hour == 11 && minute >= 57) || (hour == 12 && minute <= 20))
+                            {
+                                Speak(uebergabeText + ", Zeit fürs Mittag");
                             }
                         }
                     }
+                    #endregion
 
-                //Search after Face-Detection Phrases/Words
-                #region Gesichtserkennung
-                foreach (string facedet in facelist)
+                    //Search after Face-Detection Phrases/Words
+                    #region Gesichtserkennung
+                    foreach (string facedet in facelist)
                     {
                         if (textboxContent.Contains(facedet))
                         {
@@ -374,8 +385,8 @@ namespace InMoov.Views
                         fp.StopWebcam();
                     }
                 #endregion
-                //LED Search-Algorithm
-                #region LED
+                    //LED Search-Algorithm
+                    #region LED
                 if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
                     {
                         Debug.WriteLine(textboxContent);

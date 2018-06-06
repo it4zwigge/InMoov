@@ -314,7 +314,7 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
-            App.ALinks.servoWrite(26, 30);
+            App.ALinks.servoWrite(26, 0);
             Debug.WriteLine("SR_HG");
             Debug.WriteLine(args.Hypothesis.Text);
             if (uebergabeText == null)

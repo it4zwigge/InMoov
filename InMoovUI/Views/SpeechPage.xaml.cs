@@ -12,6 +12,7 @@ using Windows.Foundation.Collections;
 using Windows.Globalization;
 using Windows.Graphics.Display;
 using Windows.Media.SpeechRecognition;
+using Windows.Media.SpeechSynthesis;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -47,17 +48,11 @@ namespace InMoov.Views
 
         private bool isListening;
         private SpeechRecognizer speechRecognizer;
-        private ResourceContext speechContext;
-        private ResourceMap speechResourceMap;
         private StringBuilder dictatedTextBuilder;
-        private bool isPopulatingLanguages = false;
-        private IAsyncOperation<SpeechRecognitionResult> recognitionOperation;
-        private string textCaptured;                    //Handles the captured Text
         private int[] facedetect = new int[2];          //Handles the facedetection start/stop Commands
         private int[] numbers = new int[50];            //Numbers which are getting captured by speechrecognition
         private bool ledCaptured;                       //Handles if Word LED is captured
         private string colorCaptured;                   //Handles which color is picked by user
-        private List<string> ListX = new List<string>();
         //Handles the amount of colors the User can pick
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb", "schwarz", "aus" };
         //Handles the amount of Numbers the User can pick
@@ -69,7 +64,10 @@ namespace InMoov.Views
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
+        string uebergabeText;
 
+
+        private SpeechSynthesizer synthesizer;
         //Initialize a new FacesPage
         FacesPage fp = new FacesPage();
 
@@ -77,6 +75,7 @@ namespace InMoov.Views
         {
             this.InitializeComponent();
             this.Loaded += SpeechPage_Loaded;
+            synthesizer = new SpeechSynthesizer();
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
         }
@@ -160,14 +159,13 @@ namespace InMoov.Views
                 speechRecognizer.StateChanged += SpeechRecognizer_StateChanged;
 
                 //Text before continuous recognize is enabled
-                string uiOptionsText = "Ich bin noch nicht fertig, tut mir leid :(";
+                string uiOptionsText = "Hallo ich bin das InMoov Sprachprogramm\n\nIch bin noch nicht fertig, tut mir leid :( \nAber ich gebe mir mühe :)\n\nIch bin noch nicht fertig, tut mir leid :(";
                 speechRecognizer.UIOptions.ExampleText = uiOptionsText;
-                helpTextBlock.Text = "Hallo ich bin das InMoov Sprachprogramm\n\nIch bin noch nicht fertig, tut mir leid :( \nAber ich gebe mir mühe :)";
                 // Compile the constraint.
                 SpeechRecognitionCompilationResult compilationResult = await speechRecognizer.CompileConstraintsAsync();
 
 
-                resultTextBlock.Visibility = Visibility.Collapsed;
+                resultTextBlock.Visibility = Visibility.Visible;
 
                 RecognizeWithoutUIListConstraint_Toggle(this, new RoutedEventArgs());
             }
@@ -289,9 +287,8 @@ namespace InMoov.Views
                 {
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        helpTextBlock.Text = " Dictate";
                         //cbLanguageSelection.IsEnabled = true;
-                        helpTextBlock.Text = dictatedTextBuilder.ToString();
+                        resultTextBlock.Text = dictatedTextBuilder.ToString();
                         isListening = false;
                     });
                 }
@@ -299,7 +296,7 @@ namespace InMoov.Views
                 {
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        helpTextBlock.Text = " Dictate";
+                        resultTextBlock.Text = " Dictate";
                         //cbLanguageSelection.IsEnabled = true;
                         isListening = false;
                     });
@@ -437,14 +434,15 @@ namespace InMoov.Views
                 {
                     newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
                     resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
-                    exNum--;
                     byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
+                    NexNum--;
                     Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
                     //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
 
 
-                    textboxContent = "LED " + exNum + colorCaptured;
-                    helpTextBlock.Text = textboxContent;
+                    textboxContent = "LED " + exNum + " " + colorCaptured;
+                    uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
+                    resultTextBlock.Text = textboxContent;
                     //Reset Variables
                     ledCaptured = false;
                     colorCaptured = null;
@@ -454,12 +452,13 @@ namespace InMoov.Views
                     {
                         numbers[i] = 0;
                     }
+                    Speak(uebergabeText);
                     dictatedTextBuilder.Clear();
                 }
                 #endregion
                 else
                 {
-                    helpTextBlock.Text = textboxContent;
+                    resultTextBlock.Text = textboxContent;
                 }
             });
         }
@@ -486,23 +485,6 @@ namespace InMoov.Views
                 {
                     string discardedText = args.Result.Text;
                 });
-            }
-        }
-
-        private void StopRecognicing()
-        {
-            if (isListening == true && ToggleSpeech.IsOn == true)
-            {
-                ToggleSpeech.IsOn = false;
-                isListening = false;
-                helpTextBlock.Text = "";
-                heardYouSayTextBlock.Visibility = Visibility.Collapsed;
-                resultTextBlock.Visibility = Visibility.Collapsed;
-                dictatedTextBuilder.Clear();
-            }
-            else
-            {
-                //sollte nicht passieren
             }
         }
 
@@ -548,6 +530,59 @@ namespace InMoov.Views
             }
 
             return max_Countnumber;
+        }
+
+
+        /// <summary>
+        /// This is invoked when the user clicks on the speak/stop button.
+        /// </summary>
+        /// <param name="sender">Button that triggered this event</param>
+        /// <param name="e">State information about the routed event</param>
+        private async void Speak(string Text)
+        {
+            speechRecognizer.ContinuousRecognitionSession.StopAsync();
+            // If the media is playing, the user has pressed the button to stop the playback.
+            if (media.CurrentState == MediaElementState.Playing)
+            {
+                media.Stop();
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(Text))
+                {
+                    // Change the button label. You could also just disable the button if you don't want any user control.
+
+                    try
+                    {
+                        // Create a stream from the text. This will be played using a media element.
+                        SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
+
+                        // Set the source and start playing the synthesized audio stream.
+                        media.AutoPlay = true;
+                        media.SetSource(synthesisStream, synthesisStream.ContentType);
+                        media.Play();
+                    }
+                    catch (System.IO.FileNotFoundException)
+                    {
+                        // If media player components are unavailable, (eg, using a N SKU of windows), we won't
+                        // be able to start media playback. Handle this gracefully
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Media player components unavailable");
+                        await messageDialog.ShowAsync();
+                    }
+                    catch (Exception)
+                    {
+                        // If the text is unable to be synthesized, throw an error message to the user.
+                        media.AutoPlay = false;
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Unable to synthesize text");
+                        await messageDialog.ShowAsync();
+                    }
+                }
+            }
+        }
+        void media_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            uebergabeText = null;
+            speechRecognizer.ContinuousRecognitionSession.StartAsync();
         }
     }
 }

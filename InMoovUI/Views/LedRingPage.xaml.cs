@@ -33,17 +33,7 @@ namespace InMoov.Views
         private void LedRingPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
-
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
+            
         }
 
         // wenn der Leonardo verbunden ist wird diese Methode einmalig aufgerufen um den Ledring frühzeitig ansteuern zu können und diesen anzulegen

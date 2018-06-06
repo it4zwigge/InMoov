@@ -118,6 +118,9 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SpeechSchedulerPage.xaml.cs">
+      <DependentUpon>SpeechSchedulerPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SkeletonPage.xaml.cs">
       <DependentUpon>SkeletonPage.xaml</DependentUpon>
     </Compile>
@@ -193,6 +196,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\BasicSubPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SpeechSchedulerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

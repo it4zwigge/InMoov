@@ -63,7 +63,11 @@ namespace InMoov.Views
         private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne", "benutze" };
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
         //TimeList which handles the timephrases!
-        List<string> timeList = new List<string>() { "Welche Uhrzeit ist gerade", "welche uhrzeit ist gerade", "welche uhrzeit ist grade", "welche Uhrzeit ist grade", "wie spät ist es" };
+        private static List<string> timeList = new List<string>() { "Welche Uhrzeit ist gerade", "welche uhrzeit ist gerade", "welche uhrzeit ist grade", "welche Uhrzeit ist grade", "wie spät ist es" };
+        //Hellophrases
+        private static List<string> helloList = new List<string>() { "hallo roboter", "hallo in move", "hallo robi" };
+        //good bye phrases
+        private static List<string> byeList = new List<string>() { "tschüss roboter", "tschüss in move", "tschüss robi", "auf wiedersehen roboter", "auf wiedersehen in move", "auf wiedersehen robi" };
 
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
@@ -211,38 +215,45 @@ namespace InMoov.Views
             //btnContinuousRecognize.IsEnabled = false;
             if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
-                // This prevents an exception from occurring.
-                if (speechRecognizer.State == SpeechRecognizerState.Idle)
+                if (DateTime.Now.Hour >= 15)
                 {
-                    //DictationButtonText.Text = " Stop Dictation";
-                    //cbLanguageSelection.IsEnabled = false;
-                    //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
-                    //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
-                    try
+                    Speak("Ich mach jetzt Feierabend!");
+                }
+                else
+                {
+                    // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                    // This prevents an exception from occurring.
+                    if (speechRecognizer.State == SpeechRecognizerState.Idle)
                     {
-                        isListening = true;
-                        System.Diagnostics.Debug.WriteLine("HELLO");
-                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
-                        {
-                            // Show a UI link to the privacy settings.
-                            //hlOpenPrivacySettings.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
-                            await messageDialog.ShowAsync();
-                        }
+                        //DictationButtonText.Text = " Stop Dictation";
+                        //cbLanguageSelection.IsEnabled = false;
+                        //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
+                        //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
-                        isListening = false;
-                        //DictationButtonText.Text = " Dictate";
-                        //cbLanguageSelection.IsEnabled = true;
+                        try
+                        {
+                            isListening = true;
+                            System.Diagnostics.Debug.WriteLine("HELLO");
+                            await speechRecognizer.ContinuousRecognitionSession.StartAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                            {
+                                // Show a UI link to the privacy settings.
+                                //hlOpenPrivacySettings.Visibility = Visibility.Visible;
+                            }
+                            else
+                            {
+                                var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                                await messageDialog.ShowAsync();
+                            }
 
+                            isListening = false;
+                            //DictationButtonText.Text = " Dictate";
+                            //cbLanguageSelection.IsEnabled = true;
+
+                        }
                     }
                 }
             }
@@ -314,7 +325,8 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
-            App.ALinks.servoWrite(26, 30);
+            int hour = DateTime.Now.Hour;
+            int minute = DateTime.Now.Minute;
             Debug.WriteLine("SR_HG");
             Debug.WriteLine(args.Hypothesis.Text);
             if (uebergabeText == null)
@@ -326,14 +338,48 @@ namespace InMoov.Views
                 int zel = 0;
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
+                    foreach (string hello in helloList)
+                    {
+                        if(textboxContent.Contains(hello))
+                        {
+                            if(hour < 9)
+                            {
+                                Speak("Guten Morgen, schön sie zu sehen");
+                            }
+                            else if (hour < 12 || hour >= 13)
+                            {
+                                Speak("Hallo, schön sie zu sehen");
+                            }
+                            else if (hour < 13)
+                            {
+                                Speak("Guten Mittag, schön sie zu sehen");
+                            }
+                        }
+                    }
+                    foreach(string bye in byeList)
+                    {
+                        if(textboxContent.Contains(bye))
+                        {
+                            if (hour < 9)
+                            {
+                                Speak("Auf Wwiedersehen!");
+                            }
+                            else if (hour < 12 || hour >= 13)
+                            {
+                                Speak("Ich wünsche guten 'Appetit");
+                            }
+                            else if (hour < 13)
+                            {
+                                Speak("Schönen Nachmittag noch");
+                            }
+                        }
+                    }
                     //Function for Clockoutput
                     #region Uhrzeit
                     foreach (string time in timeList)
                     {
                         if (textboxContent.Contains(time))
                         {
-                            int hour = DateTime.Now.Hour;
-                            int minute = DateTime.Now.Minute;
                             uebergabeText = "Es ist " + hour.ToString() + " Uhr " + minute.ToString();
                             Speak(uebergabeText);
                             if ((hour == 10 && minute >= 55) || (hour == 11 && minute <= 5) || (hour == 13 && minute >= 55) || (hour == 14 && minute <= 5))
@@ -347,6 +393,10 @@ namespace InMoov.Views
                             else if ((hour == 11 && minute >= 57) || (hour == 12 && minute <= 20))
                             {
                                 Speak(uebergabeText + ", Zeit fürs Mittag");
+                            }
+                            else if((hour == 14 && minute == 45) || (hour >= 15))
+                            {
+                                Speak(uebergabeText + ", ich würde Feierabend vorschlagen");
                             }
                         }
                     }
@@ -486,8 +536,8 @@ namespace InMoov.Views
                     Speak(uebergabeText);
                     dictatedTextBuilder.Clear();
                 }
-            else
-                resultTextBlock.Text = textboxContent;
+                else
+                    resultTextBlock.Text = textboxContent;
 
                 #endregion
             });
@@ -569,7 +619,7 @@ namespace InMoov.Views
         /// </summary>
         /// <param name="sender">Button that triggered this event</param>
         /// <param name="e">State information about the routed event</param>
-        private async void Speak(string Text)
+        public async void Speak(string Text)
         {
             int i = 0;
             Debug.WriteLine("Media");
@@ -588,8 +638,8 @@ namespace InMoov.Views
                     {
                         if (i == 0)
                         {
-                            App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
-                            App.ALinks.servoWrite(26, 0);
+                            /*App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);*/
                             i = 1;
                             // Create a stream from the text. This will be played using a media element.
                             SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
@@ -598,11 +648,12 @@ namespace InMoov.Views
                             media.AutoPlay = true;
                             media.SetSource(synthesisStream, synthesisStream.ContentType);
                             media.Play();
+                            dictatedTextBuilder.Clear();
                             Text = null;
                             uebergabeText = null;
                         }
                     }
-                    catch (System.IO.FileNotFoundException)
+                    catch (FileNotFoundException)
                     {
                         // If media player components are unavailable, (eg, using a N SKU of windows), we won't
                         // be able to start media playback. Handle this gracefully
@@ -621,7 +672,7 @@ namespace InMoov.Views
         }
         void media_MediaEnded(object sender, RoutedEventArgs e)
         {
-            App.ALinks.servoWrite(26, 60);
+            /*App.ALinks.servoWrite(26, 60);*/
             media.AutoPlay = false;
             media.Stop();
             uebergabeText = null;

@@ -215,38 +215,45 @@ namespace InMoov.Views
             //btnContinuousRecognize.IsEnabled = false;
             if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
-                // This prevents an exception from occurring.
-                if (speechRecognizer.State == SpeechRecognizerState.Idle)
+                if (DateTime.Now.Hour >= 15)
                 {
-                    //DictationButtonText.Text = " Stop Dictation";
-                    //cbLanguageSelection.IsEnabled = false;
-                    //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
-                    //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
-                    try
+                    Speak("Ich mach jetzt Feierabend!");
+                }
+                else
+                {
+                    // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                    // This prevents an exception from occurring.
+                    if (speechRecognizer.State == SpeechRecognizerState.Idle)
                     {
-                        isListening = true;
-                        System.Diagnostics.Debug.WriteLine("HELLO");
-                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
-                        {
-                            // Show a UI link to the privacy settings.
-                            //hlOpenPrivacySettings.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
-                            await messageDialog.ShowAsync();
-                        }
+                        //DictationButtonText.Text = " Stop Dictation";
+                        //cbLanguageSelection.IsEnabled = false;
+                        //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
+                        //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
-                        isListening = false;
-                        //DictationButtonText.Text = " Dictate";
-                        //cbLanguageSelection.IsEnabled = true;
+                        try
+                        {
+                            isListening = true;
+                            System.Diagnostics.Debug.WriteLine("HELLO");
+                            await speechRecognizer.ContinuousRecognitionSession.StartAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                            {
+                                // Show a UI link to the privacy settings.
+                                //hlOpenPrivacySettings.Visibility = Visibility.Visible;
+                            }
+                            else
+                            {
+                                var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                                await messageDialog.ShowAsync();
+                            }
 
+                            isListening = false;
+                            //DictationButtonText.Text = " Dictate";
+                            //cbLanguageSelection.IsEnabled = true;
+
+                        }
                     }
                 }
             }
@@ -387,6 +394,10 @@ namespace InMoov.Views
                             {
                                 Speak(uebergabeText + ", Zeit fürs Mittag");
                             }
+                            else if((hour == 14 && minute == 45) || (hour >= 15))
+                            {
+                                Speak(uebergabeText + ", ich würde Feierabend vorschlagen");
+                            }
                         }
                     }
                     #endregion
@@ -525,8 +536,8 @@ namespace InMoov.Views
                     Speak(uebergabeText);
                     dictatedTextBuilder.Clear();
                 }
-            else
-                resultTextBlock.Text = textboxContent;
+                else
+                    resultTextBlock.Text = textboxContent;
 
                 #endregion
             });
@@ -637,6 +648,7 @@ namespace InMoov.Views
                             media.AutoPlay = true;
                             media.SetSource(synthesisStream, synthesisStream.ContentType);
                             media.Play();
+                            dictatedTextBuilder.Clear();
                             Text = null;
                             uebergabeText = null;
                         }

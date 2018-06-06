@@ -50,7 +50,7 @@
                 </HyperlinkButton>
             </StackPanel>
             <StackPanel Grid.Row="1" Margin="10,0,10,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <TextBlock Text="Gefundene Arduinos:" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <TextBlock Text="Gefundene Arduinos:" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <Border Height="1" Width="auto" Background="White"/>
                 <ListView x:Name="devicesList">
                     <ListView.ItemTemplate>

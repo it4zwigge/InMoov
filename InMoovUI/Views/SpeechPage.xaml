@@ -32,47 +32,18 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-
-        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-            <CommandBar.Content>
-                <ctl:PageHeader>
-                    <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-                    </ctl:PageHeader.HeaderContent>
-                </ctl:PageHeader>
-            </CommandBar.Content>
-        </CommandBar>
-
         <StackPanel Margin="0,0,0,10">
-            <TextBlock Text="Description:"/>
 
         </StackPanel>
         <StackPanel x:Name="Y">
-            <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
-            <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" Margin="10,25,0,0"/>            
-            <TextBlock x:Name="resultTextBlock" Margin="0,14.5,0,0" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
+            <TextBlock Text="Spracherkennung" Margin="130,10,0,0" FontSize="36" FontFamily="VW Head Office" HorizontalAlignment="Left" VerticalAlignment="Center" Width="1505"/>
+            <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1948" HorizontalAlignment="Stretch" Margin="-30,20,1250,0" VerticalAlignment="Top" Height="34" FontFamily="VW Head Office" FontSize="13"/>
+            <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" Margin="0,100,1316,0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="143" FontFamily="Segoe UI" Height="45"/>
+            <TextBlock x:Name="resultTextBlock" Height="200" Width="500" HorizontalAlignment="Left" Margin="150,-140,0,0" VerticalAlignment="Top"></TextBlock>
+            <TextBlock Margin="20,25,249,0" VerticalAlignment="Top" FontFamily="VW Head Office" FontSize="15" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." Height="253"/>
+
         </StackPanel>
         <MediaElement x:Name="media" AutoPlay="False" MediaEnded="media_MediaEnded"/>
-       
-        <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
+
     </Grid>
 </Page>

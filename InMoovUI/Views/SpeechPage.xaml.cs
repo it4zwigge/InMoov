@@ -65,9 +65,9 @@ namespace InMoov.Views
         //TimeList which handles the timephrases!
         private static List<string> timeList = new List<string>() { "Welche Uhrzeit ist gerade", "welche uhrzeit ist gerade", "welche uhrzeit ist grade", "welche Uhrzeit ist grade", "wie spät ist es" };
         //Hellophrases
-        private static List<string> helloList = new List<string>() { "Hallo Roboter", "Hallo InMove", "Hallo Robi" };
+        private static List<string> helloList = new List<string>() { "hallo roboter", "hallo in move", "hallo robi" };
         //good bye phrases
-        private static List<string> byeList = new List<string>() { "Tschüss Roboter", "Tschüss InMove", "Tschüss Robi", "Auf Wiedersehen Roboter", "Auf Wiedersehen InMove", "Auf Wiedersehen Robi" };
+        private static List<string> byeList = new List<string>() { "tschüss roboter", "tschüss in move", "tschüss robi", "auf wiedersehen roboter", "auf wiedersehen in move", "auf wiedersehen robi" };
 
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
@@ -627,8 +627,8 @@ namespace InMoov.Views
                     {
                         if (i == 0)
                         {
-                            App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
-                            App.ALinks.servoWrite(26, 0);
+                            /*App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);*/
                             i = 1;
                             // Create a stream from the text. This will be played using a media element.
                             SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
@@ -641,7 +641,7 @@ namespace InMoov.Views
                             uebergabeText = null;
                         }
                     }
-                    catch (System.IO.FileNotFoundException)
+                    catch (FileNotFoundException)
                     {
                         // If media player components are unavailable, (eg, using a N SKU of windows), we won't
                         // be able to start media playback. Handle this gracefully
@@ -660,7 +660,7 @@ namespace InMoov.Views
         }
         void media_MediaEnded(object sender, RoutedEventArgs e)
         {
-            App.ALinks.servoWrite(26, 60);
+            /*App.ALinks.servoWrite(26, 60);*/
             media.AutoPlay = false;
             media.Stop();
             uebergabeText = null;

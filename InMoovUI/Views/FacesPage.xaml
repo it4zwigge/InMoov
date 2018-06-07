@@ -42,10 +42,10 @@
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <CaptureElement Name="captureEL" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,169,0,0" VerticalAlignment="Top"/>
             <TextBlock Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="469,120,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="182" RenderTransformOrigin="0.502,0.778" Height="34"/>
-            <TextBlock Name="FaceBirthday_TextBlock" Text="Gesicht Geburtsdatum" Margin="10,265,1238,697" FontFamily="VW Head Office" />
-            <TextBlock Name="FaceFirstName_TextBlock" Text="Gesicht Vorname" Margin="10,205,1161,766" FontFamily="VW Head Office" HorizontalAlignment="Stretch" />
-            <TextBlock Name="FaceSurename_TextBlock" Text="Gesicht Nachname" Margin="10,235,1230,731" FontFamily="VW Head Office" HorizontalAlignment="Stretch" />
             <TextBlock Name="Doku_Box" Text="" FontFamily="Segoe UI" Margin="0,865,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock Name="FaceFirstname_TextBlock" HorizontalAlignment="Left" Margin="10,243,0,0" Text="Vorname:" TextWrapping="Wrap" VerticalAlignment="Top" Height="22" Width="189"/>
+            <TextBlock Name="FaceSurename_TextBlock" HorizontalAlignment="Left" Margin="10,268,0,0" Text="Nachname:" TextWrapping="Wrap" VerticalAlignment="Top" Height="25" Width="189"/>
+            <TextBlock Name="FaceBirthday_TextBlock" HorizontalAlignment="Left" Margin="10,293,0,0" Text="Geburtstag:" TextWrapping="Wrap" VerticalAlignment="Top" Height="22" Width="189"/>
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="-5,70,0,0" VerticalAlignment="Top" Width="277" Height="34" FontFamily="VW Head Office" FontSize="13">
             </HyperlinkButton>
             <ToggleSwitch Name="ToogleFace" Header="FaceDetect" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.503,0.433" Width="100" Height="90" FontFamily="VW Head Office" FontWeight="Normal"/>

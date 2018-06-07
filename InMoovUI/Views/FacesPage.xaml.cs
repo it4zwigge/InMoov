@@ -197,6 +197,8 @@ namespace InMoov.Views
         }        // Verarbeitung des aktuellen Bildes
 
         public string facedetected = "";
+        public static string firstname = "";
+        public static string surename = "";
         private async void FaceDetectM(VideoFrame frame)
         {
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
@@ -237,8 +239,9 @@ namespace InMoov.Views
                             if (result.Candidates.Length > 0)
                             {
                                 xML_Data = new XML_Data();
-                                facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                  //Schreiben des Namens auf globale Variable
-                                Views.SpeechPage.Speaking("Hallo " + facedetected);
+                                firstname = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                  //Schreiben des Namens auf globale Variable
+                                surename = xML_Data.GetNachName(result.Candidates[0].PersonId.ToString());
+                                Views.SpeechPage.Speaking("Hallo Herr " + surename);
                             }
                         }
                         #endregion XML

@@ -60,12 +60,12 @@
 
         <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="" Height="32" Margin="0,0,0,0" Width="185"/>
 
-        <Button x:Name="Neopixel_Reset" Content="Reset" HorizontalAlignment="Stretch" Margin="436,120,855,0" VerticalAlignment="Top" Height="101" Click="Neopixel_Reset_Click" FontFamily="VW Head Office"/>
-        <Button x:Name="Error" Content="Error Animation" HorizontalAlignment="Stretch" Margin="225,120,1066,0" VerticalAlignment="Top" Height="101" Click="Error_Click" FontFamily="VW Head Office"/>
-        <Button x:Name="Facedetection" Content="Facedetection Animation" HorizontalAlignment="Stretch" Margin="15,120,1276,0" VerticalAlignment="Top" Height="101" Click="Facedetection_Click" FontFamily="VW Head Office"/>
+        <Button x:Name="Neopixel_Reset" Content="Reset" HorizontalAlignment="Stretch" Margin="436,120,830,0" VerticalAlignment="Top" Height="101" Click="Neopixel_Reset_Click" FontFamily="VW Head Office"/>
+        <Button x:Name="Error" Content="Error Animation" HorizontalAlignment="Stretch" Margin="225,120,1041,0" VerticalAlignment="Top" Height="101" Click="Error_Click" FontFamily="VW Head Office"/>
+        <Button x:Name="Facedetection" Content="Facedetection Animation" HorizontalAlignment="Stretch" Margin="15,120,1251,0" VerticalAlignment="Top" Height="101" Click="Facedetection_Click" FontFamily="VW Head Office"/>
         <TextBlock Height="50" Margin="5,0,1280,940" Text="LED Ring" VerticalAlignment="Bottom" FontSize="36" FontFamily="VW Head Office" HorizontalAlignment="Stretch"/>
         <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Height="34" Margin="-10,67,0,0" VerticalAlignment="Top" Width="285" FontFamily="VW Head Office" FontSize="13"/>
-        <TextBlock HorizontalAlignment="Left" Height="185" Margin="5,284,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." TextWrapping="Wrap" VerticalAlignment="Top" Width="890" FontFamily="VW Head Office"/>
+        <TextBlock HorizontalAlignment="Left" Foreground="#FFACACA7" Height="185" Margin="5,284,0,0" Text="Die LED-Seite ist lediglich eine Hilfestellung. Im Normalfall sollten die LED's von den einzelnen Seiten selber angesprochen werden. Die hier vorliegenden Knöpfe sind Tests, ob die LED's richtig funktionieren. Später soll die Gesichtserkennung die LED's selber ansprechen, gleiches für die Error-Meldung." TextWrapping="Wrap" VerticalAlignment="Top" Width="890" FontFamily="VW Head Office"/>
 
     </Grid>
 </Page>

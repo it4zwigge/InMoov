@@ -42,9 +42,9 @@
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <CaptureElement Name="captureEL" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,169,0,0" VerticalAlignment="Top"/>
             <TextBlock Name="FaceName_TextBlock" FontFamily="VW Head Office" HorizontalAlignment="Left" Margin="469,120,0,0" Text="Gesicht Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="182" RenderTransformOrigin="0.502,0.778" Height="34"/>
-            <TextBlock Name="FaceBirthday_TextBlock" Text="Gesicht Geburtsdatum" Margin="10,319,1238,643" FontFamily="VW Head Office" />
-            <TextBlock Name="FaceFirstName_TextBlock" Text="Gesicht Vorname" Margin="10,247,1161,724" FontFamily="VW Head Office" />
-            <TextBlock Name="FaceSurename_TextBlock" Text="Gesicht Nachname" Margin="10,282,1230,684" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="VW Head Office" />
+            <TextBlock Name="FaceBirthday_TextBlock" Text="Gesicht Geburtsdatum" Margin="10,265,1238,697" FontFamily="VW Head Office" />
+            <TextBlock Name="FaceFirstName_TextBlock" Text="Gesicht Vorname" Margin="10,205,1161,766" FontFamily="VW Head Office" HorizontalAlignment="Stretch" />
+            <TextBlock Name="FaceSurename_TextBlock" Text="Gesicht Nachname" Margin="10,235,1230,731" FontFamily="VW Head Office" HorizontalAlignment="Stretch" />
             <TextBlock Name="Doku_Box" Text="" FontFamily="Segoe UI" Margin="0,865,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Left" Margin="-5,70,0,0" VerticalAlignment="Top" Width="277" Height="34" FontFamily="VW Head Office" FontSize="13">
             </HyperlinkButton>
@@ -52,7 +52,7 @@
             <ToggleSwitch Name="TooglePreview" Header="Vorschau an/aus" HorizontalAlignment="Left" Margin="237,120,0,0" VerticalAlignment="Top" Width="147" Height="90" FontFamily="VW Head Office"/>
             <TextBlock Name="Exceptions" Text="" Margin="857,0,0,0" VerticalAlignment="Bottom" Height="522" HorizontalAlignment="Stretch"/>
             <TextBlock HorizontalAlignment="Left" Margin="5,10,0,0" Text="Gesichtserkennung" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="36" FontFamily="VW Head Office"/>
-            <TextBlock HorizontalAlignment="Left" Height="249" Margin="5,400,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." TextWrapping="Wrap" VerticalAlignment="Top" Width="879" FontFamily="VW Head Office" FontSize="15">
+            <TextBlock HorizontalAlignment="Left" Foreground="#FFACACA7" Height="249" Margin="5,577,0,0" Text="Die hier verwendeten personenbezogenen Daten stehen unter Datenschutz der jeweiligen Personen. Deren Einverständnis muss vorliegen um beispielsweise Gesicht, Geburtstag und oder vollständigen Namen verarbeiten zu dürfen." TextWrapping="Wrap" VerticalAlignment="Top" Width="879" FontFamily="VW Head Office" FontSize="15">
                 <TextBlock.FocusVisualSecondaryBrush>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="Black"/>

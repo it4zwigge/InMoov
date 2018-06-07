@@ -241,7 +241,7 @@ namespace InMoov.Views
                                 surename = xML_Data.GetNachName(result.Candidates[0].PersonId.ToString());
                                 //FaceFirstName_TextBlock.Text = firstname;
                                 //FaceSurename_TextBlock.Text = surename;
-                                Views.SpeechPage.Speaking("Hallo Herr " + surename);
+                                //Views.SpeechPage.Speaking("Hallo Herr " + surename);
                             }
                         }
                         #endregion XML

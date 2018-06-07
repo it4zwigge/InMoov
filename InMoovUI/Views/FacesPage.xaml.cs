@@ -46,7 +46,6 @@ namespace InMoov.Views
         public bool status = false;                                                                                                 //Beschreibt ob Erkennung an oderr aus
         public XML_Data xML_Data;
         DispatcherTimer _faceTimer = new DispatcherTimer();
-        public string nameface_voice = null;
 
         DisplayRequest displayRequest = new DisplayRequest();
         public FacesPage()
@@ -90,8 +89,6 @@ namespace InMoov.Views
                     displayRequest.RequestActive();
                     DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
                     await mediaCapture.StartPreviewAsync();
-
-
                 }
             }
             else
@@ -101,7 +98,7 @@ namespace InMoov.Views
                 else
                 { StopWebcam(); }
             }
-        }
+        }                   //ToogleSwitch: Auslöser für Vorschau des aktuellen Kamera Bildes
 
         private void FacesPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -110,11 +107,12 @@ namespace InMoov.Views
 
         private async void _faceTimer_Tick(object sender, object e)
         {
-            FaceName_TextBlock.Text = firstname;
-            StarteWebcam();
-            FaceName_TextBlock.Text = "Hallo " + firstname;
-            nameface_voice = FaceName_TextBlock.Text;
-            if (FaceName_TextBlock.Text == "") { }
+            //StarteWebcam();
+            FaceSurename_TextBlock.Text = "";
+            //FaceName_TextBlock.Text = "Hallo " + facedetected;
+            FaceFirstName_TextBlock.Text = "Vorname: " + firstname;
+            FaceSurename_TextBlock.Text = "Nachname: " +surename;
+            if (FaceSurename_TextBlock.Text == "") { }
             else { await Task.Delay(5000); }
         }  
 
@@ -243,8 +241,8 @@ namespace InMoov.Views
                                 xML_Data = new XML_Data();
                                 firstname = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                  //Schreiben des Namens auf globale Variable
                                 surename = xML_Data.GetNachName(result.Candidates[0].PersonId.ToString());
-                                FaceFirstName_TextBlock.Text = firstname;
-                                FaceSurename_TextBlock.Text = surename;
+                                //FaceFirstName_TextBlock.Text = firstname;
+                                //FaceSurename_TextBlock.Text = surename;
                                 Views.SpeechPage.Speaking("Hallo Herr " + surename);
                             }
                         }
@@ -305,11 +303,6 @@ namespace InMoov.Views
                 return false;
             }
         }
-
-        //public string GetFaceName()                                                 // Methode zum Abrufen des aktuellen Names
-        //{
-        //    return facedetected;
-        //}
 
         public async void StopWebcam()
         {

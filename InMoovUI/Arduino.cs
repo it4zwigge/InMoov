@@ -101,6 +101,7 @@ namespace InMoov
                 message[2] = (byte)(angle >> 7);
                 //_serialPort.Write(message, 0, 3);
                 connection.write(message);
+
             //}
             //else
             //{

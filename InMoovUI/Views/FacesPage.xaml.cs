@@ -110,9 +110,9 @@ namespace InMoov.Views
 
         private async void _faceTimer_Tick(object sender, object e)
         {
-            FaceName_TextBlock.Text = facedetected;
+            FaceName_TextBlock.Text = firstname;
             StarteWebcam();
-            FaceName_TextBlock.Text = "Hallo " + facedetected;
+            FaceName_TextBlock.Text = "Hallo " + firstname;
             nameface_voice = FaceName_TextBlock.Text;
             if (FaceName_TextBlock.Text == "") { }
             else { await Task.Delay(5000); }
@@ -196,7 +196,7 @@ namespace InMoov.Views
             }
         }        // Verarbeitung des aktuellen Bildes
 
-        public string facedetected = "";
+        //public string facedetected = "";
         public static string firstname = "";
         public static string surename = "";
         private async void FaceDetectM(VideoFrame frame)
@@ -204,6 +204,8 @@ namespace InMoov.Views
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
             {
+                FaceFirstName_TextBlock.Text = "Vorname: ";
+                FaceSurename_TextBlock.Text = "Nachname: ";
                 using (var inputStream = new InMemoryRandomAccessStream())
                 {
                     using (var converted = SoftwareBitmap.Convert(frame.SoftwareBitmap, BitmapPixelFormat.Rgba16))  // kompr. Videoframe -> unkompr. Bitmap
@@ -241,6 +243,8 @@ namespace InMoov.Views
                                 xML_Data = new XML_Data();
                                 firstname = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                  //Schreiben des Namens auf globale Variable
                                 surename = xML_Data.GetNachName(result.Candidates[0].PersonId.ToString());
+                                FaceFirstName_TextBlock.Text = firstname;
+                                FaceSurename_TextBlock.Text = surename;
                                 Views.SpeechPage.Speaking("Hallo Herr " + surename);
                             }
                         }

@@ -215,12 +215,12 @@ namespace InMoov.Views
             //btnContinuousRecognize.IsEnabled = false;
             if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                if (DateTime.Now.Hour >= 15)
-                {
-                    Speak("Ich mach jetzt Feierabend!");
-                }
-                else
-                {
+                //if (DateTime.Now.Hour >= 15)
+                //{
+                //    Speak("Ich mach jetzt Feierabend!");
+                //}
+                //else
+                //{
                     // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
                     // This prevents an exception from occurring.
                     if (speechRecognizer.State == SpeechRecognizerState.Idle)
@@ -255,7 +255,7 @@ namespace InMoov.Views
 
                         }
                     }
-                }
+                //}
             }
             else
             {
@@ -670,6 +670,62 @@ namespace InMoov.Views
                 }
             }
         }
+
+        public static async void Speaking(string Text) // TODO "Marschalled"
+        {
+            MediaElement media = new MediaElement();
+            SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+
+            int i = 0;
+            Debug.WriteLine("Media");
+            // If the media is playing, the user has pressed the button to stop the playback.
+            if (media.CurrentState == MediaElementState.Playing)
+            {
+                media.Stop();
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(Text))
+                {
+                    // Change the button label. You could also just disable the button if you don't want any user control.
+
+                    try
+                    {
+                        if (i == 0)
+                        {
+                            /*App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);*/
+                            i = 1;
+                            // Create a stream from the text. This will be played using a media element.
+                            SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
+
+                            // Set the source and start playing the synthesized audio stream.
+                            media.AutoPlay = true;
+                            media.SetSource(synthesisStream, synthesisStream.ContentType);
+                            media.Play();
+                            //dictatedTextBuilder.Clear();
+                            Text = null;
+                            //uebergabeText = null;
+                        }
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        // If media player components are unavailable, (eg, using a N SKU of windows), we won't
+                        // be able to start media playback. Handle this gracefully
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Media player components unavailable");
+                        await messageDialog.ShowAsync();
+                    }
+                    catch (Exception)
+                    {
+                        // If the text is unable to be synthesized, throw an error message to the user.
+                        media.AutoPlay = false;
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Unable to synthesize text");
+                        await messageDialog.ShowAsync();
+                    }
+                }
+            }
+        }
+
         void media_MediaEnded(object sender, RoutedEventArgs e)
         {
             /*App.ALinks.servoWrite(26, 60);*/

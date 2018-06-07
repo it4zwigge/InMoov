@@ -231,47 +231,48 @@ namespace InMoov.Views
                         }
 
                         #region XML                                                                                                     //For working xml: The XML-File has to copied to the AppX path in the bin-folder                    
-                        //if (results != null)                                                                                            //Filename for the xml-file: "XMLFile1.xml"
-                        //{
-                        //    var result = results[0];
-                        //    if (result.Candidates.Length > 0)
-                        //    {
-                        //        xML_Data = new XML_Data();
-                        //        facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
-                        //    }
-                        //}
+                        if (results != null)                                                                                            //Filename for the xml-file: "XMLFile1.xml"
+                        {
+                            var result = results[0];
+                            if (result.Candidates.Length > 0)
+                            {
+                                xML_Data = new XML_Data();
+                                facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                  //Schreiben des Namens auf globale Variable
+                                Views.SpeechPage.Speaking("Hallo " + facedetected);
+                            }
+                        }
                         #endregion XML
 
                         #region CloudNames 
-                        for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
-                        {
-                            var face = faces[i];
+                        //for (var i = 0; i < faces.Length; i++)                                                                          //Identifizierung mit Name und PersonID
+                        //{
+                        //    var face = faces[i];
 
-                            var photoFace = new PhotoFace()                                                                             //Koordinaten zum Gesicht im Bild
-                            {
-                                Rect = face.FaceRectangle,
-                                Identified = false
-                            };
+                        //    var photoFace = new PhotoFace()                                                                             //Koordinaten zum Gesicht im Bild
+                        //    {
+                        //        Rect = face.FaceRectangle,
+                        //        Identified = false
+                        //    };
 
 
-                            if (results != null)
-                            {
-                                var result = results[i];
-                                if (result.Candidates.Length > 0)
-                                {
-                                    photoFace.PersonId = result.Candidates[0].PersonId;
-                                    photoFace.Name = _personList.Where(p => p.PersonId == result.Candidates[0].PersonId).FirstOrDefault()?.Name;    //Verknüpfen des Namens
-                                    photoFace.Identified = true;
-                                    facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
-                                                                                                                                                    //Debug.WriteLine(photoFace.Name.ToString());
+                        //    if (results != null)
+                        //    {
+                        //        var result = results[i];
+                        //        if (result.Candidates.Length > 0)
+                        //        {
+                        //            photoFace.PersonId = result.Candidates[0].PersonId;
+                        //            photoFace.Name = _personList.Where(p => p.PersonId == result.Candidates[0].PersonId).FirstOrDefault()?.Name;    //Verknüpfen des Namens
+                        //            photoFace.Identified = true;
+                        //            facedetected = photoFace.Name.ToString();                                                                       //Schreiben des Namens auf globale Variable
+                        //                                                                                                                            //Debug.WriteLine(photoFace.Name.ToString());
 
-                                    //xML_Data = new XML_Data();
-                                    //facedetected = xML_Data.GetVorName(photoFace.PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
+                        //            //xML_Data = new XML_Data();
+                        //            //facedetected = xML_Data.GetVorName(photoFace.PersonId.ToString());                                                  //Schreiben des Namens auf globale Variable
 
-                                }
-                            }
+                        //        }
+                        //    }
 
-                        }
+                        //}
                         #endregion CloudNames
                     }
                 }

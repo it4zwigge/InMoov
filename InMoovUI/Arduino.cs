@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
+using System.IO.Ports;
 
 namespace InMoov
 {
@@ -89,9 +90,11 @@ namespace InMoov
             return this.arduino.digitalRead(pin);
         }
 
-        public void servoWrite (byte pin, ushort value) // schreibt einen winkel auf einen Servo (pwm pin)
+        public void servoWrite (byte pin, int value) // schreibt einen winkel auf einen Servo (pwm pin)
         {
-            this.arduino.analogWrite(pin, value);
+            this.arduino.analogWrite(pin, (ushort)value);
+
+            
         }
 
         #region InMoov Firmata

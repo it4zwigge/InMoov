@@ -330,6 +330,7 @@ namespace InMoov.Views
                     {
                         if (textboxContent.Contains(hello))
                         {
+                            i = 0;
                             if (hour < 9)
                             {
                                 Speak("Guten Morgen, schön sie zu sehen");
@@ -348,9 +349,10 @@ namespace InMoov.Views
                     {
                         if (textboxContent.Contains(bye))
                         {
+                            i = 0;
                             if (hour < 9)
                             {
-                                Speak("Auf Wwiedersehen!");
+                                Speak("Auf Wiedersehen!");
                             }
                             else if (hour < 12 || hour >= 13)
                             {
@@ -368,8 +370,8 @@ namespace InMoov.Views
                     {
                         if (textboxContent.Contains(time))
                         {
+                            i = 0;
                             uebergabeText = "Es ist " + hour.ToString() + " Uhr " + minute.ToString();
-                            Speak(uebergabeText);
                             if ((hour == 10 && minute >= 55) || (hour == 11 && minute <= 5) || (hour == 13 && minute >= 55) || (hour == 14 && minute <= 5))
                             {
                                 Speak(uebergabeText + ", Zeit für die Sozi");
@@ -385,6 +387,10 @@ namespace InMoov.Views
                             else if ((hour == 14 && minute == 45) || (hour >= 15))
                             {
                                 Speak(uebergabeText + ", ich würde Feierabend vorschlagen");
+                            }
+                            else
+                            {
+                                Speak(uebergabeText);
                             }
                         }
                     }
@@ -521,6 +527,7 @@ namespace InMoov.Views
                         {
                             numbers[i] = 0;
                         }
+                        i = 0;
                         Speak(uebergabeText);
                         dictatedTextBuilder.Clear();
                     }

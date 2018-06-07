@@ -56,12 +56,12 @@ namespace InMoov
             //Animation.ResetAnimation();
         }
 
-        public void clear()
+        public async void clear()
         {
             for (byte pixel = 0; pixel < 16; pixel++)
             {
                 App.neopixel.SetPixelColor(pixel, 0, 0, 0);
-                Thread.Sleep(50);
+                await Task.Delay(50);
             }
         }
 

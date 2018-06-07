@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -54,7 +55,9 @@ namespace InMoov.Views
 
         private void servoSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            App.ALinks.servoWrite(26, (byte)servoSlider.Value);
+            int value = (int)servoSlider.Value;
+            Debug.WriteLine(value);
+            App.ALinks.servoWrite(26, value);
         }
     }
 }

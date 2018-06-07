@@ -41,6 +41,7 @@
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
             <TextBlock HorizontalAlignment="Stretch" Height="377" Margin="0,556,304,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <Slider x:Name="servoSlider"  Width="100" HorizontalAlignment="Center" Margin="0,276,0,0" VerticalAlignment="Top" ValueChanged="servoSlider_ValueChanged"></Slider>
             <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1941" HorizontalAlignment="Stretch" Margin="-50,70,1175,0" VerticalAlignment="Top" Height="34" FontFamily="VW Head Office" FontSize="13"/>
             <TextBlock Margin="0,10,1004,0" Text="Skelletierung" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="36" FontFamily="VW Head Office"/>
         </Grid>

@@ -110,7 +110,7 @@ namespace InMoov.Views
             StarteWebcam();
             FaceSurename_TextBlock.Text = "";
             //FaceName_TextBlock.Text = "Hallo " + facedetected;
-            FaceFirstName_TextBlock.Text = "Vorname: " + firstname;
+            FaceFirstname_TextBlock.Text = "Vorname: " + firstname;
             FaceSurename_TextBlock.Text = "Nachname: " +surename;
             if (FaceSurename_TextBlock.Text == "") { }
             else { await Task.Delay(5000); }
@@ -202,8 +202,6 @@ namespace InMoov.Views
             IdentifyResult[] results = null;  // Erkennnungsergebnisse
             try
             {
-                FaceFirstName_TextBlock.Text = "Vorname: ";
-                FaceSurename_TextBlock.Text = "Nachname: ";
                 using (var inputStream = new InMemoryRandomAccessStream())
                 {
                     using (var converted = SoftwareBitmap.Convert(frame.SoftwareBitmap, BitmapPixelFormat.Rgba16))  // kompr. Videoframe -> unkompr. Bitmap
@@ -214,7 +212,7 @@ namespace InMoov.Views
                         await encoder.FlushAsync();                                                                 //Daten umwandeln
 
 
-                        StopWebcam();
+                        //StopWebcam();
 
                         Face[] faces = null;
                         try
@@ -286,7 +284,7 @@ namespace InMoov.Views
             {
                 Debug.WriteLine("Try again!");
             }
-            StarteWebcam();
+            //StarteWebcam();
         }
 
         private async Task<bool> CheckIfGroupExistsAsync()

@@ -214,24 +214,18 @@ namespace InMoov.Views
         /// <param name="e">Unused event details</param>
         public async void RecognizeWithoutUIListConstraint_Toggle(object sender, RoutedEventArgs e)
         {
-            //btnContinuousRecognize.IsEnabled = false;
             if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                //if (DateTime.Now.Hour >= 15)
-                //{
-                //    Speak("Ich mach jetzt Feierabend!");
-                //}
-                //else
-                //{
+                if (DateTime.Now.Hour >= 15)
+                {
+                    Speak("Ich mach jetzt Feierabend!");
+                }
+                else
+                {
                     // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
                     // This prevents an exception from occurring.
                     if (speechRecognizer.State == SpeechRecognizerState.Idle)
                     {
-                        //DictationButtonText.Text = " Stop Dictation";
-                        //cbLanguageSelection.IsEnabled = false;
-                        //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
-                        //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
                         try
                         {
                             isListening = true;
@@ -242,28 +236,21 @@ namespace InMoov.Views
                         {
                             if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
                             {
-                                // Show a UI link to the privacy settings.
-                                //hlOpenPrivacySettings.Visibility = Visibility.Visible;
+                                //Empty
                             }
                             else
                             {
                                 var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
                                 await messageDialog.ShowAsync();
                             }
-
                             isListening = false;
-                            //DictationButtonText.Text = " Dictate";
-                            //cbLanguageSelection.IsEnabled = true;
-
                         }
                     }
-                //}
+                }
             }
             else
             {
                 isListening = false;
-                //DictationButtonText.Text = " Dictate";
-                //cbLanguageSelection.IsEnabled = true;
 
                 if (speechRecognizer.State != SpeechRecognizerState.Idle)
                 {
@@ -284,7 +271,6 @@ namespace InMoov.Views
                     }
                 }
             }
-            //btnContinuousRecognize.IsEnabled = true;
         }
 
         /// <summary>

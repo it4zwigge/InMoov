@@ -89,9 +89,34 @@ namespace InMoov
             return this.arduino.digitalRead(pin);
         }
 
-        public void servoWrite (byte pin, ushort value) // schreibt einen winkel auf einen Servo (pwm pin)
+        public void servoWrite (byte pin, ushort angle) // schreibt einen winkel auf einen Servo (pwm pin)
         {
-            this.arduino.analogWrite(pin, value);
+            byte ANALOG_MESSAGE = 0xE0;
+            byte[] message = null;
+            //if (pin <= 15)
+            //{
+                message = new byte[3];
+                message[0] = (byte)(ANALOG_MESSAGE | (pin & 0x0F));
+                message[1] = (byte)(angle & 0x7F);
+                message[2] = (byte)(angle >> 7);
+                //_serialPort.Write(message, 0, 3);
+                connection.write(message);
+            //}
+            //else
+            //{
+            //    message = new byte[12];
+            //    int len = 4;
+            //    message[0] = START_SYSEX;           // 0xF0, 240, start a MIDI SysEx message
+            //    message[1] = 0x6F;                  // 111, ?
+            //    message[2] = (byte)pin;             // Pin (z.B. 22)
+            //    message[3] = (byte)(angle & 0x7F);
+            //    if (angle > 0x00000080) message[len++] = (byte)((angle >> 7) & 0x7F);
+            //    if (angle > 0x00004000) message[len++] = (byte)((angle >> 14) & 0x7F);
+            //    if (angle > 0x00200000) message[len++] = (byte)((angle >> 21) & 0x7F);
+            //    if (angle > 0x10000000) message[len++] = (byte)((angle >> 28) & 0x7F);
+            //    message[len++] = 0xF7;
+            //    _serialPort.Write(message, 0, len);
+            //}
         }
 
         #region InMoov Firmata

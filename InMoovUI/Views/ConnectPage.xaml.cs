@@ -17,8 +17,6 @@ namespace InMoov.Views
 {
     public sealed partial class ConnectPage : Page
     {
-        DispatcherTimer timeout;
-        DateTime connectionAttemptStartedTime;
         DateTime timePageNavigatedTo;
         CancellationTokenSource cancelTokenSource;
 

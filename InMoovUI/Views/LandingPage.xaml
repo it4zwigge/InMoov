@@ -8,7 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-    mc:Ignorable="d">
+    mc:Ignorable="d" FontFamily="Segoe UI">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
@@ -39,27 +39,23 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" IsTabStop="True" Margin="12,4,0,0">
+        <ScrollViewer Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" IsTabStop="True" Margin="12,4,0,0" FontFamily="VW Head Office">
             <StackPanel x:Name="ContentContainer" Margin="12,0,24,0">
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" FontSize="30" Margin="0,12,0,4">Projekt InMoov</TextBlock>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" FontSize="36" Margin="0,12,0,4" FocusVisualPrimaryBrush="White" Foreground="#FF153CEC" FontWeight="Bold" FontFamily="VW Head Office">Projekt InMoov</TextBlock>
 
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,18,0,4">Was ist dieses InMoov?</TextBlock>
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Height="150" Margin="0,0,0,4">Das Projekt InMoov ist ein OpenSource-Projekt eines humanoiden 
-                    Roboters, welcher vom gesammten Informatikteam des Volkswagen Bildungsinstituts programmiert wird. Der Roboter besteht aus selbstgedruckten 
-                    Teilen, 28 Servomotoren und einem Mecanum-Fahrgestell. Gesteuert wird er mittels mehrerer Arduino's. Er besitzt mehrere Besonderheiten, wie eine 
-                    Gesichts, sowie Spracherkennung, eine Skelletierung, welche die genauen Bewegung des menschlichen Charakters nach ahmt. Aufgrund des Mecanum Fahrgestelles 
-                    ist er in der Lage, in alle Richtungen zu fahren, auch ohne sich drehen zu müssen.</TextBlock>
-                
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 1)  Spracherkennung bereit -</TextBlock>
-                <TextBlock Name="spracherkennungcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 2)  Gesichtserkennung bereit -</TextBlock>
-                <TextBlock Name="gesichtserkennungcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 3)  Arduino's verbunden -</TextBlock>
-                <TextBlock Name="arduinocheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 4) Fahrbereit -</TextBlock>
-                <TextBlock Name="fahrbereitcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="1"> 5) Skelletierung bereit -</TextBlock>
-                <TextBlock Name="skelletierungcheck" Margin="200,-20,0,0" Height="15" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="30,18,0,4" Foreground="#FF153CEC" FontSize="22" FontFamily="VW Head Office">Was ist dieses InMoov?</TextBlock>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#FFACACA7" Height="299" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" SelectionChanged="TextBlock_SelectionChanged" FontFamily="VW Head Office"><Run Text="Das Projekt InMoov ist ein OpenSource-Projekt eines humanoiden Roboters, welcher vom gesamten Informatikteam des Volkswagen Bildungsinstitut's programmiert wird. Der Roboter besteht ausschließlich aus selbstgedruckten Teilen, 28 Servomotoren und einem Mecanum-Fahrgestell. Gesteuert wird er mittels mehrerer Arduino's. Er besitzt mehrere Besonderheiten, wie eine Gesichts- und Spracherkennung, eine Skelletierung, welche die genauen Bewegungen des menschlichen Modells nachahmt und eine Sprachausgabe. Der Roboter soll also die menschliche Interaktion simulieren. Aufgrund des Mecanum Fahrgestelles ist er in der Lage, in alle Richtungen zu fahren, auch ohne sich drehen zu müssen. Unter der Leitung von René Tuchscherer hat die Fachinformatikergruppe FIAN16 den Druck des Roboters in Gang gesetzt, nach Ausbildungsbeginn der FIAN17 haben diese das Projekt schnell übernommen und sich mit Hilfe von Visual Studio in verschiedene Themen eingearbeitet."/></TextBlock>
+
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="#FFACACA7" Height="30" Margin="1" FontFamily="VW Head Office" FontSize="20"> 1)  Spracherkennung bereit :</TextBlock>
+                <Rectangle x:Name="SpeachRec" Height="30" Margin="300,-32,0,0" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" ></Rectangle>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="#FFACACA7" Height="30" Margin="1" FontSize="20" FontFamily="VW Head Office"> 2)  Gesichtserkennung bereit :</TextBlock>
+                <Rectangle x:Name="FaceRec" Height="30" Margin="300,-32,0,0" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" ></Rectangle>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="#FFACACA7" Height="30" Margin="1" FontFamily="VW Head Office" FontSize="20"> 3)  Arduino's verbunden :</TextBlock>
+                <Rectangle x:Name="ArduRec" Height="30" Margin="300,-32,0,0" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" ></Rectangle>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="#FFACACA7" Height="30" Margin="1" FontSize="20" FontFamily="VW Head Office"> 4) Fahrbereit :</TextBlock>
+                <Rectangle x:Name="DriveRec" Height="30" Margin="300,-32,0,0" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" ></Rectangle>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="#FFACACA7" Height="30" Margin="1" FontSize="20" FontFamily="VW Head Office"> 5) Skelletierung bereit :</TextBlock>
+                <Rectangle x:Name="SkelRec" Height="30" Margin="300,-32,0,0" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" ></Rectangle>
             </StackPanel>
         </ScrollViewer>
     </Grid>

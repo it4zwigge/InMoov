@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="InMoov.Views.DrivePage"
+    x:Class="InMoov.Views.SpeechSchedulerPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctl="using:InMoov.Controls"
@@ -38,19 +38,9 @@
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+            <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0"/>
 
-        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text=""/>
-            <Button x:Name="Vor_Button" Content="Vor" HorizontalAlignment="Left" Height="170" Margin="594,120,0,0" VerticalAlignment="Top" Width="254" FontFamily="VW Head Office"/>
-            <Button x:Name="Stop_Button" Content="Stop" HorizontalAlignment="Left" Height="170" Margin="594,327,0,0" VerticalAlignment="Top" Width="254" Click="Stop_Button_Click" FontFamily="VW Head Office"/>
-            <Button x:Name="Rueckwaerts_Button" Content="Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,120,0,0" VerticalAlignment="Top" Width="254" Click="Rueckwaerts_Button_Click" FontFamily="VW Head Office"/>
-            <Button x:Name="Stop_R_Button" Content="Stop Rückwärts" HorizontalAlignment="Left" Height="170" Margin="301,327,0,0" VerticalAlignment="Top" Width="254" Click="Stop_R_Button_Click" FontFamily="VW Head Office"/>
-            <Button x:Name="Drehung_Button" Content="Drehung" HorizontalAlignment="Left" Height="170" Margin="10,222,0,0" VerticalAlignment="Top" Width="254" Click="Drehung_Button_Click" FontFamily="VW Head Office" />
-            <TextBlock HorizontalAlignment="Left" Height="60" Margin="5,10,0,0" Text="Fahrwerkssteuerung" TextWrapping="Wrap" VerticalAlignment="Top" Width="386" FontSize="36" FontFamily="VW Head Office"/>
-            <HyperlinkButton HorizontalAlignment="Left" Height="35" Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2033" Margin="-10,70,0,0" VerticalAlignment="Top" Width="280" FontSize="13"  FocusVisualPrimaryBrush="{x:Null}" FontFamily="VW Head Office"/>
-            <TextBlock Height="170" Margin="5,550,525,0" Foreground="#FFACACA7" Text="Auf dieser Seite können Sie den InMoov sich bewegen lassen. Die verschiedenen Knöpfe führen die Aktionen aus, wie sie auf den jeweiligen Könpfen auch beschrieben sind. Fahre vor, Fahre zurück und wieder zum Standartpunkt vor." TextWrapping="Wrap"  VerticalAlignment="Top" FontSize="15" FontFamily="VW Head Office" HorizontalAlignment="Stretch"/>
-
-        </Grid>
+        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0"/>
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <AppBarButton Icon="Edit" Label="Edit"/>

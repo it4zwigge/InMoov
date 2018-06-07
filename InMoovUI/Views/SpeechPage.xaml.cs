@@ -56,12 +56,21 @@ namespace InMoov.Views
         //Handles the amount of colors the User can pick
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb", "schwarz", "aus" };
         //Handles the amount of Numbers the User can pick
-        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"};
+        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
         //Handles Keywords the user can say to pick Facedetection
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         //Handles basic start/stop Keys
         private static List<string> openList = new List<string>() { "starte", "erkenne", "öffne", "benutze" };
         private static List<string> closeList = new List<string>() { "schließe", "stoppe", "stoppen", "verhindere" };
+        //TimeList which handles the timephrases!
+        private static List<string> timeList = new List<string>() { "Welche Uhrzeit ist gerade", "welche uhrzeit ist gerade", "welche uhrzeit ist grade", "welche Uhrzeit ist grade", "wie spät ist es" };
+        //Hellophrases
+        private static List<string> helloList = new List<string>() { "hallo roboter", "hallo in move", "hallo robi" };
+        //good bye phrases
+        private static List<string> byeList = new List<string>() { "tschüss roboter", "tschüss in move", "tschüss robi", "auf wiedersehen roboter", "auf wiedersehen in move", "auf wiedersehen robi" };
+
+        int i = 0;
+
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
         string uebergabeText;
@@ -85,18 +94,18 @@ namespace InMoov.Views
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
             //move commandbar to page bottom on small screens
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
+            //if (diagonal < 7)
+            //{
+            //    topbar.Visibility = Visibility.Collapsed;
+            //    //pageTitleContainer.Visibility = Visibility.Visible;
+            //    bottombar.Visibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    topbar.Visibility = Visibility.Visible;
+            //    //pageTitleContainer.Visibility = Visibility.Collapsed;
+            //    bottombar.Visibility = Visibility.Collapsed;
+            //}
         }
 
         /// <summary>
@@ -205,49 +214,43 @@ namespace InMoov.Views
         /// <param name="e">Unused event details</param>
         public async void RecognizeWithoutUIListConstraint_Toggle(object sender, RoutedEventArgs e)
         {
-            //btnContinuousRecognize.IsEnabled = false;
             if (isListening == false && ToggleSpeech.IsOn == true)
             {
-                // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
-                // This prevents an exception from occurring.
-                if (speechRecognizer.State == SpeechRecognizerState.Idle)
+                if (DateTime.Now.Hour >= 15)
                 {
-                    //DictationButtonText.Text = " Stop Dictation";
-                    //cbLanguageSelection.IsEnabled = false;
-                    //hlOpenPrivacySettings.Visibility = Visibility.Collapsed;
-                    //discardedTextBlock.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
-                    try
+                    Speak("Ich mach jetzt Feierabend!");
+                }
+                else
+                {
+                    // The recognizer can only start listening in a continuous fashion if the recognizer is currently idle.
+                    // This prevents an exception from occurring.
+                    if (speechRecognizer.State == SpeechRecognizerState.Idle)
                     {
-                        isListening = true;
-                        System.Diagnostics.Debug.WriteLine("HELLO");
-                        await speechRecognizer.ContinuousRecognitionSession.StartAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                        try
                         {
-                            // Show a UI link to the privacy settings.
-                            //hlOpenPrivacySettings.Visibility = Visibility.Visible;
+                            isListening = true;
+                            System.Diagnostics.Debug.WriteLine("HELLO");
+                            await speechRecognizer.ContinuousRecognitionSession.StartAsync();
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
-                            await messageDialog.ShowAsync();
+                            if ((uint)ex.HResult == HResultPrivacyStatementDeclined)
+                            {
+                                //Empty
+                            }
+                            else
+                            {
+                                var messageDialog = new Windows.UI.Popups.MessageDialog(ex.Message, "Exception");
+                                await messageDialog.ShowAsync();
+                            }
+                            isListening = false;
                         }
-
-                        isListening = false;
-                        //DictationButtonText.Text = " Dictate";
-                        //cbLanguageSelection.IsEnabled = true;
-
                     }
                 }
             }
             else
             {
                 isListening = false;
-                //DictationButtonText.Text = " Dictate";
-                //cbLanguageSelection.IsEnabled = true;
 
                 if (speechRecognizer.State != SpeechRecognizerState.Idle)
                 {
@@ -268,7 +271,6 @@ namespace InMoov.Views
                     }
                 }
             }
-            //btnContinuousRecognize.IsEnabled = true;
         }
 
         /// <summary>
@@ -311,156 +313,223 @@ namespace InMoov.Views
         /// <param name="args">The hypothesis formed</param>
         private async void SpeechRecognizer_HypothesisGenerated(SpeechRecognizer sender, SpeechRecognitionHypothesisGeneratedEventArgs args)
         {
-
+            int hour = DateTime.Now.Hour;
+            int minute = DateTime.Now.Minute;
             Debug.WriteLine("SR_HG");
             Debug.WriteLine(args.Hypothesis.Text);
-
-            //Create the Text
-            string textboxContent = dictatedTextBuilder.ToString() + " " + args.Hypothesis.Text + " ...";
-
-            int zel = 0;
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            if (uebergabeText == null)
             {
-                //Search after Face-Detection Phrases/Words
-                #region Gesichtserkennung
-                foreach (string facedet in facelist)
+
+                //Create the Text
+                string textboxContent = dictatedTextBuilder.ToString() + " " + args.Hypothesis.Text + " ...";
+
+                int zel = 0;
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    if (textboxContent.Contains(facedet))
+                    foreach (string hello in helloList)
                     {
-                        facedetect[0] = 1;
-                    }
-                }
-                foreach (string open in openList)
-                {
-                    if (textboxContent.Contains(open))
-                    {
-                        facedetect[1] = 1;
-                    }
-                }
-                foreach (string close in closeList)
-                {
-                    if (textboxContent.Contains(close))
-                    {
-                        facedetect[1] = 2;
-                    }
-                }
-                //Start Facedetect
-                if (facedetect[0] == 1 && facedetect[1] == 1)
-                {
-                    fp.StarteWebcam();
-                }
-                //End Facedetect
-                else if (facedetect[0] == 1 && facedetect[1] == 2)
-                {
-                    fp.StopWebcam();
-                }
-                #endregion
-                //LED Search-Algorithm
-                #region LED
-                if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
-                {
-                    Debug.WriteLine(textboxContent);
-                    Debug.WriteLine("LED captured!");
-                    ledCaptured = true;
-                }
-                //Search if captured Word is any of the given colors
-                foreach (string colorS in colorlist)
-                {
-                    if (textboxContent.Contains(colorS))
-                    {
-                        Debug.WriteLine(textboxContent + colorS);
-                        Debug.WriteLine("Color captured: " + colorS);
-                        colorCaptured = colorS;
-                        switch (colorCaptured)
+                        if (textboxContent.Contains(hello))
                         {
-                            //Set RGB-Colors to red
-                            case "rot":
-                                color[0] = 255;             //R
-                                color[1] = 0;               //G
-                                color[2] = 0;               //B
-                                break;
-                            //Set RGB-Colors to blau
-                            case "blau":
-                                color[0] = 0;               //R
-                                color[1] = 0;               //G
-                                color[2] = 255;             //B
-                                break;
-                            //Set RGB-Colors to green
-                            case "grün":
-                                color[0] = 0;               //R
-                                color[1] = 255;             //G
-                                color[2] = 0;               //B
-                                break;
-                            //Set RGB-Colors to yellow
-                            case "gelb":
-                                color[0] = 255;             //R
-                                color[1] = 255;             //G
-                                color[2] = 0;               //B
-                                break;
-                            //Set RGB-Colors to off/black
-                            case "schwarz":
-                            case "aus":
-                                color[0] = 0;               //R
-                                color[1] = 0;               //G
-                                color[2] = 0;               //B
-                                break;
-                            default:
-                                color[0] = color[1] = color[2] = 0;
-                                break;
+                            if (hour < 9)
+                            {
+                                Speak("Guten Morgen, schön sie zu sehen");
+                            }
+                            else if (hour < 12 || hour >= 13)
+                            {
+                                Speak("Hallo, schön sie zu sehen");
+                            }
+                            else if (hour < 13)
+                            {
+                                Speak("Guten Mittag, schön sie zu sehen");
+                            }
                         }
                     }
-                }
-
-                //Get Number out of the recognized string
-                int newNum = 0;
-                foreach (string number in numberlist)
-                {
-                    if (textboxContent.Contains(number))
+                    foreach (string bye in byeList)
                     {
-                        int.TryParse(number, out newNum);
-                        numbers[zel] = newNum;
-                        zel++;
+                        if (textboxContent.Contains(bye))
+                        {
+                            if (hour < 9)
+                            {
+                                Speak("Auf Wwiedersehen!");
+                            }
+                            else if (hour < 12 || hour >= 13)
+                            {
+                                Speak("Ich wünsche guten 'Appetit");
+                            }
+                            else if (hour < 13)
+                            {
+                                Speak("Schönen Nachmittag noch");
+                            }
+                        }
                     }
-                    else if (textboxContent.Contains("eins"))
+                    //Function for Clockoutput
+                    #region Uhrzeit
+                    foreach (string time in timeList)
                     {
-                        Debug.WriteLine(1);
-                        numbers[zel] = 1;
-                        zel++;
+                        if (textboxContent.Contains(time))
+                        {
+                            uebergabeText = "Es ist " + hour.ToString() + " Uhr " + minute.ToString();
+                            Speak(uebergabeText);
+                            if ((hour == 10 && minute >= 55) || (hour == 11 && minute <= 5) || (hour == 13 && minute >= 55) || (hour == 14 && minute <= 5))
+                            {
+                                Speak(uebergabeText + ", Zeit für die Sozi");
+                            }
+                            else if ((hour == 8 && minute >= 57) || (hour == 9 && minute <= 20))
+                            {
+                                Speak(uebergabeText + ", Zeit fürs Frühstück");
+                            }
+                            else if ((hour == 11 && minute >= 57) || (hour == 12 && minute <= 20))
+                            {
+                                Speak(uebergabeText + ", Zeit fürs Mittag");
+                            }
+                            else if ((hour == 14 && minute == 45) || (hour >= 15))
+                            {
+                                Speak(uebergabeText + ", ich würde Feierabend vorschlagen");
+                            }
+                        }
                     }
-                }
+                    #endregion
 
-                //Change Color of the LED
-                if (ledCaptured == true && colorCaptured != null)
-                {
-                    newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
-                    resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
-                    byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
-                    NexNum--;
-                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
-
-
-                    textboxContent = "LED " + exNum + " " + colorCaptured;
-                    uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
-                    resultTextBlock.Text = textboxContent;
-                    //Reset Variables
-                    ledCaptured = false;
-                    colorCaptured = null;
-                    zel = 0;
-                    facedetect[0] = facedetect[1] = 0;
-                    for (int i = 0; i < numbers.Length; i++)
+                    //Search after Face-Detection Phrases/Words
+                    #region Gesichtserkennung
+                    foreach (string facedet in facelist)
                     {
-                        numbers[i] = 0;
+                        if (textboxContent.Contains(facedet))
+                        {
+                            facedetect[0] = 1;
+                        }
                     }
-                    Speak(uebergabeText);
-                    dictatedTextBuilder.Clear();
-                }
-                #endregion
-                else
-                {
-                    resultTextBlock.Text = textboxContent;
-                }
-            });
+                    foreach (string open in openList)
+                    {
+                        if (textboxContent.Contains(open))
+                        {
+                            facedetect[1] = 1;
+                        }
+                    }
+                    foreach (string close in closeList)
+                    {
+                        if (textboxContent.Contains(close))
+                        {
+                            facedetect[1] = 2;
+                        }
+                    }
+                    //Start Facedetect
+                    if (facedetect[0] == 1 && facedetect[1] == 1)
+                    {
+                        fp.StarteWebcam();
+                    }
+                    //End Facedetect
+                    else if (facedetect[0] == 1 && facedetect[1] == 2)
+                    {
+                        fp.StopWebcam();
+                    }
+                    #endregion
+                    //LED Search-Algorithm
+                    #region LED
+                    if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
+                    {
+                        Debug.WriteLine(textboxContent);
+                        Debug.WriteLine("LED captured!");
+                        ledCaptured = true;
+                    }
+                    //Search if captured Word is any of the given colors
+                    foreach (string colorS in colorlist)
+                    {
+                        if (textboxContent.Contains(colorS))
+                        {
+                            Debug.WriteLine(textboxContent + colorS);
+                            Debug.WriteLine("Color captured: " + colorS);
+                            colorCaptured = colorS;
+                            switch (colorCaptured)
+                            {
+                                //Set RGB-Colors to red
+                                case "rot":
+                                    color[0] = 255;             //R
+                                    color[1] = 0;               //G
+                                    color[2] = 0;               //B
+                                    break;
+                                //Set RGB-Colors to blau
+                                case "blau":
+                                    color[0] = 0;               //R
+                                    color[1] = 0;               //G
+                                    color[2] = 255;             //B
+                                    break;
+                                //Set RGB-Colors to green
+                                case "grün":
+                                    color[0] = 0;               //R
+                                    color[1] = 255;             //G
+                                    color[2] = 0;               //B
+                                    break;
+                                //Set RGB-Colors to yellow
+                                case "gelb":
+                                    color[0] = 255;             //R
+                                    color[1] = 255;             //G
+                                    color[2] = 0;               //B
+                                    break;
+                                //Set RGB-Colors to off/black
+                                case "schwarz":
+                                case "aus":
+                                    color[0] = 0;               //R
+                                    color[1] = 0;               //G
+                                    color[2] = 0;               //B
+                                    break;
+                                default:
+                                    color[0] = color[1] = color[2] = 0;
+                                    break;
+                            }
+                        }
+                    }
+
+                    //Get Number out of the recognized string
+                    int newNum = 0;
+                    foreach (string number in numberlist)
+                    {
+                        if (textboxContent.Contains(number))
+                        {
+                            int.TryParse(number, out newNum);
+                            numbers[zel] = newNum;
+                            zel++;
+                        }
+                        else if (textboxContent.Contains("eins"))
+                        {
+                            Debug.WriteLine(1);
+                            numbers[zel] = 1;
+                            zel++;
+                        }
+                    }
+
+                    //Change Color of the LED
+                    if (ledCaptured == true && colorCaptured != null)
+                    {
+                        newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
+                        resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
+                        byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
+                        NexNum--;
+                        Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
+                        //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
+
+                        textboxContent = "LED " + exNum + " " + colorCaptured;
+                        uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
+                        resultTextBlock.Text = textboxContent;
+                        //Reset Variables
+                        ledCaptured = false;
+                        colorCaptured = null;
+                        zel = 0;
+                        i = 0;
+                        facedetect[0] = facedetect[1] = 0;
+                        for (int i = 0; i < numbers.Length; i++)
+                        {
+                            numbers[i] = 0;
+                        }
+                        Speak(uebergabeText);
+                        dictatedTextBuilder.Clear();
+                    }
+                    else
+                        resultTextBlock.Text = textboxContent;
+
+                    #endregion
+                });
+            }
         }
 
         /// <summary>
@@ -508,13 +577,13 @@ namespace InMoov.Views
                     {
                         l_count++;
                     }
-                    if(ArrayOfNumbers[i] >= 10 && i < 25)
+                    if (ArrayOfNumbers[i] >= 10 && i < 25)
                     {
-                        for(int k = 25; k < ArrayOfNumbers.Length; k++)
+                        for (int k = 25; k < ArrayOfNumbers.Length; k++)
                         {
                             //Füllt letzte 25 Stellen mit Zahl wenn 11 - 16 erkannt worden ist
                             //Das ist nötig weil gute Erkennung ansonsten nicht möglich ist. 
-                            ArrayOfNumbers[k] = ArrayOfNumbers[i];              
+                            ArrayOfNumbers[k] = ArrayOfNumbers[i];
                         }
                     }
                 }
@@ -532,15 +601,14 @@ namespace InMoov.Views
             return max_Countnumber;
         }
 
-
         /// <summary>
         /// This is invoked when the user clicks on the speak/stop button.
         /// </summary>
         /// <param name="sender">Button that triggered this event</param>
         /// <param name="e">State information about the routed event</param>
-        private async void Speak(string Text)
+        public async void Speak(string Text)
         {
-            speechRecognizer.ContinuousRecognitionSession.StopAsync();
+            Debug.WriteLine("Media");
             // If the media is playing, the user has pressed the button to stop the playback.
             if (media.CurrentState == MediaElementState.Playing)
             {
@@ -554,15 +622,24 @@ namespace InMoov.Views
 
                     try
                     {
-                        // Create a stream from the text. This will be played using a media element.
-                        SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
+                        if (i == 0)
+                        {
+                            /*App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);*/
+                            i = 1;
+                            // Create a stream from the text. This will be played using a media element.
+                            SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
 
-                        // Set the source and start playing the synthesized audio stream.
-                        media.AutoPlay = true;
-                        media.SetSource(synthesisStream, synthesisStream.ContentType);
-                        media.Play();
+                            // Set the source and start playing the synthesized audio stream.
+                            media.AutoPlay = true;
+                            media.SetSource(synthesisStream, synthesisStream.ContentType);
+                            media.Play();
+                            dictatedTextBuilder.Clear();
+                            Text = null;
+                            uebergabeText = null;
+                        }
                     }
-                    catch (System.IO.FileNotFoundException)
+                    catch (FileNotFoundException)
                     {
                         // If media player components are unavailable, (eg, using a N SKU of windows), we won't
                         // be able to start media playback. Handle this gracefully
@@ -579,10 +656,68 @@ namespace InMoov.Views
                 }
             }
         }
+
+        public static async void Speaking(string Text) // TODO "Marschalled"
+        {
+            MediaElement media = new MediaElement();
+            SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+
+            int i = 0;
+            Debug.WriteLine("Media");
+            // If the media is playing, the user has pressed the button to stop the playback.
+            if (media.CurrentState == MediaElementState.Playing)
+            {
+                media.Stop();
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(Text))
+                {
+                    // Change the button label. You could also just disable the button if you don't want any user control.
+
+                    try
+                    {
+                        if (i == 0)
+                        {
+                            /*App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);*/
+                            i = 1;
+                            // Create a stream from the text. This will be played using a media element.
+                            SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
+
+                            // Set the source and start playing the synthesized audio stream.
+                            media.AutoPlay = true;
+                            media.SetSource(synthesisStream, synthesisStream.ContentType);
+                            media.Play();
+                            //dictatedTextBuilder.Clear();
+                            Text = null;
+                            //uebergabeText = null;
+                        }
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        // If media player components are unavailable, (eg, using a N SKU of windows), we won't
+                        // be able to start media playback. Handle this gracefully
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Media player components unavailable");
+                        await messageDialog.ShowAsync();
+                    }
+                    catch (Exception)
+                    {
+                        // If the text is unable to be synthesized, throw an error message to the user.
+                        media.AutoPlay = false;
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Unable to synthesize text");
+                        await messageDialog.ShowAsync();
+                    }
+                }
+            }
+        }
+
         void media_MediaEnded(object sender, RoutedEventArgs e)
         {
+            /*App.ALinks.servoWrite(26, 60);*/
+            media.AutoPlay = false;
+            media.Stop();
             uebergabeText = null;
-            speechRecognizer.ContinuousRecognitionSession.StartAsync();
         }
     }
 }

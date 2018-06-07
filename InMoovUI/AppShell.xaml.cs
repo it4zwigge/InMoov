@@ -66,6 +66,12 @@ namespace InMoov
                     Symbol = Symbol.People,
                     Label = "Skelettierung",
                     DestPage = typeof(SkeletonPage)
+                },
+                new NavMenuItem()
+                {
+                    Symbol = Symbol.Clock,
+                    Label = "Sprachbefehle",
+                    DestPage = typeof(SpeechSchedulerPage)
                 }
             });
 

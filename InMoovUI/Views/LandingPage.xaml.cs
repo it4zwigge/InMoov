@@ -21,19 +21,27 @@ using System.Diagnostics;
 
 namespace InMoov.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class LandingPage : Page
     {
-
         public LandingPage()
         {
             this.InitializeComponent();
             this.Loading += LandingPage_Loading;
+
+            SolidColorBrush Rot = new SolidColorBrush(Windows.UI.Color.FromArgb(250, 153, 0, 0));
+            SolidColorBrush Gruen = new SolidColorBrush(Windows.UI.Color.FromArgb(250, 0, 153, 0));
+            SpeachRec.Fill = Gruen;
+            FaceRec.Fill = Gruen;
+            ArduRec.Fill = Gruen;
+            DriveRec.Fill = Gruen;
+            SkelRec.Fill = Rot;
         }
 
         private void LandingPage_Loading(FrameworkElement sender, object args)
+        {
+        }
+
+        private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
         {
         }
     }

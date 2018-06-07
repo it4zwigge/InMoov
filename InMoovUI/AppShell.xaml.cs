@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using InMoov.Controls;
 using InMoov.Views;
+using Windows.UI;
 
 namespace InMoov
 {
@@ -84,7 +85,6 @@ namespace InMoov
         public AppShell()
         {
             this.InitializeComponent();
-
             this.Loaded += (sender, args) =>
             {
                 Current = this;

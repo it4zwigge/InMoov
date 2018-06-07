@@ -47,6 +47,7 @@ namespace InMoov
 
         public static NeoPixel neopixel { get; set; }
 
+
         //public static bool ArduinosReady()
         //{
         //    if (readyDevices == App.Arduinos.Values.Count)

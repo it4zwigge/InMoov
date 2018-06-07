@@ -56,7 +56,7 @@ namespace InMoov.Views
         //Handles the amount of colors the User can pick
         private static List<string> colorlist = new List<string>() { "grün", "rot", "blau", "gelb", "schwarz", "aus" };
         //Handles the amount of Numbers the User can pick
-        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"};
+        private static List<string> numberlist = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
         //Handles Keywords the user can say to pick Facedetection
         private static List<string> facelist = new List<string>() { "Gesichtserkennung", "gesichtserkennung", "Gesicht", "gesicht" };
         //Handles basic start/stop Keys
@@ -68,6 +68,8 @@ namespace InMoov.Views
         private static List<string> helloList = new List<string>() { "hallo roboter", "hallo in move", "hallo robi" };
         //good bye phrases
         private static List<string> byeList = new List<string>() { "tschüss roboter", "tschüss in move", "tschüss robi", "auf wiedersehen roboter", "auf wiedersehen in move", "auf wiedersehen robi" };
+
+        int i = 0;
 
         //Needed to give NeoPixel the RGBs of picked Color
         private byte[] color = new byte[3];
@@ -340,9 +342,9 @@ namespace InMoov.Views
                 {
                     foreach (string hello in helloList)
                     {
-                        if(textboxContent.Contains(hello))
+                        if (textboxContent.Contains(hello))
                         {
-                            if(hour < 9)
+                            if (hour < 9)
                             {
                                 Speak("Guten Morgen, schön sie zu sehen");
                             }
@@ -356,9 +358,9 @@ namespace InMoov.Views
                             }
                         }
                     }
-                    foreach(string bye in byeList)
+                    foreach (string bye in byeList)
                     {
-                        if(textboxContent.Contains(bye))
+                        if (textboxContent.Contains(bye))
                         {
                             if (hour < 9)
                             {
@@ -386,7 +388,7 @@ namespace InMoov.Views
                             {
                                 Speak(uebergabeText + ", Zeit für die Sozi");
                             }
-                            else if((hour == 8 && minute >= 57) || (hour == 9 && minute <= 20))
+                            else if ((hour == 8 && minute >= 57) || (hour == 9 && minute <= 20))
                             {
                                 Speak(uebergabeText + ", Zeit fürs Frühstück");
                             }
@@ -394,7 +396,7 @@ namespace InMoov.Views
                             {
                                 Speak(uebergabeText + ", Zeit fürs Mittag");
                             }
-                            else if((hour == 14 && minute == 45) || (hour >= 15))
+                            else if ((hour == 14 && minute == 45) || (hour >= 15))
                             {
                                 Speak(uebergabeText + ", ich würde Feierabend vorschlagen");
                             }
@@ -425,27 +427,27 @@ namespace InMoov.Views
                             facedetect[1] = 2;
                         }
                     }
-                //Start Facedetect
-                if (facedetect[0] == 1 && facedetect[1] == 1)
+                    //Start Facedetect
+                    if (facedetect[0] == 1 && facedetect[1] == 1)
                     {
                         fp.StarteWebcam();
                     }
-                //End Facedetect
-                else if (facedetect[0] == 1 && facedetect[1] == 2)
+                    //End Facedetect
+                    else if (facedetect[0] == 1 && facedetect[1] == 2)
                     {
                         fp.StopWebcam();
                     }
-                #endregion
+                    #endregion
                     //LED Search-Algorithm
                     #region LED
-                if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
+                    if ((textboxContent.Contains("LED") || textboxContent.Contains("led")) && ledCaptured != true)
                     {
                         Debug.WriteLine(textboxContent);
                         Debug.WriteLine("LED captured!");
                         ledCaptured = true;
                     }
-                //Search if captured Word is any of the given colors
-                foreach (string colorS in colorlist)
+                    //Search if captured Word is any of the given colors
+                    foreach (string colorS in colorlist)
                     {
                         if (textboxContent.Contains(colorS))
                         {
@@ -454,37 +456,37 @@ namespace InMoov.Views
                             colorCaptured = colorS;
                             switch (colorCaptured)
                             {
-                            //Set RGB-Colors to red
-                            case "rot":
+                                //Set RGB-Colors to red
+                                case "rot":
                                     color[0] = 255;             //R
-                                color[1] = 0;               //G
-                                color[2] = 0;               //B
-                                break;
-                            //Set RGB-Colors to blau
-                            case "blau":
+                                    color[1] = 0;               //G
+                                    color[2] = 0;               //B
+                                    break;
+                                //Set RGB-Colors to blau
+                                case "blau":
                                     color[0] = 0;               //R
-                                color[1] = 0;               //G
-                                color[2] = 255;             //B
-                                break;
-                            //Set RGB-Colors to green
-                            case "grün":
+                                    color[1] = 0;               //G
+                                    color[2] = 255;             //B
+                                    break;
+                                //Set RGB-Colors to green
+                                case "grün":
                                     color[0] = 0;               //R
-                                color[1] = 255;             //G
-                                color[2] = 0;               //B
-                                break;
-                            //Set RGB-Colors to yellow
-                            case "gelb":
+                                    color[1] = 255;             //G
+                                    color[2] = 0;               //B
+                                    break;
+                                //Set RGB-Colors to yellow
+                                case "gelb":
                                     color[0] = 255;             //R
-                                color[1] = 255;             //G
-                                color[2] = 0;               //B
-                                break;
-                            //Set RGB-Colors to off/black
-                            case "schwarz":
+                                    color[1] = 255;             //G
+                                    color[2] = 0;               //B
+                                    break;
+                                //Set RGB-Colors to off/black
+                                case "schwarz":
                                 case "aus":
                                     color[0] = 0;               //R
-                                color[1] = 0;               //G
-                                color[2] = 0;               //B
-                                break;
+                                    color[1] = 0;               //G
+                                    color[2] = 0;               //B
+                                    break;
                                 default:
                                     color[0] = color[1] = color[2] = 0;
                                     break;
@@ -492,8 +494,8 @@ namespace InMoov.Views
                         }
                     }
 
-                //Get Number out of the recognized string
-                int newNum = 0;
+                    //Get Number out of the recognized string
+                    int newNum = 0;
                     foreach (string number in numberlist)
                     {
                         if (textboxContent.Contains(number))
@@ -510,37 +512,37 @@ namespace InMoov.Views
                         }
                     }
 
-                //Change Color of the LED
-                if (ledCaptured == true && colorCaptured != null)
-                {
-                    newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
-                    resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
-                    byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
-                    NexNum--;
-                    Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
-                    App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
-
-
-                    textboxContent = "LED " + exNum + " " + colorCaptured;
-                    uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
-                    resultTextBlock.Text = textboxContent;
-                    //Reset Variables
-                    ledCaptured = false;
-                    colorCaptured = null;
-                    zel = 0;
-                    facedetect[0] = facedetect[1] = 0;
-                    for (int i = 0; i < numbers.Length; i++)
+                    //Change Color of the LED
+                    if (ledCaptured == true && colorCaptured != null)
                     {
-                        numbers[i] = 0;
-                    }
-                    Speak(uebergabeText);
-                    dictatedTextBuilder.Clear();
-                }
-                else
-                    resultTextBlock.Text = textboxContent;
+                        newNum = GetMostUsedValue(numbers, out int exNum);          //exNum == exitNumber
+                        resultTextBlock.Text = "Die LED" + exNum.ToString() + " ist jetzt " + colorCaptured.ToString();
+                        byte.TryParse(exNum.ToString(), out byte NexNum);           //NexNum == NewExitNumber
+                        NexNum--;
+                        Debug.WriteLine($"LED: {ledCaptured}, Color: {colorCaptured}, Number: {exNum}");
+                        //App.neopixel.SetPixelColor((NexNum), color[0], color[1], color[2]);
 
-                #endregion
-            });
+                        textboxContent = "LED " + exNum + " " + colorCaptured;
+                        uebergabeText = "Alles klar, die LED " + exNum + " ist jetzt " + colorCaptured;
+                        resultTextBlock.Text = textboxContent;
+                        //Reset Variables
+                        ledCaptured = false;
+                        colorCaptured = null;
+                        zel = 0;
+                        i = 0;
+                        facedetect[0] = facedetect[1] = 0;
+                        for (int i = 0; i < numbers.Length; i++)
+                        {
+                            numbers[i] = 0;
+                        }
+                        Speak(uebergabeText);
+                        dictatedTextBuilder.Clear();
+                    }
+                    else
+                        resultTextBlock.Text = textboxContent;
+
+                    #endregion
+                });
             }
         }
 
@@ -589,13 +591,13 @@ namespace InMoov.Views
                     {
                         l_count++;
                     }
-                    if(ArrayOfNumbers[i] >= 10 && i < 25)
+                    if (ArrayOfNumbers[i] >= 10 && i < 25)
                     {
-                        for(int k = 25; k < ArrayOfNumbers.Length; k++)
+                        for (int k = 25; k < ArrayOfNumbers.Length; k++)
                         {
                             //Füllt letzte 25 Stellen mit Zahl wenn 11 - 16 erkannt worden ist
                             //Das ist nötig weil gute Erkennung ansonsten nicht möglich ist. 
-                            ArrayOfNumbers[k] = ArrayOfNumbers[i];              
+                            ArrayOfNumbers[k] = ArrayOfNumbers[i];
                         }
                     }
                 }
@@ -613,7 +615,6 @@ namespace InMoov.Views
             return max_Countnumber;
         }
 
-
         /// <summary>
         /// This is invoked when the user clicks on the speak/stop button.
         /// </summary>
@@ -621,7 +622,6 @@ namespace InMoov.Views
         /// <param name="e">State information about the routed event</param>
         public async void Speak(string Text)
         {
-            int i = 0;
             Debug.WriteLine("Media");
             // If the media is playing, the user has pressed the button to stop the playback.
             if (media.CurrentState == MediaElementState.Playing)

@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -25,8 +26,13 @@ namespace InMoov.Views
     {
         public SpeechSchedulerPage()
         {
-            this.InitializeComponent();
-            this.Loaded += SpeechSchedulerPage_Loaded;
+            this.InitializeComponent();            this.Loaded += SpeechSchedulerPage_Loaded;
+           
+           
+            TimePicker firstTimePicker = new TimePicker();
+            firstTimePicker.Header = "Arrival time";
+            Debug.WriteLine(firstTimePicker.ToString());
+
         }
 
         private void SpeechSchedulerPage_Loaded(object sender, RoutedEventArgs e)
@@ -46,6 +52,7 @@ namespace InMoov.Views
                 //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
             }
+
         }
     }
 }

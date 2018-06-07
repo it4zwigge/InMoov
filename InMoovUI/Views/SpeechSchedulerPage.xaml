@@ -51,7 +51,7 @@
             <CommandBar.Content>
                 <ctl:PageHeader>
                     <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
+                        <TextBlock x:Name="HeaderTextBlock" Text="SpeechScheduler Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
                     </ctl:PageHeader.HeaderContent>
                 </ctl:PageHeader>
             </CommandBar.Content>
@@ -63,8 +63,11 @@
             </ctl:PageHeader.HeaderContent>
         </ctl:PageHeader>-->
 
-        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0"/>
-
+        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
+            <TimePicker x:Name="firstTimePicker" Header="Fist time" HorizontalAlignment="Left" Margin="191,178,0,0" VerticalAlignment="Top"/>
+            <AutoSuggestBox x:Name="AutoSuggestBox" HorizontalAlignment="Left" Margin="603,208,0,0" VerticalAlignment="Top" Height="52" Width="364"/>
+        </Grid>
+        <TextBlock>Text</TextBlock>
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <AppBarButton Icon="Edit" Label="Edit"/>
             <AppBarButton Icon="Delete" Label="Delete"/>

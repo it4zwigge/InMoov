@@ -30,11 +30,11 @@ namespace InMoov
         public bool ready { get; set; }
 
         //Firmata Ansteuerungsbytes
-        private static byte SABERTOOTH_MOTOR_VOR = 0x42;
-        private static byte SABERTOOTH_MOTOR_STOP = 0x43;
-        private static byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
-        private static byte SABERTOOTH_MOTOR_STOP_ZURUECK = 0x45;
-        private static byte SABERTOOTH_MOTOR_DREHUNG_RECHTS = 0x46;
+        private const byte SABERTOOTH_MOTOR_VOR = 0x42;
+        private const byte SABERTOOTH_MOTOR_STOP = 0x43;
+        private const byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
+        private const byte SABERTOOTH_MOTOR_STOP_ZURUECK = 0x45;
+        private const byte SABERTOOTH_MOTOR_DREHUNG_RECHTS = 0x46;
 
         public Arduino(DeviceInformation device) // Konstruktor
         {
@@ -48,76 +48,104 @@ namespace InMoov
 
             this.firmata = new UwpFirmata();
             this.firmata.begin(this.connection);
-
-            this.firmata.FirmataConnectionReady += Firmata_FirmataConnectionReady;
-            this.firmata.FirmataConnectionFailed += Firmata_FirmataConnectionFailed;
-            this.firmata.FirmataConnectionLost += Firmata_FirmataConnectionLost;
-
             this.ready = false;
             this.name = device.Name;
             this.id = device.Id;
             this.kind = device.Kind.ToString();
+
+            //Events
+            this.firmata.FirmataConnectionReady += Firmata_FirmataConnectionReady;
+            this.firmata.FirmataConnectionFailed += Firmata_FirmataConnectionFailed;
+            this.firmata.FirmataConnectionLost += Firmata_FirmataConnectionLost;
         }
 
-        public void connect() // startet die verbindung
+        public void connect() // startet die Verbindung
         {
-            this.connection.begin(57600, SerialConfig.SERIAL_8N1);
+            try
+            {
+                this.connection.begin(57600, SerialConfig.SERIAL_8N1);
+            }
+            catch { }
         }
 
         public void setPinMode(byte pin, PinMode pinMode) // setzt den Pin mode auf dem Arduino
         {
-            this.arduino.pinMode(pin, pinMode);
+            try
+            {
+                this.arduino.pinMode(pin, pinMode);
+            }
+            catch { }
         }
 
         public void analogWrite(byte pin, ushort value) //schreib auf einen analogen pin einen Wert zwichen 0 und 255
         {
-            this.arduino.analogWrite(pin, value);
+            try
+            {
+                this.arduino.analogWrite(pin, value);
+            }
+            catch { }
         }
 
         public ushort analogRead (byte pin) // liest einen wert aus einem Analogen pin (gut für sensorig)
         {
-            return this.arduino.analogRead(pin.ToString());
+            try
+            {
+                return this.arduino.analogRead(pin.ToString());
+            }
+            catch { return 0; }
         }
 
         public void digitalWrite(byte pin, PinState pinstate) // schreibt einen digitalen wert (HIGH/LOW) auf einen digitalen Pin
         {
-            this.arduino.digitalWrite(pin, pinstate);
+            try
+            {
+                this.arduino.digitalWrite(pin, pinstate);
+            }
+            catch { }
         }
 
         public PinState digitalRead(byte pin) // liest einen digitalen Wert aus einem digitalen Pin
         {
-            return this.arduino.digitalRead(pin);
+            try
+            {
+                return this.arduino.digitalRead(pin);
+            }
+            catch { return 0; }
         }
 
-        public void servoWrite (byte pin, ushort angle) // schreibt einen winkel auf einen Servo (pwm pin)
+        public void servoWrite (byte pin, int angle) // schreibt einen winkel auf einen Servo (pwm pin)
         {
-            byte ANALOG_MESSAGE = 0xE0;
-            byte[] message = null;
-            //if (pin <= 15)
-            //{
-                message = new byte[3];
-                message[0] = (byte)(ANALOG_MESSAGE | (pin & 0x0F));
-                message[1] = (byte)(angle & 0x7F);
-                message[2] = (byte)(angle >> 7);
-                //_serialPort.Write(message, 0, 3);
-                connection.write(message);
-
-            //}
-            //else
-            //{
-            //    message = new byte[12];
-            //    int len = 4;
-            //    message[0] = START_SYSEX;           // 0xF0, 240, start a MIDI SysEx message
-            //    message[1] = 0x6F;                  // 111, ?
-            //    message[2] = (byte)pin;             // Pin (z.B. 22)
-            //    message[3] = (byte)(angle & 0x7F);
-            //    if (angle > 0x00000080) message[len++] = (byte)((angle >> 7) & 0x7F);
-            //    if (angle > 0x00004000) message[len++] = (byte)((angle >> 14) & 0x7F);
-            //    if (angle > 0x00200000) message[len++] = (byte)((angle >> 21) & 0x7F);
-            //    if (angle > 0x10000000) message[len++] = (byte)((angle >> 28) & 0x7F);
-            //    message[len++] = 0xF7;
-            //    _serialPort.Write(message, 0, len);
-            //}
+            try {
+                byte ANALOG_MESSAGE = 0xE0;
+                byte START_SYSEX = 0xF0;
+                byte[] message = null;
+                if (pin <= 15)
+                {
+                    message = new byte[3];
+                    message[0] = (byte)(ANALOG_MESSAGE | (pin & 0x0F));
+                    message[1] = (byte)(angle & 0x7F);
+                    message[2] = (byte)(angle >> 7);
+                    //_serialPort.Write(message, 0, 3);
+                    connection.write(message);
+                }
+                else
+                {
+                    message = new byte[12];
+                    int len = 4;
+                    message[0] = START_SYSEX;           // 0xF0, 240, start a MIDI SysEx message
+                    message[1] = 0x6F;                  // 111, ?
+                    message[2] = (byte)pin;             // Pin (z.B. 22)
+                    message[3] = (byte)(angle & 0x7F);
+                    if (angle > 0x00000080) message[len++] = (byte)((angle >> 7) & 0x7F);
+                    if (angle > 0x00004000) message[len++] = (byte)((angle >> 14) & 0x7F);
+                    if (angle > 0x00200000) message[len++] = (byte)((angle >> 21) & 0x7F);
+                    if (angle > 0x10000000) message[len++] = (byte)((angle >> 28) & 0x7F);
+                    message[len++] = 0xF7;
+                    //_serialPort.Write(message, 0, len);
+                    connection.write(message);
+                }
+            }
+            catch { }
         }
 
         #region InMoov Firmata
@@ -216,6 +244,7 @@ namespace InMoov
                 Debug.WriteLine("[" + this.name + "] Firmata bereit!");
             }
             #endregion
+
         #endregion
     }
 }

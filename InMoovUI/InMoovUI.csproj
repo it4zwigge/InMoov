@@ -107,6 +107,9 @@
     </Compile>
     <Compile Include="Keys.cs" />
     <Compile Include="LED.cs" />
+    <Compile Include="MotorControl.xaml.cs">
+      <DependentUpon>MotorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NavMenuItem.cs" />
     <None Include="FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />
@@ -171,6 +174,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\PageHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MotorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -249,7 +256,7 @@
       <Version>1.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.4</Version>
+      <Version>6.1.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ProjectOxford.Common">
       <Version>2.1.1</Version>

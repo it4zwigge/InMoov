@@ -28,13 +28,17 @@ namespace InMoov.Views
         public DrivePage()
         {
             this.InitializeComponent();
+
+            SliderSTMotor.Maximum = 127;
+            SliderSTMotor.Minimum = -127;
+            SliderSTMotor.Value = 0;
             this.Loaded += DrivePage_Loaded;
             Vor_Button.Click += Vor_Button_Click;
         }
 
         private void Vor_Button_Click(object sender, RoutedEventArgs e)
         {
-            App.Leonardo.STMotor_Vor(100);
+            App.Leonardo.STMotor_Vor();
         }
 
         private void Stop_Button_Click(object sender, RoutedEventArgs e)
@@ -44,9 +48,22 @@ namespace InMoov.Views
 
         private void Rueckwaerts_Button_Click(object sender, RoutedEventArgs e)
         {
-            App.Leonardo.STMotor_Zurueck(100);
+            App.Leonardo.STMotor_Zurueck();
         }
 
+        private void Stop_R_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor_Stop_Zurueck();
+        }
+
+        private void Drehung_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor_Drehung();
+        }
+        private void STMotor_Click(object sender, RoutedEventArgs e)
+        {
+            App.Leonardo.STMotor();
+        }
         private void DrivePage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
@@ -64,16 +81,6 @@ namespace InMoov.Views
                 //pageTitleContainer.Visibility = Visibility.Collapsed;
                 bottombar.Visibility = Visibility.Collapsed;
             }
-        }
-
-        private void Stop_R_Button_Click(object sender, RoutedEventArgs e)
-        {
-            App.Leonardo.STMotor_Stop_Zurueck();
-        }
-
-        private void Drehung_Button_Click(object sender, RoutedEventArgs e)
-        {
-            App.Leonardo.STMotor_Drehung();
         }
     }
 }

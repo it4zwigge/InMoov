@@ -29,6 +29,7 @@ namespace InMoov
         public string kind { get; set; }
         public bool ready { get; set; }
 
+        private static byte SABERTOOTH_MOTOR = 0x41;
         private static byte SABERTOOTH_MOTOR_VOR = 0x42;
         private static byte SABERTOOTH_MOTOR_STOP = 0x43;
         private static byte SABERTOOTH_MOTOR_ZURUECK = 0x44;
@@ -91,12 +92,20 @@ namespace InMoov
             this.arduino.analogWrite(pin, value);
         }
 
-        public void STMotor_Vor(byte speed)
+        public void STMotor()
         {
             byte[] message = new byte[3];
-            message[0] = (byte)(speed);
-            message[1] = (byte)(speed);
-            message[2] = (byte)(speed);
+            message[0] = (byte)(0);
+            message[1] = (byte)(0);
+            message[2] = (byte)(0);
+            firmata.sendSysex(SABERTOOTH_MOTOR, message.AsBuffer());
+        }
+        public void STMotor_Vor()
+        {
+            byte[] message = new byte[3];
+            message[0] = (byte)(0);
+            message[1] = (byte)(0);
+            message[2] = (byte)(0);
             firmata.sendSysex(SABERTOOTH_MOTOR_VOR,message.AsBuffer());
         }
 
@@ -109,15 +118,14 @@ namespace InMoov
             firmata.sendSysex(SABERTOOTH_MOTOR_STOP, message.AsBuffer());
         }
 
-        public void STMotor_Zurueck(byte speed)
+        public void STMotor_Zurueck()
         {
             byte[] message = new byte[3];
-            message[0] = (byte)(speed);
-            message[1] = (byte)(speed);
-            message[2] = (byte)(speed);
+            message[0] = (byte)(0);
+            message[1] = (byte)(0);
+            message[2] = (byte)(0);
             firmata.sendSysex(SABERTOOTH_MOTOR_ZURUECK, message.AsBuffer());
         }
-
 
         public void STMotor_Stop_Zurueck()
         {
@@ -137,10 +145,7 @@ namespace InMoov
             firmata.sendSysex(SABERTOOTH_MOTOR_DREHUNG_RECHTS, message.AsBuffer());
         }
 
-        #region InMoov Firmata
-
-        #endregion
-
+        
         #region Events
 
         #region arduino

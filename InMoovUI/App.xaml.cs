@@ -38,7 +38,6 @@ namespace InMoov
 
         static byte NEOPIXEL = 0x72;
         static byte NEOPIXEL_REGISTER = 0x74;
-        static byte SABERTOOTH_MOTOR = 0x42;
 
         public static int readyDevices = 0;
 

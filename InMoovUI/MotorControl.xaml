@@ -1,0 +1,32 @@
+﻿<UserControl
+    x:Class="App1.MotorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App1"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="160"
+    d:DesignWidth="250">
+    <!--<UserControl.Resources>
+     <local:StringFormatConverter x:Key="StringFormatConverter" />
+    </UserControl.Resources>-->
+    <Grid>
+        <StackPanel x:Name="StackPanelMotorVL" Orientation="Vertical">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" Text="Motor vorn links"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{Binding Path=MinSpeed, Mode=TwoWay}" />
+                <Slider x:Name="SliderMotorVL" Width="150" Minimum="{Binding Path=MinSpeed, Mode=TwoWay}" Maximum="{Binding Path=MaxSpeed, Mode=TwoWay}" Value="0"/>
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{Binding Path=MaxSpeed, Mode=TwoWay}" />
+            </StackPanel>
+            <Button x:Name="ButtonMotor"
+                    IsHoldingEnabled="True"
+                    Content="{Binding ElementName=SliderMotorVL, Path=Value, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}Start [{0}]'}"
+                    HorizontalAlignment="Center"
+                    Width="{Binding ElementName=SliderMotorVL, Path=Width}"
+                    Height="70"
+                    Holding="ButtonMotor_Holding"
+                    />
+        </StackPanel>
+    </Grid>
+</UserControl>

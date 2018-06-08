@@ -29,6 +29,8 @@ formatted using the GNU C formatting and indenting
 #include <Servo.h>
 #include <Wire.h>
 #include <Firmata.h>
+#include <SoftwareSerial.h>
+#include <SabertoothSimplified.h>
 
 // move the following defines to Firmata.h?
 #define I2C_WRITE B00000000
@@ -51,7 +53,21 @@ formatted using the GNU C formatting and indenting
 #define NEOPIXEL 0x72
 #define NEOPIXEL_REGISTER 0x74
 
+#define SABERTOOTH_MOTOR 0x41
+#define SABERTOOTH_MOTOR_VOR 0x42
+#define SABERTOOTH_MOTOR_STOP 0x43
+#define SABERTOOTH_MOTOR_ZURUECK 0x44
+#define SABERTOOTH_MOTOR_STOP_R 0x45
+#define SABERTOOTH_MOTOR_DREHUNG_RECHTS 0x46
+
 Adafruit_NeoPixel *neopixels = NULL;
+
+SoftwareSerial Sabertooth1(NOT_A_PIN, 3);//Sabertooth1 nutzt PIN 3
+SabertoothSimplified ST1(Sabertooth1); 
+SoftwareSerial Sabertooth2(NOT_A_PIN, 5);//Sabertooth2 nutzt PIN 5
+SabertoothSimplified ST2(Sabertooth2);
+
+int STspeed = 0;
 
 /*==============================================================================
 * GLOBAL VARIABLES
@@ -541,23 +557,106 @@ void sysexCallback(byte command, byte argc, byte *argv)
 			neopixels = new Adafruit_NeoPixel(count, pin, NEO_GRB + NEO_KHZ800);
 			neopixels->begin();
 		}
+   break;
 	case NEOPIXEL:
 		{
 			int index = argv[0];
 			int red = argv[1];
 			int green = argv[2];
 			int blue = argv[3];
-      int gamma = argv[4];
-      if (gamma == argv[4])
-      {
-              neopixels->setPixelColor(index, neopixels->Color(red, green, blue, gamma));
-      }
-      else
-      {
-              neopixels->setPixelColor(index, neopixels->Color(red, green, blue));
-      }
+
+			int gamma = argv[4];
+
+			  if (gamma == argv[4])
+			  {
+					  neopixels->setPixelColor(index, neopixels->Color(red, green, blue, gamma));
+			  }
+			  else
+			  {
+					  neopixels->setPixelColor(index, neopixels->Color(red, green, blue));
+			  }
 			neopixels->show();
-		}
+			}
+   break;
+	case SABERTOOTH_MOTOR:
+	{
+		argv[0] = 50;
+		argv[1] = 10;
+		argv[2] = 0;
+		
+			ST1.motor(1, argv[0]);
+			ST1.motor(2, argv[1]);
+			ST2.motor(1, argv[2]);
+			ST2.motor(2, argv[3]);
+	}
+	break;
+   case SABERTOOTH_MOTOR_VOR:
+      {
+        STspeed = 127;
+        for(int power = 0; power <= STspeed; power++)
+        {
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
+		  
+          delay(30);
+        }               
+      }
+      break;
+
+ case SABERTOOTH_MOTOR_STOP:
+      {    
+         for(int power = STspeed; power >= 0; power--)
+        {
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
+          delay(30);
+        }              
+      }
+      break;
+       case SABERTOOTH_MOTOR_STOP_R:
+      {    
+         for(int power = -127; power <= 0; power++)
+        {
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
+          delay(30);
+        }              
+      }
+      break;
+      
+ case SABERTOOTH_MOTOR_ZURUECK:
+      {
+        STspeed = 127;
+        for(int power = 0; power >= -STspeed; power--)
+        {
+          ST1.motor(1, power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, power);
+          delay(30);
+        }             
+      }
+      break;     
+
+ case SABERTOOTH_MOTOR_DREHUNG_RECHTS:
+ {
+        STspeed = 10;
+        for(int power = 0; power >= -STspeed; power--)
+        {
+          ST1.motor(1, -power);
+          ST1.motor(2, power);
+          ST2.motor(1, power);
+          ST2.motor(2, -power);
+          delay(30);
+        }             
+  }
+  break;
 	}
 }
 
@@ -632,6 +731,9 @@ void setup()
 	Firmata.attach(SET_PIN_MODE, setPinModeCallback);
 	Firmata.attach(START_SYSEX, sysexCallback);
 	Firmata.attach(SYSTEM_RESET, systemResetCallback);
+
+  Sabertooth1.begin(9600); //Sabertooth1 Baudstart
+  Sabertooth2.begin(9600); //Sabertooth2 Baudstart
 
 	Firmata.begin(57600);
 	systemResetCallback();  // reset to default config

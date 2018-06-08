@@ -55,7 +55,7 @@ namespace InMoov.Views
 
         private void servoSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            int value = (int)servoSlider.Value;
+             ushort value = (ushort)servoSlider.Value;
             Debug.WriteLine(value);
             App.ALinks.servoWrite(26, value);
         }

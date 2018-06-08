@@ -62,12 +62,17 @@ namespace InMoov.Views
         }
         private void STMotor_Click(object sender, RoutedEventArgs e)
         {
-            App.Leonardo.STMotor();
+            //App.Leonardo.STMotor();
         }
         private void DrivePage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
 
+        }
+
+        private void SliderSTMotor_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            App.Leonardo.STMotor((int)SliderSTMotor.Value);
         }
     }
 }

@@ -57,7 +57,7 @@ namespace InMoov.Views
         {
             int value = (int)servoSlider.Value;
             Debug.WriteLine(value);
-            App.ALinks.servoWrite(26, value);
+           // App.ALinks.servoWrite(26, value);
         }
     }
 }

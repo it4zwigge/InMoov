@@ -38,9 +38,8 @@
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-            <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0"/>
 
-        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0"/>
+
 
         <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <AppBarButton Icon="Edit" Label="Edit"/>
@@ -53,5 +52,7 @@
                 <AppBarButton Label="Menu Item 3"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
+        <TimePicker x:Name="timePicker" HorizontalAlignment="Left" Margin="279,363,0,0" Grid.Row="1" VerticalAlignment="Top" Height="41" Width="434" RenderTransformOrigin="0.66,0.549"/>
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Margin="100,100,0,0" Text="TextBox" VerticalAlignment="Center"/>
     </Grid>
 </Page>

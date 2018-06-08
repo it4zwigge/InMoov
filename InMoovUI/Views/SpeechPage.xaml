@@ -41,7 +41,7 @@
             <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" HorizontalAlignment="Stretch" VerticalAlignment="Top" FontFamily="VW Head Office" Height="45"/>
             <TextBlock x:Name="resultTextBlock" Height="200" Width="971" HorizontalAlignment="Left" Margin="150,-140,0,0" VerticalAlignment="Top"></TextBlock>
             <TextBlock Margin="10,25,249,0" VerticalAlignment="Top" FontFamily="VW Head Office" FontSize="15" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." Height="253" HorizontalAlignment="Stretch"/>
-            <MediaElement x:Name="media" AutoPlay="False" MediaEnded="media_MediaEnded"/>
+            <!--<MediaElement x:Name="media" AutoPlay="False" MediaEnded="media_MediaEnded"/>-->
         </StackPanel>
 
     </Grid>

@@ -111,6 +111,7 @@
     <Compile Include="NavMenuItem.cs" />
     <None Include="CognitiveServices\FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />
+    <Compile Include="TestClass.cs" />
     <Compile Include="Triggers\IsTenFootTrigger.cs" />
     <Compile Include="Views\BasicPage.xaml.cs">
       <DependentUpon>BasicPage.xaml</DependentUpon>
@@ -273,6 +274,9 @@
       <Project>{8376216c-282a-4927-b9ef-c2d545fe0bca}</Project>
       <Name>Microsoft.Maker.Serial</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="HelperClasses\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -238,7 +238,6 @@ namespace InMoov.Views
                             {
                                 xML_Data = new XML_Data();
                                 facedetected = xML_Data.GetVorName(result.Candidates[0].PersonId.ToString());                                  //Schreiben des Namens auf globale Variable
-                                Views.SpeechPage.Speaking("Hallo " + facedetected);
                             }
                         }
                         #endregion XML

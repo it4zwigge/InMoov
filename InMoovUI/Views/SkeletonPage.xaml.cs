@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -27,6 +28,10 @@ namespace InMoov.Views
         {
             this.InitializeComponent();
             this.Loaded += SkeletonPage_Loaded;
+            servoSlider.Maximum = 60;
+            servoSlider.Minimum = 0;
+            servoSlider.Value = 30;
+            App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
         }
 
         private void SkeletonPage_Loaded(object sender, RoutedEventArgs e)
@@ -46,6 +51,13 @@ namespace InMoov.Views
             //    //pageTitleContainer.Visibility = Visibility.Collapsed;
             //    bottombar.Visibility = Visibility.Collapsed;
             //}
+        }
+
+        private void servoSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            int value = (int)servoSlider.Value;
+            Debug.WriteLine(value);
+            App.ALinks.servoWrite(26, value);
         }
     }
 }

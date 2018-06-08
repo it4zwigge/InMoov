@@ -38,18 +38,19 @@
         </Grid.RowDefinitions>
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <StackPanel Grid.Row="0" Margin="10,10,0,0" x:Name="ConnectSelection" Orientation="Vertical" VerticalAlignment="Stretch">
+            <StackPanel Grid.Row="0" Margin="0,0,0,0" x:Name="ConnectSelection" Orientation="Vertical" VerticalAlignment="Stretch">
                 <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <StackPanel Margin="0,0,20,0" Orientation="Vertical" HorizontalAlignment="Stretch">
                     </StackPanel>
                     <StackPanel x:Name="BaudRateStack" Orientation="Vertical" HorizontalAlignment="Stretch">
                     </StackPanel>
                 </StackPanel>
-                <TextBlock HorizontalAlignment="Left" Height="47" Margin="130,-5,0,0" Text="ArduinoConnect" TextWrapping="Wrap" Width="283" FontSize="36" FontFamily="VW Head Office" VerticalAlignment="Stretch"/>
-                <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2056" HorizontalAlignment="Left" Margin="7,15,0,0" VerticalAlignment="Top" Width="292" Height="31" FontFamily="VW Head Office" FontSize="13">
+                <TextBlock HorizontalAlignment="Stretch" Height="47" Margin="10,-5,1029,0" Text="ArduinoConnect" TextWrapping="Wrap" FontSize="36" FontFamily="VW Head Office" VerticalAlignment="Stretch"/>
+                <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2056" HorizontalAlignment="Left" Margin="-5,15,0,0" VerticalAlignment="Top" Width="292" Height="31" FontFamily="VW Head Office" FontSize="13">
                 </HyperlinkButton>
+                <TextBlock HorizontalAlignment="Left" Margin="10,300,0,0" Foreground="#FFACACA7" Text="Auf dieser Seite können Sie die Arduinos verbinden lassen. Sollte dies ein mal nicht funktionieren können sie über den Knopf 'refresh' erneut suchen. Über den Knopf 'connect' ist es möglich, einzelne Arduinos hinzu zufügen." TextWrapping="Wrap" VerticalAlignment="Top" Width="909" Height="205"/>
             </StackPanel>
-            <StackPanel Grid.Row="1" Margin="10,0,10,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <StackPanel Margin="10,155,490,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Text="Gefundene Arduinos:" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <Border Height="1" Width="auto" Background="White"/>
                 <ListView x:Name="devicesList">
@@ -71,7 +72,7 @@
                     <Button x:Uid="Verbinden" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
                     <Button x:Uid="Aktuallisieren" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
                 </StackPanel>
-                <TextBlock Text="wenn sie ien neuen Arduino angeschlossen haben, drücken sie auf Refresh um nach neuen Arduinos zu suchen und diese zu automatisch zu verbinden.&#x0a;Sollte einer der Arduinos nicht verbunden sein, so können sie über den Connect Button diesen Manuell Verbinden"></TextBlock>
+
             </StackPanel>
 
             <TextBlock Grid.Row="2" Margin="10,0,0,0"

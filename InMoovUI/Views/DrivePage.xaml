@@ -48,7 +48,7 @@
             <Button x:Name="Drehung_Button" Content="Drehung" HorizontalAlignment="Left" Height="170" Margin="10,222,0,0" VerticalAlignment="Top" Width="254" Click="Drehung_Button_Click" FontFamily="VW Head Office" />
             <TextBlock HorizontalAlignment="Left" Height="60" Margin="5,10,0,0" Text="Fahrwerkssteuerung" TextWrapping="Wrap" VerticalAlignment="Top" Width="386" FontSize="36" FontFamily="VW Head Office"/>
             <HyperlinkButton HorizontalAlignment="Left" Height="35" Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2033" Margin="-10,70,0,0" VerticalAlignment="Top" Width="280" FontSize="13"  FocusVisualPrimaryBrush="{x:Null}" FontFamily="VW Head Office"/>
-            <TextBlock HorizontalAlignment="Left" Height="170" Margin="5,550,0,0" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." VerticalAlignment="Top" Width="890" FontSize="15" FontFamily="VW Head Office"/>
+            <TextBlock Height="170" Margin="5,550,525,0" Foreground="#FFACACA7" Text="Auf dieser Seite können Sie den InMoov sich bewegen lassen. Die verschiedenen Knöpfe führen die Aktionen aus, wie sie auf den jeweiligen Könpfen auch beschrieben sind. Fahre vor, Fahre zurück und wieder zum Standartpunkt vor." TextWrapping="Wrap"  VerticalAlignment="Top" FontSize="15" FontFamily="VW Head Office" HorizontalAlignment="Stretch"/>
 
         </Grid>
 

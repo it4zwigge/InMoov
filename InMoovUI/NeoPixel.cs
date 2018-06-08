@@ -56,12 +56,12 @@ namespace InMoov
             //Animation.ResetAnimation();
         }
 
-        public void clear()
+        public async void clear()
         {
             for (byte pixel = 0; pixel < 16; pixel++)
             {
                 App.neopixel.SetPixelColor(pixel, 0, 0, 0);
-                Thread.Sleep(50);
+                await Task.Delay(50);
             }
         }
 
@@ -174,14 +174,14 @@ namespace InMoov
                         }
                         if (stop) { break; }
                     }
-                    for (byte fade = 125; fade > 0; fade -= 5)
+                    for (byte fade = 125; fade > 0; fade -= 10)
                     {
                         for (byte i = 0; i < 16; i++)
                         {
                             if (!stop)
                             {
                                 App.neopixel.SetPixelColor(i, 0, 0, fade);
-                                await Task.Delay(1);
+                                await Task.Delay(01);
                             }
                             else
                                 break;

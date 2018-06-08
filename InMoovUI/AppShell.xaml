@@ -17,7 +17,6 @@
          by default with a transparent background.  It will also take into account the presence of software
          navigation buttons if they appear on a device.  An app can opt-out by switching to UseCoreWindow.
     -->
-
     <Page.Resources>
         <DataTemplate x:Key="NavMenuItemTemplate" x:DataType="local:NavMenuItem">
             <Grid>

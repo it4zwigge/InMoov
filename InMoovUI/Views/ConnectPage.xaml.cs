@@ -1,174 +1,98 @@
 ﻿using Communication;
-using Microsoft.Maker.RemoteWiring;
 using Microsoft.Maker.Serial;
-using Microsoft.Maker.Firmata;
 using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using InMoov;
-using System.Diagnostics;
 
 namespace InMoov.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ConnectPage : Page
     {
-        DispatcherTimer timeout;
-        DateTime connectionAttemptStartedTime;
         DateTime timePageNavigatedTo;
         CancellationTokenSource cancelTokenSource;
 
         public ConnectPage()
         {
             this.InitializeComponent();
-
+            devicesList.ItemClick += DevicesList_ItemClick;
             this.Loaded += ConnectPage_Loaded;
             App.Telemetry.TrackEvent("ConnectPage_Launched");
+        }
+
+        private void DevicesList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            ConnectButton.Visibility = Visibility.Visible;
         }
 
         // Hier müssen alle anzusteuernde funktionen eingetragen werden
         public static void Startup()
         {
-            Views.LedRingPage.InitializeNeoPixel();   // initialisiert die NeoPixel LED im Bauch        
+            App.neopixel.clear();
+            playSound("Assets/sounds/startup.mp3");
+            App.neopixel.SetAnimation(AnimationID.Ready);
+            Thread.Sleep(9000);
+            App.neopixel.StopAnimation();
         }
 
-
         #region UI events
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ConnectPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
-
-            //move commandbar to page bottom on small screens
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="e"></param>
+        //spiele verschiedene sounds zb. connected oder connection lost
+        public static void playSound(string path)
+        {
+            MediaPlayer sound = new MediaPlayer();
+            sound.Source = MediaSource.CreateFromUri(new Uri("ms-appx:///" + path)); 
+            sound.Play();
+        }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            // Telemetry
             App.Telemetry.TrackPageView("Connection_Page");
             timePageNavigatedTo = DateTime.UtcNow;
 
-            if (ConnectionList.ItemsSource == null)
+            if (devicesList.ItemsSource == null)
             {
-                ConnectMessage.Text = "Select an item to connect to.";
-                RefreshDeviceList();
+                ConnectMessage.Text = "Wählen sie einen Arduino aus.";
+                Aktuallisieren();
             }
         }
 
-        /// <summary>
-        /// Called if the Refresh button is pressed
-        /// </summary>
-        /// <param name="sender">The object invoking the event</param>
-        /// <param name="e">Arguments relating to the event</param>
+        //Aktuallisiere Seite bei click auf refresh button
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshDeviceList();
+            Aktuallisieren();
+            this.Frame.Navigate(this.GetType());
         }
 
-        /// <summary>
-        /// Called if the Cancel button is pressed
-        /// </summary>
-        /// <param name="sender">The object invoking the event</param>
-        /// <param name="e">Arguments relating to the event</param>
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            OnConnectionCancelled();
-        }
-
-        /// <summary>
-        /// Called if the Connect button is pressed
-        /// </summary>
-        /// <param name="sender">The object invoking the event</param>
-        /// <param name="e">Arguments relating to the event</param>
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            //disable the buttons and set a timer in case the connection times out
-            SetUiEnabled(false);
-
-            DeviceInformation device = null;
-            if (ConnectionList.SelectedItem != null)
-            {
-                var selectedConnection = ConnectionList.SelectedItem as Connection;
-                device = selectedConnection.Source as DeviceInformation;
-            }
-
-            // Connection properties dictionary, used only for telemetry data
-            var properties = new Dictionary<string, string>
-            {
-                { "Device_Name", device.Name },
-                { "Device_ID", device.Id },
-                { "Device_Kind", device.Kind.ToString() }
-            };
-            App.Telemetry.TrackEvent("USB_Connection_Attempt", properties);
-            foreach (string key in App.Arduinos.Keys)
-            {
-                if (key == device.Id)
-                {
-                    App.Arduinos.Remove(device.Id);
-                    break;
-                }
-            }
-            App.Arduinos.Add(device.Id, new Arduino(device));
+            Verbinden();
         }
         #endregion UI events
 
         #region Helper
-        /// <summary>
-        /// 
-        /// </summary>
+
         private void RefreshDeviceList()
         {
-            Dictionary<string, UsbSerial> devices = new Dictionary<string, UsbSerial>();
-
-            //invoke the listAvailableDevicesAsync method of the correct Serial class. Since it is Async, we will wrap it in a Task and add a llambda to execute when finished
             Task<DeviceInformationCollection> task = null;
 
-            ConnectionList.Visibility = Visibility.Visible;
-            NetworkConnectionGrid.Visibility = Visibility.Collapsed;
-            BaudRateStack.Visibility = Visibility.Visible;
+            devicesList.Visibility = Visibility.Visible;
 
-            //create a cancellation token which can be used to cancel a task
             cancelTokenSource = new CancellationTokenSource();
-            cancelTokenSource.Token.Register(() => OnConnectionCancelled());
 
             task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
 
@@ -180,6 +104,7 @@ namespace InMoov.Views
                     //store the result and populate the device list on the UI thread
                     var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
+                        //ObservableCollection<Connection> connections = new ObservableCollection<Connection>();
                         Connections connections = new Connections();
 
                         var result = listTask.Result;
@@ -191,49 +116,137 @@ namespace InMoov.Views
                         {
                             foreach (DeviceInformation device in result)
                             {
-                                connections.Add(new Connection(device.Name, device));
-                                //devices.Add(device.Name, new UsbSerial(device));
+                                bool vorhanden = false;
+                                foreach (Arduino arduino in App.Arduinos.Values.ToList())
+                                {
+                                    if (arduino.name == device.Name)
+                                    {
+                                        vorhanden = true;
+                                    }
+                                }
+                                if (vorhanden == false)
+                                {
+                                    App.Arduinos.Add(device.Id, new Arduino(device));
+                                }
                             }
                             ConnectMessage.Text = "Wählen sie einen Arduino aus.";
-
-                            ConnectionList.ItemsSource = connections;  // Anzeige der Geräte als Liste
+                            devicesList.ItemsSource = App.Arduinos.Values;
                         }
                     }));
                 });
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enabled"></param>
-        private void SetUiEnabled(bool enabled)
-        {
-            RefreshButton.IsEnabled = enabled;
-            ConnectButton.IsEnabled = enabled;
-            CancelButton.IsEnabled = !enabled;
-        }
-
-        /// <summary>
-        /// This function is invoked if a cancellation is invoked for any reason on the connection task
-        /// </summary>
-        private void OnConnectionCancelled()
-        {
-            ConnectMessage.Text = "Connection attempt cancelled.";
-            App.Telemetry.TrackRequest("Connection_Cancelled_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true);
-
-
-            if (cancelTokenSource != null)
-            {
-                cancelTokenSource.Dispose();
-            }
-
-            App.Connection = null;
-            App.Arduino = null;
-            cancelTokenSource = null;
-
-            SetUiEnabled(true);
-        }
         #endregion Helper
+
+
+        // startet die Verbindung mit dem ausgewählten arduino bei Knopdruck
+        private async Task <bool> Verbinden()
+        {
+            var selc = devicesList.SelectedItem as Arduino;
+            if (devicesList.SelectedItem != null)
+            {
+                selc.connect();
+                while (selc.ready == false)
+                {
+                    await Task.Delay(100);
+                }
+                this.Frame.Navigate(this.GetType());
+            }
+            return selc.ready;
+        }
+
+
+        public void Aktuallisieren()
+        {
+            //initialisiert den kommenden Vorgang
+            Task<DeviceInformationCollection> task = null;
+            devicesList.Visibility = Visibility.Visible;
+            cancelTokenSource = new CancellationTokenSource();
+            task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>(cancelTokenSource.Token);
+
+            if (task != null)
+            {
+                //speichert alle gefunden items vom Typ Deviceinformation wenn der Task fertig ist
+                task.ContinueWith(listTask =>
+                {
+                    //speichert die ergebnisse "result" und füllt die Geräte Liste im UI-Thread
+                    var action = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
+                    {
+                        var result = listTask.Result;
+                        //Prüfe ob überhaupt geräte gefunden wurden
+                        if (result == null || result.Count == 0)
+                        {
+                            ConnectMessage.Text = "[Info] Keine Geräte Gefunden!";
+                        }
+                        else
+                        {
+                            foreach (DeviceInformation device in result) // Hier der algorythmus zum filtern von vorhandenen geräten
+                            {
+                                bool vorhanden = false;
+                                foreach (Arduino arduino in App.Arduinos.Values.ToList())
+                                {
+                                    if (arduino.name == device.Name) // sollte ein name übereinstimmen dann ist dieses gerät schon vorhanden
+                                    {
+                                        vorhanden = true;
+                                    }
+                                }
+                                if (vorhanden == false)
+                                {
+                                    App.Arduinos.Add(device.Id, new Arduino(device)); //solte das Gerät nicht vorhanden sein, soll dieses zu liste hinzugefügt werden
+                                }
+                            }
+                            devicesList.ItemsSource = App.Arduinos.Values; //zeige alle items aus der App.Arduinos liste (Dictonary)
+                            task = null; // lösche speicher
+                        }
+                    }));
+                });
+            }
+        }
+
+        public static async void sortArduinos()
+        {
+            foreach (Arduino arduino in App.Arduinos.Values)
+             {
+                switch (arduino.id.Substring(26, 20))
+                {
+                    //case "756303137363513071D1":
+                    //case "55639303834351D0F191":
+                    //case "85539313931351C09082":
+                    //case "95530343634351901162":
+                    case "955303430353518062E0":
+                        App.Leonardo = arduino;
+                        Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
+                        break;
+                    case "75533353038351313212":
+                        App.ARechts = arduino;
+                        Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
+                        break;
+                    case "85531303231351812120":
+                        App.ALinks = arduino;
+                        Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
+                        break;
+                }
+            }
+        }
+        public static async void checkDevices()
+        {
+            try
+            {
+                if (App.Leonardo.ready == true && App.neopixel == null)
+                {
+                    Views.LedRingPage.InitializeNeoPixel();
+                    await Views.LedRingPage.turnConnected();
+                }
+            }
+            catch
+            {
+
+            }
+            //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
+            //{
+            //    Startup();
+            //}
+        }
     }
 }

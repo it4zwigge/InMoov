@@ -32,69 +32,17 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
+        <StackPanel Margin="0,0,0,10">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition />
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-            <CommandBar.Content>
-                <ctl:PageHeader>
-                    <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="CommandBar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-                    </ctl:PageHeader.HeaderContent>
-                </ctl:PageHeader>
-            </CommandBar.Content>
-        </CommandBar>
+        </StackPanel>
+        <StackPanel x:Name="Y">
+            <TextBlock Text="Spracherkennung" Margin="10,10,1147,0" FontSize="36" FontFamily="VW Head Office" VerticalAlignment="Top" Height="47" HorizontalAlignment="Stretch"/>
+            <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=1948" HorizontalAlignment="Stretch" Margin="-5,20,1278,0" VerticalAlignment="Top" Height="34" FontFamily="VW Head Office" FontSize="13"/>
+            <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Toggle" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="VW Head Office" Height="45" Margin="15,0,0,0" Width="1500"/>
+            <TextBlock x:Name="resultTextBlock" Height="200" Width="971" HorizontalAlignment="Left" Margin="150,-140,0,0" VerticalAlignment="Top"></TextBlock>
+            <TextBlock Margin="10,25,249,0" VerticalAlignment="Top" FontFamily="VW Head Office" FontSize="15" Text="Hier stehen Informationen, Hinweise und eventuelle Warnungen." Height="253" HorizontalAlignment="Stretch"/>
+            <!--<MediaElement x:Name="media" AutoPlay="False" MediaEnded="media_MediaEnded"/>-->
+        </StackPanel>
 
-        <!--<ctl:PageHeader x:Name="pageTitleContainer" Visibility="Collapsed">
-            <ctl:PageHeader.HeaderContent>
-                <TextBlock x:Name="AltHeaderTextBlock" Text="Commandbar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-            </ctl:PageHeader.HeaderContent>
-        </ctl:PageHeader>-->
-
-        <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <StackPanel Margin="0,0,0,10">
-                <TextBlock Text="Description:"/>
-
-            </StackPanel>
-            <ScrollViewer Grid.Row="1" VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Language: " Margin="20,40,0,0" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="cbLanguageSelection" SelectionChanged="cbLanguageSelection_SelectionChanged" Margin="15,40,0,0" Width="200"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <TextBlock Text="Spracherkennung: " Margin="0,35,0,0"/>
-                        <ToggleSwitch x:Name="ToggleSpeech" Toggled="RecognizeWithoutUIListConstraint_Click" Margin="10,25,0,0"/>
-                    </StackPanel>
-                    <TextBlock x:Name="helpTextBlock" Margin="0,50,0,0" Text="Inmoov Speech Recognition" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
-                    <TextBlock x:Name="heardYouSayTextBlock" Margin="0,14.5,0,0" Text="Heard you say" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                    <TextBlock x:Name="resultTextBlock" Margin="0,14.5,0,0" Visibility="Collapsed" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"/>
-                </StackPanel>
-            </ScrollViewer>
-        </Grid>
-
-        <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
     </Grid>
 </Page>

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using InMoov.Controls;
 using InMoov.Views;
+using Windows.UI;
 
 namespace InMoov
 {
@@ -65,6 +66,12 @@ namespace InMoov
                     Symbol = Symbol.People,
                     Label = "Skelettierung",
                     DestPage = typeof(SkeletonPage)
+                },
+                new NavMenuItem()
+                {
+                    Symbol = Symbol.Clock,
+                    Label = "Sprachbefehle",
+                    DestPage = typeof(SpeechSchedulerPage)
                 }
             });
 
@@ -78,7 +85,6 @@ namespace InMoov
         public AppShell()
         {
             this.InitializeComponent();
-
             this.Loaded += (sender, args) =>
             {
                 Current = this;

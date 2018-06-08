@@ -5,6 +5,8 @@
     xmlns:ctl="using:InMoov.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:InMoov"
+    xmlns:local1="using:Communication"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -16,8 +18,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ContentContainer.Margin" Value="24,0"/>
-                        <!--<Setter Target="HeaderTextBlock.Style" Value="{StaticResource PageTitleTextBlockStyle}"/>
-                        <Setter Target="AltHeaderTextBlock.Style" Value="{StaticResource PageTitleTextBlockStyle}"/>-->
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -26,8 +26,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ContentContainer.Margin" Value="12,0"/>
-                        <!--<Setter Target="HeaderTextBlock.Style" Value="{StaticResource NarrowPageTitleTextBlockStyle}"/>
-                        <Setter Target="AltHeaderTextBlock.Style" Value="{StaticResource NarrowPageTitleTextBlockStyle}"/>-->
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -38,91 +36,47 @@
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <CommandBar x:Name="topbar" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-            <CommandBar.Content>
-                <ctl:PageHeader>
-                    <ctl:PageHeader.HeaderContent>
-                        <TextBlock x:Name="HeaderTextBlock" Text="Connect Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-                    </ctl:PageHeader.HeaderContent>
-                </ctl:PageHeader>
-            </CommandBar.Content>
-        </CommandBar>
-
-        <!--<ctl:PageHeader x:Name="pageTitleContainer" Visibility="Collapsed">
-            <ctl:PageHeader.HeaderContent>
-                <TextBlock x:Name="AltHeaderTextBlock" Text="Commandbar Page" Style="{StaticResource PageTitleTextBlockStyle}"/>
-            </ctl:PageHeader.HeaderContent>
-        </ctl:PageHeader>-->
 
         <Grid x:Name="ContentContainer" Grid.Row="1" EntranceNavigationTransitionInfo.IsTargetElement="True" Margin="24,0">
-            <StackPanel Grid.Row="0" Margin="10,10,0,0" x:Name="ConnectSelection" Orientation="Vertical">
+            <StackPanel Grid.Row="0" Margin="0,0,0,0" x:Name="ConnectSelection" Orientation="Vertical" VerticalAlignment="Stretch">
                 <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <StackPanel Margin="0,0,20,0" Orientation="Vertical" HorizontalAlignment="Stretch">
-                        <!--<TextBlock Text="Connection Method:" />
-                        <ComboBox x:Name="ConnectionMethodComboBox" HorizontalAlignment="Stretch" SelectedIndex="0">
-                            <x:String>Bluetooth</x:String>
-                            <x:String>USB</x:String>
-                            <x:String>Network</x:String>
-                        </ComboBox>-->
                     </StackPanel>
                     <StackPanel x:Name="BaudRateStack" Orientation="Vertical" HorizontalAlignment="Stretch">
-                        <!--<TextBlock Text="Baud Rate:" />
-                        <ComboBox x:Name="BaudRateComboBox" HorizontalAlignment="Stretch" SelectedIndex="7">
-                            <x:String>300</x:String>
-                            <x:String>1200</x:String>
-                            <x:String>2400</x:String>
-                            <x:String>4800</x:String>
-                            <x:String>9600</x:String>
-                            <x:String>19200</x:String>
-                            <x:String>38400</x:String>
-                            <x:String>57600</x:String>
-                            <x:String>115200</x:String>
-                        </ComboBox>-->
                     </StackPanel>
                 </StackPanel>
+                <TextBlock HorizontalAlignment="Stretch" Height="47" Margin="10,-5,1029,0" Text="ArduinoConnect" TextWrapping="Wrap" FontSize="36" FontFamily="VW Head Office" VerticalAlignment="Stretch"/>
+                <HyperlinkButton Content="Die Dokumentation zum Projekt finden Sie hier." NavigateUri="http://h2590701.stratoserver.net/?p=2056" HorizontalAlignment="Left" Margin="-5,15,0,0" VerticalAlignment="Top" Width="292" Height="31" FontFamily="VW Head Office" FontSize="13">
+                </HyperlinkButton>
+                <TextBlock HorizontalAlignment="Left" Margin="10,300,0,0" Foreground="#FFACACA7" Text="Auf dieser Seite können Sie die Arduinos verbinden lassen. Sollte dies ein mal nicht funktionieren können sie über den Knopf 'refresh' erneut suchen. Über den Knopf 'connect' ist es möglich, einzelne Arduinos hinzu zufügen." TextWrapping="Wrap" VerticalAlignment="Top" Width="909" Height="205"/>
             </StackPanel>
-            <StackPanel Grid.Row="1" Margin="10,0,10,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <ListBox x:Name="ConnectionList" DisplayMemberPath="DisplayName" />
-                <Grid Name="NetworkConnectionGrid" HorizontalAlignment="Stretch"  Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Name="NetworkHostNameTextBox" Grid.Column="0" HorizontalAlignment="Stretch" PlaceholderText="IP or HostName" />
-                    <TextBox Name="NetworkPortTextBox" Grid.Column="1" HorizontalAlignment="Stretch" PlaceholderText="Port" />
-                </Grid>
+            <StackPanel Margin="10,155,490,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Text="Gefundene Arduinos:" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <Border Height="1" Width="auto" Background="White"/>
+                <ListView x:Name="devicesList">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:Arduino">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{x:Bind ImageUri}" Visibility="Visible" Width="80" Height="50"></Image>
+                                        <TextBlock Text="{x:Bind name}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Border Height="1" Width="auto" Background="White"/>
+                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" >
+                    <Button x:Uid="Verbinden" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
+                    <Button x:Uid="Aktuallisieren" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
+                </StackPanel>
+
             </StackPanel>
 
             <TextBlock Grid.Row="2" Margin="10,0,0,0"
                     x:Name="ConnectMessage" FontSize="14" Width="Auto" VerticalAlignment="Bottom"/>
-
-            <StackPanel Grid.Row="3" Margin="10" Orientation="Horizontal" FlowDirection="RightToLeft" >
-                <Button x:Uid="Connect" Margin="0,0,10,0" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
-                <Button x:Uid="Cancel" Margin="0,0,10,0" x:Name="CancelButton" Click="CancelButton_Click" IsEnabled="False">Cancel</Button>
-                <Button x:Uid="RefreshBtn" Margin="0,0,10,0" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
-            </StackPanel>
-            <!--<TextBlock Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Your App Content"/>-->
         </Grid>
-
-        <CommandBar x:Name="bottombar" Grid.Row="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Delete" Label="Delete"/>
-            <AppBarSeparator/>
-            <AppBarToggleButton Icon="Sort" Label="Sort"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Menu Item 1"/>
-                <AppBarButton Label="Menu Item 2"/>
-                <AppBarButton Label="Menu Item 3"/>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
     </Grid>
 </Page>

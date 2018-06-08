@@ -17,7 +17,6 @@
          by default with a transparent background.  It will also take into account the presence of software
          navigation buttons if they appear on a device.  An app can opt-out by switching to UseCoreWindow.
     -->
-
     <Page.Resources>
         <DataTemplate x:Key="NavMenuItemTemplate" x:DataType="local:NavMenuItem">
             <Grid>
@@ -131,7 +130,7 @@
         <SplitView x:Name="RootSplitView"
                    DisplayMode="Inline"
                    OpenPaneLength="320"
-                   PaneBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                   PaneBackground="{ThemeResource SystemControlAcrylicWindowBrush}"
                    PaneClosed="RootSplitView_PaneClosed"
                    LightDismissOverlayMode="On"
                    IsTabStop="False">
@@ -158,7 +157,8 @@
                                               ContainerContentChanging="NavMenuItemContainerContentChanging"
                                               ItemContainerStyle="{StaticResource NavMenuItemContainerStyle}"
                                               ItemTemplate="{StaticResource NavMenuItemTemplate}"
-                                              ItemInvoked="NavMenuList_ItemInvoked"/>
+                                              ItemInvoked="NavMenuList_ItemInvoked">
+                    </controls:NavMenuListView>
                     <Rectangle x:Name="NavPaneDivider"
                                Grid.Row="1"
                                Grid.ColumnSpan="3"

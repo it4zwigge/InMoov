@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
@@ -32,26 +33,62 @@ namespace InMoov.Views
         private void LedRingPage_Loaded(object sender, RoutedEventArgs e)
         {
             double? diagonal = DisplayInformation.GetForCurrentView().DiagonalSizeInInches;
-
-            //move commandbar to page bottom on small screens
-            if (diagonal < 7)
-            {
-                topbar.Visibility = Visibility.Collapsed;
-                //pageTitleContainer.Visibility = Visibility.Visible;
-                bottombar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                topbar.Visibility = Visibility.Visible;
-                //pageTitleContainer.Visibility = Visibility.Collapsed;
-                bottombar.Visibility = Visibility.Collapsed;
-            }
+            
         }
 
+        // wenn der Leonardo verbunden ist wird diese Methode einmalig aufgerufen um den Ledring frühzeitig ansteuern zu können und diesen anzulegen
         public static void InitializeNeoPixel()
         {
             App.neopixel = new NeoPixel(App.Leonardo.firmata, 9, 16);
-            App.neopixel.SetPixelColor(2, 0, 255, 0);
+            App.neopixel.clear();
+        }
+
+        public static async Task<bool> turnConnected()
+        {
+            bool succeeded = false;
+            byte readyDevices;
+            while (!succeeded)
+            {
+                readyDevices = 0;
+                foreach (Arduino arduino in App.Arduinos.Values)
+                {
+                    if (arduino.ready == true)
+                    {
+                        readyDevices++;
+                    }
+                }
+                for (byte pixel = 0; pixel < 6 * readyDevices; pixel++)
+                {
+                    App.neopixel.SetPixelColor(pixel, 0, 100, 0);
+                    await Task.Delay(62);
+                }
+                for (byte pixel = byte.Parse((readyDevices * 6).ToString()); pixel < 16; pixel++)
+                {
+                    App.neopixel.SetPixelColor(pixel, 100, 0, 0);
+                    await Task.Delay(62);
+                }
+                if (readyDevices == 3)
+                {
+                    Views.ConnectPage.Startup();
+                    succeeded = true;
+                }
+            }
+            return succeeded;
+        }
+
+        private void Neopixel_Reset_Click(object sender, RoutedEventArgs e)
+        {
+            App.neopixel.StopAnimation();
+        }
+
+        private void Facedetection_Click(object sender, RoutedEventArgs e)
+        {
+            App.neopixel.SetAnimation(AnimationID.Facedetection);
+        }
+
+        private void Error_Click(object sender, RoutedEventArgs e)
+        {
+            App.neopixel.SetAnimation(AnimationID.Error);
         }
     }
 }

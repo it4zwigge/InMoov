@@ -10,7 +10,7 @@
     <AssemblyName>InMoov</AssemblyName>
     <DefaultLanguage>de-DE</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.17134.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
@@ -99,6 +99,7 @@
     <Compile Include="AudioCapturePermissions.cs" />
     <Compile Include="BodyPart.cs" />
     <Compile Include="CognitiveServices\PhotoFace.cs" />
+    <Compile Include="CognitiveServices\XML_Data.cs" />
     <Compile Include="Communication\Connection.cs" />
     <Compile Include="Communication\Connections.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
@@ -106,19 +107,20 @@
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Keys.cs" />
-    <Compile Include="LED.cs" />
-    <Compile Include="MotorControl.xaml.cs">
-      <DependentUpon>MotorControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="NeoPixel.cs" />
     <Compile Include="NavMenuItem.cs" />
-    <None Include="FaceDetection.cs.orig" />
+    <None Include="CognitiveServices\FaceDetection.cs.orig" />
     <Compile Include="SystemInformationHelpers.cs" />
+    <Compile Include="TestClass.cs" />
     <Compile Include="Triggers\IsTenFootTrigger.cs" />
     <Compile Include="Views\BasicPage.xaml.cs">
       <DependentUpon>BasicPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SpeechSchedulerPage.xaml.cs">
+      <DependentUpon>SpeechSchedulerPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SkeletonPage.xaml.cs">
       <DependentUpon>SkeletonPage.xaml</DependentUpon>
@@ -158,7 +160,12 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\sounds\disconnected.wav" />
+    <Content Include="Assets\sounds\connected.wav" />
+    <Content Include="Assets\connected.png" />
+    <Content Include="Assets\disconnected.png" />
     <Content Include="Assets\smalltile-sdk.png" />
+    <Content Include="Assets\sounds\startup.mp3" />
     <Content Include="Assets\splash-sdk.png" />
     <Content Include="Assets\squaretile-sdk.png" />
     <Content Include="Assets\StoreLogo.scale-100.png" />
@@ -177,10 +184,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MotorControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Styles\Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -194,6 +197,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\BasicSubPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SpeechSchedulerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -235,20 +242,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.vcxproj">
-      <Project>{f0a53bc9-c617-47dd-8b68-f91e3502d633}</Project>
-      <Name>Microsoft.Maker.Firmata</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.vcxproj">
-      <Project>{5a8b1bb1-7cd5-47c4-a1f7-d7bcf5facad1}</Project>
-      <Name>Microsoft.Maker.RemoteWiring</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.Serial\Microsoft.Maker.Serial.vcxproj">
-      <Project>{8376216c-282a-4927-b9ef-c2d545fe0bca}</Project>
-      <Name>Microsoft.Maker.Serial</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.PersistenceChannel">
       <Version>1.2.3</Version>
     </PackageReference>
@@ -267,6 +260,23 @@
     <PackageReference Include="Microsoft.ProjectOxford.Vision">
       <Version>1.0.393</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.vcxproj">
+      <Project>{f0a53bc9-c617-47dd-8b68-f91e3502d633}</Project>
+      <Name>Microsoft.Maker.Firmata</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.vcxproj">
+      <Project>{5a8b1bb1-7cd5-47c4-a1f7-d7bcf5facad1}</Project>
+      <Name>Microsoft.Maker.RemoteWiring</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Maker\Microsoft.Maker.Serial\Microsoft.Maker.Serial.vcxproj">
+      <Project>{8376216c-282a-4927-b9ef-c2d545fe0bca}</Project>
+      <Name>Microsoft.Maker.Serial</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="HelperClasses\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

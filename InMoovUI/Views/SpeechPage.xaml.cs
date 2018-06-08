@@ -71,8 +71,6 @@ namespace InMoov.Views
         private static string uebergabeText;
         #endregion
 
-
-        private static SpeechSynthesizer synthesizer;
         //Initialize a new FacesPage
         FacesPage fp = new FacesPage();
 
@@ -82,7 +80,6 @@ namespace InMoov.Views
         {
             this.InitializeComponent();
             this.Loaded += SpeechPage_Loaded;
-            synthesizer = new SpeechSynthesizer();
             isListening = false;
             dictatedTextBuilder = new StringBuilder();
 
@@ -548,6 +545,7 @@ namespace InMoov.Views
         /// <param name="e">State information about the routed event</param>
         public static async void Speak(string Text)
         {
+            SpeechSynthesizer synthesizer = new SpeechSynthesizer();
             // If the media is playing, the user has pressed the button to stop the playback.
             if (mediaElement.CurrentState == MediaElementState.Playing)
             {
@@ -595,24 +593,89 @@ namespace InMoov.Views
                 }
             }
         }
+
+        public static async void Speaking(string Text, bool isSpeeking)
+        {
+            SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+            MediaElement mediaElement = new MediaElement();
+            mediaElement.AutoPlay = false;
+            mediaElement.MediaEnded += media_MediaEnded;
+            // If the media is playing, the user has pressed the button to stop the playback.
+            if (mediaElement.CurrentState == MediaElementState.Playing)
+            {
+                mediaElement.Stop();
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(Text))
+                {
+                    // Change the button label. You could also just disable the button if you don't want any user control.
+
+                    try
+                    {
+                        if (isSpeeking)
+                        {
+                            /*App.ALinks.setPinMode(26, Microsoft.Maker.RemoteWiring.PinMode.SERVO);
+                            App.ALinks.servoWrite(26, 0);*/
+                            isSpeeking = false;
+                            // Create a stream from the text. This will be played using a media element.
+                            SpeechSynthesisStream synthesisStream = await synthesizer.SynthesizeTextToStreamAsync(Text);
+
+                            // Set the source and start playing the synthesized audio stream.
+                            mediaElement.AutoPlay = true;
+                            mediaElement.SetSource(synthesisStream, synthesisStream.ContentType);
+                            mediaElement.Play();
+                            Text = null;
+                        }
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        // If media player components are unavailable, (eg, using a N SKU of windows), we won't
+                        // be able to start media playback. Handle this gracefully
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Media player components unavailable");
+                        await messageDialog.ShowAsync();
+                    }
+                    catch (Exception)
+                    {
+                        // If the text is unable to be synthesized, throw an error message to the user.
+                        mediaElement.AutoPlay = false;
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Unable to synthesize text");
+                        await messageDialog.ShowAsync();
+                    }
+                }
+            }
+        }
+
+        private static void media_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 
+    public class MyEventArgs
+    {
+        public String Prop1 { get; set; }
+    }
 
 
     public class SpeechHandler
     {
         private EventRegistrationTokenTable<EventHandler<SpeechEventArgs>> m_SpeechTokenTable = new EventRegistrationTokenTable<EventHandler<SpeechEventArgs>>();
-
+        private TestClass testclass = new TestClass("Text");
         public SpeechHandler()
         {
-
+           
         }
+
+        
 
         public void HandleDetectedSpeech(string text)
         {
             if (text.Equals("start"))
                 OnUpdateLed(new SpeechEventArgs("grün"));
+            testclass.EventRaising("TexttoSpeechhhhhh");
         }
+
 
         public event EventHandler<SpeechEventArgs>UpdateLed
         {
@@ -631,6 +694,7 @@ namespace InMoov.Views
             EventRegistrationTokenTable<EventHandler<SpeechEventArgs>>
             .GetOrCreateEventRegistrationTokenTable(ref m_SpeechTokenTable)
             .InvocationList?.Invoke(this, new SpeechEventArgs(e.Color));
+
         }
     }
 

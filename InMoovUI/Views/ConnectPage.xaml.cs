@@ -210,16 +210,18 @@ namespace InMoov.Views
              {
                 switch (arduino.id.Substring(26, 20))
                 {
-                    case "85539313931351C09082":
-                    case "955303430353518062E0":
+                    case "955303430353518062E0": // TestArduino
+                    case "85539313931351C09082": // InMoovArduino
                         App.Leonardo = arduino;
                         Debug.WriteLine("Leonardo wurde das gerät " + arduino.name + " zugeteilt!");
                         break;
-                    case "75533353038351313212":
+                    case "95530343634351901162": // TestArduino
+                    case "75533353038351313212": // InMoovArduino
                         App.ARechts = arduino;
                         Debug.WriteLine("ARechts wurde das gerät " + arduino.name + " zugeteilt!");
                         break;
-                    case "85531303231351812120":
+                    case "756303137363513071D1": // TestArduino
+                    case "85531303231351812120": // InMoovArduino
                         App.ALinks = arduino;
                         Debug.WriteLine("ALinks wurde das gerät " + arduino.name + " zugeteilt!");
                         break;
@@ -240,10 +242,6 @@ namespace InMoov.Views
             {
 
             }
-            //if (App.ARechts != null && App.ALinks != null && App.Leonardo != null)
-            //{
-            //    Startup();
-            //}
         }
     }
 }

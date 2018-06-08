@@ -597,22 +597,30 @@ namespace InMoov.Views
         }
     }
 
+    public class MyEventArgs
+    {
+        public String Prop1 { get; set; }
+    }
 
 
     public class SpeechHandler
     {
         private EventRegistrationTokenTable<EventHandler<SpeechEventArgs>> m_SpeechTokenTable = new EventRegistrationTokenTable<EventHandler<SpeechEventArgs>>();
-
+        private TestClass testclass = new TestClass("Text");
         public SpeechHandler()
         {
-
+           
         }
+
+        
 
         public void HandleDetectedSpeech(string text)
         {
             if (text.Equals("start"))
                 OnUpdateLed(new SpeechEventArgs("grün"));
+            testclass.EventRaising("TexttoSpeechhhhhh");
         }
+
 
         public event EventHandler<SpeechEventArgs>UpdateLed
         {
@@ -631,6 +639,7 @@ namespace InMoov.Views
             EventRegistrationTokenTable<EventHandler<SpeechEventArgs>>
             .GetOrCreateEventRegistrationTokenTable(ref m_SpeechTokenTable)
             .InvocationList?.Invoke(this, new SpeechEventArgs(e.Color));
+
         }
     }
 

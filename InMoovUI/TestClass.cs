@@ -16,7 +16,7 @@ namespace InMoov
 
         public TestClass(string textToSpeech)
         {
-            SpeechPage.Speak(textToSpeech);
+            //SpeechPage.Speak(textToSpeech);
 
             SpeechHandler = new SpeechHandler();
             SpeechHandler.UpdateLed += SpeechHandler_UpdateLed;

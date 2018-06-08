@@ -37,7 +37,7 @@ namespace InMoov.Views
             //TimePicker firstTimePicker = new TimePicker();
             //firstTimePicker.Header = "Arrival time";
             //Debug.WriteLine(timePicker.GetValue());
-           ;
+            
 
         }
 
@@ -45,7 +45,7 @@ namespace InMoov.Views
         {
             hour = timePicker.Time.Hours;
             minute = timePicker.Time.Minutes;
-            timer.Interval = TimeSpan.FromSeconds(30);
+            timer.Interval = TimeSpan.FromSeconds(40);
             timer.Start();
             timer.Tick += Ticker;
         }
@@ -65,6 +65,6 @@ namespace InMoov.Views
 
             //move commandbar to page bottom on small screens
 
-        }
+        }        
     }
 }

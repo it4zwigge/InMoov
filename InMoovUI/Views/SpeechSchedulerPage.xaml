@@ -53,6 +53,6 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
         <TimePicker x:Name="timePicker" HorizontalAlignment="Left" Margin="279,363,0,0" Grid.Row="1" VerticalAlignment="Top" Height="41" Width="434" RenderTransformOrigin="0.66,0.549"/>
-        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Margin="100,100,0,0" Text="TextBox" VerticalAlignment="Center"/>
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Margin="967,363,0,0" Text="TextBox" VerticalAlignment="Top" Grid.Row="1" Width="349" Height="41"/>
     </Grid>
 </Page>
